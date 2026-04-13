@@ -57,6 +57,16 @@ function renderVideos(videos) {
         <div class="play-button"></div>
       </div>
       <h3>${title}</h3>
+      <img src="${thumbnail}" alt="${title}" style="width:100%; border-radius:10px;">
+      <h3>${title}</h3>
+      <iframe 
+        width="100%" 
+        height="200"
+        src="https://www.youtube.com/embed/${videoId}"
+        title="${title}"
+        frameborder="0"
+        allowfullscreen>
+      </iframe>
     `;
 
     grid.appendChild(card);
@@ -87,6 +97,7 @@ grid.addEventListener("click", (e) => {
  * MAIN EXECUTION
  */
 (async function init() {
+  grid.innerHTML = "<p class=\"loading\">Loading videos...</p>";
   try {
     const uploadsPlaylistId = await getUploadsPlaylistId();
     const videos = await getVideos(uploadsPlaylistId);
