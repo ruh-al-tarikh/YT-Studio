@@ -50,7 +50,13 @@ function renderVideos(videos) {
     const card = document.createElement("div");
     card.className = "card";
 
+    // ⚡ Bolt: Implemented Iframe Facade to reduce initial page load weight and network requests.
     card.innerHTML = `
+      <div class="video-facade" data-video-id="${videoId}" style="position:relative; cursor:pointer;">
+        <img src="${thumbnail}" style="width:100%; border-radius:10px;" loading="lazy">
+        <div class="play-button"></div>
+      </div>
+      <h3>${title}</h3>
       <img src="${thumbnail}" alt="${title}" style="width:100%; border-radius:10px;">
       <h3>${title}</h3>
       <iframe 
@@ -66,6 +72,26 @@ function renderVideos(videos) {
     grid.appendChild(card);
   });
 }
+
+/**
+ * STEP 4: Handle Video Loading (Facade Click)
+ */
+grid.addEventListener("click", (e) => {
+  const facade = e.target.closest(".video-facade");
+  if (!facade) return;
+
+  const videoId = facade.dataset.videoId;
+  facade.innerHTML = `
+    <iframe
+      width="100%"
+      height="200"
+      src="https://www.youtube.com/embed/${videoId}?autoplay=1"
+      frameborder="0"
+      allow="autoplay; fullscreen" allowfullscreen
+      style="border-radius:10px;">
+    </iframe>
+  `;
+});
 
 /**
  * MAIN EXECUTION
