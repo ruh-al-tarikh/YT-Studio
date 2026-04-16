@@ -1,67 +1,24 @@
-@'
 <!DOCTYPE html>
 <html>
 <head>
-<<<<<<< HEAD
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <title>Ruh Al Tarikh</title>
-  <meta name="description" content="Islamic Documentary Series - Ruh Al Tarikh" />
-
-  <link rel="stylesheet" href="css/style.css" />
-=======
+  <meta charset="UTF-8">
   <title>Ruh Al Tarikh</title>
   <link rel="stylesheet" href="css/style.css">
->>>>>>> 0bcfeb7 (Fix full YouTube integration and resolve video loading issue)
 </head>
 <body>
 
-<<<<<<< HEAD
-  <!-- HEADER -->
-  <header class="header">
-    <h1>🎬 Ruh Al Tarikh</h1>
-    <p>Islamic Documentary Series</p>
-  </header>
-
-  <!-- FEATURED BANNER -->
-  <section id="featured-banner" class="featured">
-    <div class="overlay">
-      <h1 id="featured-title">Loading...</h1>
-      <p id="featured-meta"></p>
-
-      <button id="play-btn" type="button">
-        ▶ Watch Now
-      </button>
-    </div>
-  </section>
-
-  <!-- FILTER BUTTONS -->
-  <section class="filters">
-    <button class="season-btn active" data-season="all" type="button">All</button>
-    <button class="season-btn" data-season="season1" type="button">Season 1</button>
-    <button class="season-btn" data-season="season2" type="button">Season 2</button>
-  </section>
-
-  <!-- VIDEO GRID -->
-  <main class="episodes">
-    <div id="video-grid" class="grid"></div>
-  </main>
-
-  <!-- SCRIPT -->
-  <script src="js/app.js" defer></script>
-
-=======
 <header class="header">
   <h1>🎬 Ruh Al Tarikh</h1>
+  <p>Islamic Documentary Series</p>
 </header>
 
+<section class="featured" id="featured"></section>
+
 <section>
+  <h2 style="text-align:center;">Episodes</h2>
   <div id="video-grid"></div>
 </section>
 
 <script src="js/app.js"></script>
->>>>>>> 0bcfeb7 (Fix full YouTube integration and resolve video loading issue)
 </body>
 </html>
-'@ | Set-Content -Encoding UTF8 index.html

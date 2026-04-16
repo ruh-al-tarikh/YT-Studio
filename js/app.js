@@ -1,48 +1,49 @@
-const WORKER_URL = "https://yt-studio-api.<your-subdomain>.workers.dev";
+const WORKER_URL = "https://old-sound-f9da.yt-studio-ruhaltarikh.workers.dev";
+
 const grid = document.getElementById("video-grid");
+
+let allVideos = [];
 
 async function loadVideos() {
   try {
-    grid.innerHTML = "Loading...";
+    grid.innerHTML = "Loading episodes...";
+
     const res = await fetch(WORKER_URL);
 
     if (!res.ok) throw new Error("Worker failed");
 
     const data = await res.json();
-    
-    // Check if videos exist and is an array
-    if (!data.videos || !Array.isArray(data.videos)) {
-      throw new Error("Invalid response");
+
+    allVideos = data.videos || [];
+
+    if (!allVideos.length) {
+      grid.innerHTML = "No videos found";
+      return;
     }
 
-    render(data.videos);
+    render(allVideos);
 
-  } catch (e) {
-    console.error(e);
-    grid.innerHTML = "<p style='color:red'>API not available</p>";
+  } catch (err) {
+    console.error(err);
+    grid.innerHTML = "Failed to load videos";
   }
 }
 
-// FIXED: Added missing function declaration
 function render(videos) {
-  grid.innerHTML = ""; // Clear "Loading..." text
+  grid.innerHTML = "";
 
   videos.forEach(v => {
     const card = document.createElement("div");
     card.className = "card";
 
-    // FIXED: Usually you want the iframe OR the thumbnail, not both 
-    // stacked. Added a container for the iframe.
     card.innerHTML = `
-      <div class="video-container">
-        <iframe 
-          src="https://www.youtube.com/embed/${v.videoId}" 
-          allowfullscreen 
-          frameborder="0">
-        </iframe>
-      </div>
+      <img src="${v.thumbnail}">
       <h3>${v.title}</h3>
     `;
+
+    card.onclick = () => {
+      window.open(`https://www.youtube.com/watch?v=${v.videoId}`, "_blank");
+    };
 
     grid.appendChild(card);
   });
