@@ -1,200 +1,40 @@
-:root {
-  --primary-color: #ffcc00;
-  --bg-dark: #0d0d0d;
-  --bg-card: #1a1a1a;
-  --text-main: #ffffff;
-  --text-muted: #aaa;
-  --transition: 0.3s ease;
-}
-
 body {
   margin: 0;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, Arial, sans-serif;
-  background: var(--bg-dark);
-  color: var(--text-main);
-  line-height: 1.6;
+  font-family: Arial;
+  background: #0d0d0d;
+  color: white;
 }
 
-/* =========================
-   HEADER
-========================= */
 .header {
   text-align: center;
-  padding: 30px 20px;
-  background: linear-gradient(to bottom, #111, var(--bg-dark));
-  border-bottom: 1px solid #222;
+  padding: 20px;
+  background: #111;
 }
 
-.header h1 {
-  margin: 0;
-  font-size: 2rem;
-  letter-spacing: -0.5px;
-}
-
-/* =========================
-   FEATURED BANNER
-========================= */
 .featured {
-  min-height: 450px;
-  background-size: cover;
-  background-position: center;
-  display: flex;
-  align-items: flex-end;
-  padding: 60px 40px;
-  position: relative;
-}
-
-.featured::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(to top, rgba(13,13,13,1) 10%, transparent 90%);
-}
-
-.overlay {
-  position: relative;
-  z-index: 2;
-  max-width: 600px;
-}
-
-.overlay h1 {
-  margin: 0;
-  font-size: clamp(1.5rem, 5vw, 2.5rem);
-  font-weight: 800;
-}
-
-.overlay p {
-  margin: 15px 0;
-  color: #ddd;
-  font-size: 1.1rem;
-  text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
-}
-
-#play-btn {
-  background: var(--primary-color);
-  color: black;
-  border: none;
-  padding: 12px 28px;
-  font-size: 1rem;
-  font-weight: bold;
-  cursor: pointer;
-  border-radius: 4px;
-  transition: var(--transition);
-  text-transform: uppercase;
-}
-
-#play-btn:hover {
-  background: #e6b800;
-  transform: translateY(-2px);
-}
-
-/* =========================
-   FILTERS
-========================= */
-.filters {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin: 30px 0;
-  padding: 0 20px;
-}
-
-.season-btn {
+  height: 300px;
   background: #222;
-  color: white;
-  border: 1px solid #333;
-  padding: 8px 20px;
-  cursor: pointer;
-  border-radius: 20px;
-  transition: var(--transition);
-  font-weight: 500;
+  margin: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.season-btn:hover {
-  border-color: var(--primary-color);
-}
-
-.season-btn.active {
-  background: var(--primary-color);
-  color: black;
-  border-color: var(--primary-color);
-}
-
-/* =========================
-   EPISODE GRID
-========================= */
-.episodes {
-  padding: 0 40px 40px;
-}
-
-.grid,
 #video-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 25px;
-  padding: 20px;
-}
-
-/* =========================
-   VIDEO CARD
-========================= */
-.card {
-  background: var(--bg-card);
-  border-radius: 12px;
-  overflow: hidden;
-  transition: var(--transition);
-  border: 1px solid transparent;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
   padding: 10px;
 }
 
-.card:hover {
-  transform: translateY(-5px);
-  border-color: #333;
+.card {
+  background: #1a1a1a;
+  padding: 10px;
+  border-radius: 10px;
+  cursor: pointer;
 }
 
 .card img {
   width: 100%;
-  aspect-ratio: 16 / 9;
-  object-fit: cover;
-  display: block;
-}
-
-.card-content {
-  padding: 15px;
-}
-
-.card h3 {
-  font-size: 1rem;
-  margin: 0 0 8px 0;
-  color: var(--primary-color);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.card p {
-  font-size: 0.85rem;
-  color: var(--text-muted);
-  margin: 0;
-}
-
-.card iframe {
-  width: 100%;
-  aspect-ratio: 16 / 9;
-  border: none;
-}
-
-/* =========================
-   MOBILE
-========================= */
-@media (max-width: 600px) {
-  .featured {
-    padding: 40px 20px;
-    min-height: 350px;
-  }
-
-  .episodes {
-    padding: 0 15px 20px;
-  }
+  border-radius: 8px;
 }
