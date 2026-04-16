@@ -14,12 +14,18 @@ async function loadVideos() {
     const res = await fetch(WORKER_URL);
     const data = await res.json();
 
-    allVideos = data.items || [];
+    // ✅ FIX: assign properly
+    allVideos = data.videos || [];
+
+    if (allVideos.length === 0) {
+      grid.innerHTML = "<p>No episodes found</p>";
+      return;
+    }
 
     renderVideos(allVideos);
 
   } catch (err) {
-    console.error(err);
+    console.error("Load error:", err);
     grid.innerHTML = "<p>Failed to load videos</p>";
   }
 }
@@ -31,18 +37,19 @@ function renderVideos(videos) {
   grid.innerHTML = "";
 
   videos.forEach((item) => {
-    const snippet = item.snippet;
-    const videoId = snippet.resourceId.videoId;
-    const title = snippet.title;
-    const thumbnail = snippet.thumbnails.medium.url;
+    const videoId = item.videoId;
+    const title = item.title;
+    const thumbnail = item.thumbnail;
 
     const card = document.createElement("div");
     card.className = "card";
 
-    // Optional: Season tagging via title keywords
+    // 🎬 Auto Season Detection
     let seasonTag = "all";
-    if (title.toLowerCase().includes("season 1")) seasonTag = "season1";
-    if (title.toLowerCase().includes("season 2")) seasonTag = "season2";
+    const lowerTitle = title.toLowerCase();
+
+    if (lowerTitle.includes("season 1")) seasonTag = "season1";
+    else if (lowerTitle.includes("season 2")) seasonTag = "season2";
 
     card.dataset.season = seasonTag;
 
@@ -65,27 +72,32 @@ function renderVideos(videos) {
 /**
  * Season filter system
  */
-document.querySelectorAll(".season-btn").forEach(btn => {
-  btn.addEventListener("click", () => {
-    document.querySelectorAll(".season-btn").forEach(b => b.classList.remove("active"));
-    btn.classList.add("active");
+function initSeasonFilter() {
+  const buttons = document.querySelectorAll(".season-btn");
 
-    const season = btn.dataset.season;
+  buttons.forEach(btn => {
+    btn.addEventListener("click", () => {
 
-    const cards = document.querySelectorAll(".card");
+      // Active button UI
+      buttons.forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
 
-    cards.forEach(card => {
-      if (season === "all") {
-        card.style.display = "block";
-      } else {
-        card.style.display =
-          card.dataset.season === season ? "block" : "none";
-      }
+      const season = btn.dataset.season;
+
+      const filtered =
+        season === "all"
+          ? allVideos
+          : allVideos.filter(v =>
+              v.title.toLowerCase().includes(season.replace("season", "season "))
+            );
+
+      renderVideos(filtered);
     });
   });
-});
+}
 
 /**
  * INIT
  */
 loadVideos();
+initSeasonFilter();
