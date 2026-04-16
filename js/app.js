@@ -1,11 +1,17 @@
+<<<<<<< HEAD
 const WORKER_URL =
   "https://old-sound-f9da.yt-studio-ruhaltarikh.workers.dev";
+=======
+@'
+const WORKER_URL = "https://old-sound-f9da.yt-studio-ruhaltarikh.workers.dev";
+>>>>>>> 0bcfeb7 (Fix full YouTube integration and resolve video loading issue)
 
 const grid = document.getElementById("video-grid");
 
 let allVideos = [];
 
 /**
+<<<<<<< HEAD
  * 🎬 Parse season + episode safely
  */
 function parseMeta(title) {
@@ -51,10 +57,18 @@ function setFeatured(video) {
 async function loadVideos() {
   try {
     grid.innerHTML = "<p>Loading...</p>";
+=======
+ * Load videos
+ */
+async function loadVideos() {
+  try {
+    grid.innerHTML = "<p class='loading'>🎬 Loading episodes...</p>";
+>>>>>>> 0bcfeb7 (Fix full YouTube integration and resolve video loading issue)
 
     const res = await fetch(WORKER_URL);
     const data = await res.json();
 
+<<<<<<< HEAD
     if (!res.ok || !data.videos) {
       throw new Error("API failed");
     }
@@ -66,6 +80,18 @@ async function loadVideos() {
           a.season - b.season ||
           a.episode - b.episode
       );
+=======
+    console.log("API RESPONSE:", data);
+
+    allVideos = data.videos || [];
+
+    if (!Array.isArray(allVideos) || allVideos.length === 0) {
+      grid.innerHTML = "<p>No videos found</p>";
+      return;
+    }
+
+    render(allVideos);
+>>>>>>> 0bcfeb7 (Fix full YouTube integration and resolve video loading issue)
 
     if (!allVideos.length) {
       grid.innerHTML = "<p>No videos found</p>";
@@ -84,6 +110,7 @@ async function loadVideos() {
 /**
  * 🎥 Render grid (optimized - no iframe spam)
  */
+<<<<<<< HEAD
 function render(list) {
   grid.innerHTML = "";
 
@@ -113,12 +140,33 @@ function render(list) {
     card.appendChild(h3);
     card.appendChild(p);
     card.appendChild(btn);
+=======
+function render(videos) {
+  grid.innerHTML = "";
+
+  videos.forEach(v => {
+    const card = document.createElement("div");
+    card.className = "card";
+
+    card.innerHTML = `
+      <img src="${v.thumbnail}" style="width:100%; border-radius:10px;">
+      <h3>${v.title}</h3>
+      <iframe
+        width="100%"
+        height="200"
+        src="https://www.youtube.com/embed/${v.videoId}"
+        frameborder="0"
+        allowfullscreen>
+      </iframe>
+    `;
+>>>>>>> 0bcfeb7 (Fix full YouTube integration and resolve video loading issue)
 
     grid.appendChild(card);
   });
 }
 
 /**
+<<<<<<< HEAD
  * 🎛 Filter system
  */
 function initFilters() {
@@ -147,3 +195,9 @@ function initFilters() {
  */
 loadVideos();
 initFilters();
+=======
+ * INIT
+ */
+loadVideos();
+'@ | Set-Content -Encoding UTF8 js\app.js
+>>>>>>> 0bcfeb7 (Fix full YouTube integration and resolve video loading issue)
