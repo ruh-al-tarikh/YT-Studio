@@ -1,22 +1,13 @@
-<<<<<<< HEAD
-const WORKER_URL =
-  "https://old-sound-f9da.yt-studio-ruhaltarikh.workers.dev";
-=======
-@'
 const WORKER_URL = "https://old-sound-f9da.yt-studio-ruhaltarikh.workers.dev";
->>>>>>> 0bcfeb7 (Fix full YouTube integration and resolve video loading issue)
-
 const grid = document.getElementById("video-grid");
 
 let allVideos = [];
 
 /**
-<<<<<<< HEAD
- * 🎬 Parse season + episode safely
+ * 🎬 Parse season + episode safely from title
  */
 function parseMeta(title) {
   const t = title.toLowerCase();
-
   let season = 1;
   let episode = 0;
 
@@ -30,7 +21,7 @@ function parseMeta(title) {
 }
 
 /**
- * 🔥 Featured banner
+ * 🔥 Update Featured banner with the latest video
  */
 function setFeatured(video) {
   const banner = document.getElementById("featured-banner");
@@ -38,79 +29,54 @@ function setFeatured(video) {
   const meta = document.getElementById("featured-meta");
   const btn = document.getElementById("play-btn");
 
-  banner.style.backgroundImage = `url(${video.thumbnail})`;
+  if (!banner || !title || !meta || !btn) return;
 
+  banner.style.backgroundImage = `url(${video.thumbnail})`;
   title.textContent = video.title;
   meta.textContent = `Season ${video.season} • Episode ${video.episode}`;
 
   btn.onclick = () => {
-    window.open(
-      `https://www.youtube.com/watch?v=${video.videoId}`,
-      "_blank"
-    );
+    window.open(`https://www.youtube.com/watch?v=${video.videoId}`, "_blank");
   };
 }
 
 /**
- * 📺 Load videos
- */
-async function loadVideos() {
-  try {
-    grid.innerHTML = "<p>Loading...</p>";
-=======
- * Load videos
+ * 📺 Fetch and process videos
  */
 async function loadVideos() {
   try {
     grid.innerHTML = "<p class='loading'>🎬 Loading episodes...</p>";
->>>>>>> 0bcfeb7 (Fix full YouTube integration and resolve video loading issue)
 
     const res = await fetch(WORKER_URL);
     const data = await res.json();
 
-<<<<<<< HEAD
     if (!res.ok || !data.videos) {
       throw new Error("API failed");
     }
 
-    allVideos = (data.videos || [])
+    // Process and sort videos by Season and Episode
+    allVideos = data.videos
       .map((v) => ({ ...v, ...parseMeta(v.title) }))
-      .sort(
-        (a, b) =>
-          a.season - b.season ||
-          a.episode - b.episode
-      );
-=======
-    console.log("API RESPONSE:", data);
+      .sort((a, b) => a.season - b.season || a.episode - b.episode);
 
-    allVideos = data.videos || [];
-
-    if (!Array.isArray(allVideos) || allVideos.length === 0) {
+    if (allVideos.length === 0) {
       grid.innerHTML = "<p>No videos found</p>";
       return;
     }
 
-    render(allVideos);
->>>>>>> 0bcfeb7 (Fix full YouTube integration and resolve video loading issue)
-
-    if (!allVideos.length) {
-      grid.innerHTML = "<p>No videos found</p>";
-      return;
-    }
-
-    // 🎬 Featured = latest episode
+    // Set featured video to the most recent one
     setFeatured(allVideos[allVideos.length - 1]);
-
     render(allVideos);
+
   } catch (e) {
-    grid.innerHTML = "<p>Failed to load videos</p>";
+    console.error("Error loading videos:", e);
+    grid.innerHTML = "<p>Failed to load videos. Please try again later.</p>";
   }
 }
 
 /**
- * 🎥 Render grid (optimized - no iframe spam)
+ * 🎥 Render grid (Optimized: Uses thumbnails instead of heavy iframes)
  */
-<<<<<<< HEAD
 function render(list) {
   grid.innerHTML = "";
 
@@ -118,68 +84,35 @@ function render(list) {
     const card = document.createElement("div");
     card.className = "card";
 
-    const img = document.createElement("img");
-    img.src = v.thumbnail;
-    img.alt = v.title;
-
-    const h3 = document.createElement("h3");
-    h3.textContent = `S${v.season} • E${v.episode}`;
-
-    const p = document.createElement("p");
-    p.textContent = v.title;
-
-    const btn = document.createElement("button");
-    btn.textContent = "▶ Watch";
-    btn.onclick = () =>
-      window.open(
-        `https://www.youtube.com/watch?v=${v.videoId}`,
-        "_blank"
-      );
-
-    card.appendChild(img);
-    card.appendChild(h3);
-    card.appendChild(p);
-    card.appendChild(btn);
-=======
-function render(videos) {
-  grid.innerHTML = "";
-
-  videos.forEach(v => {
-    const card = document.createElement("div");
-    card.className = "card";
-
     card.innerHTML = `
-      <img src="${v.thumbnail}" style="width:100%; border-radius:10px;">
-      <h3>${v.title}</h3>
-      <iframe
-        width="100%"
-        height="200"
-        src="https://www.youtube.com/embed/${v.videoId}"
-        frameborder="0"
-        allowfullscreen>
-      </iframe>
+      <img src="${v.thumbnail}" alt="${v.title}" style="width:100%; border-radius:10px;">
+      <div class="card-content">
+        <h3>S${v.season} • E${v.episode}</h3>
+        <p>${v.title}</p>
+        <button class="watch-btn">▶ Watch</button>
+      </div>
     `;
->>>>>>> 0bcfeb7 (Fix full YouTube integration and resolve video loading issue)
+
+    card.querySelector(".watch-btn").onclick = () => {
+      window.open(`https://www.youtube.com/watch?v=${v.videoId}`, "_blank");
+    };
 
     grid.appendChild(card);
   });
 }
 
 /**
-<<<<<<< HEAD
- * 🎛 Filter system
+ * 🎛 Filter system for Season buttons
  */
 function initFilters() {
-  document.querySelectorAll(".season-btn").forEach((btn) => {
+  const buttons = document.querySelectorAll(".season-btn");
+  buttons.forEach((btn) => {
     btn.onclick = () => {
-      document
-        .querySelectorAll(".season-btn")
-        .forEach((b) => b.classList.remove("active"));
-
+      // Toggle active UI
+      buttons.forEach((b) => b.classList.remove("active"));
       btn.classList.add("active");
 
       const s = btn.dataset.season;
-
       if (s === "all") {
         render(allVideos);
       } else {
@@ -191,13 +124,7 @@ function initFilters() {
 }
 
 /**
- * 🚀 INIT
+ * 🚀 Initialize
  */
 loadVideos();
 initFilters();
-=======
- * INIT
- */
-loadVideos();
-'@ | Set-Content -Encoding UTF8 js\app.js
->>>>>>> 0bcfeb7 (Fix full YouTube integration and resolve video loading issue)
