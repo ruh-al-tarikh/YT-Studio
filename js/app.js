@@ -13,7 +13,7 @@ const nextBtn = document.getElementById("next-btn");
 let allVideos = [];
 let currentIndex = 0;
 
-/* 🎬 PARSE SEASON + EP */
+/* 🎬 PARSE */
 function parseMeta(title) {
   const t = title.toLowerCase();
   const s = t.match(/season\s*(\d+)/);
@@ -31,6 +31,8 @@ function setFeatured(video) {
   const title = document.getElementById("featured-title");
   const btn = document.getElementById("featured-btn");
 
+  if (!video) return;
+
   section.style.display = "block";
   section.style.backgroundImage = `url(${video.thumbnail})`;
   title.textContent = video.title;
@@ -43,6 +45,7 @@ function openModal(index) {
   currentIndex = index;
 
   const v = allVideos[index];
+  if (!v) return;
 
   player.src = `https://www.youtube.com/embed/${v.videoId}?autoplay=1`;
   modal.style.display = "block";
@@ -66,13 +69,39 @@ closeBtn.onclick = () => {
   player.src = "";
 };
 
+/* FILTER (FIXED) */
+function initFilters() {
+  const buttons = document.querySelectorAll(".season-btn");
+
+  buttons.forEach(btn => {
+    btn.onclick = () => {
+      buttons.forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+
+      const season = btn.dataset.season;
+
+      if (season === "all") {
+        render(allVideos);
+      } else {
+        const filtered = allVideos.filter(v => v.season == season);
+        render(filtered);
+      }
+    };
+  });
+}
+
 /* LOAD */
 async function loadVideos() {
   try {
+    grid.innerHTML = "<p>Loading episodes...</p>";
+
     const res = await fetch(WORKER_URL);
     const data = await res.json();
 
-    if (!data.videos) throw new Error();
+    if (!data.videos || data.videos.length === 0) {
+      grid.innerHTML = "<p>No videos found</p>";
+      return;
+    }
 
     allVideos = data.videos.map(v => ({
       ...v,
@@ -83,8 +112,9 @@ async function loadVideos() {
     render(allVideos);
     initFilters();
 
-  } catch {
-    grid.innerHTML = "Failed to load videos";
+  } catch (err) {
+    console.error(err);
+    grid.innerHTML = "<p>Failed to load videos</p>";
   }
 }
 
@@ -108,21 +138,6 @@ function render(videos) {
     card.onclick = () => openModal(i);
 
     grid.appendChild(card);
-  });
-}
-
-/* FILTER */
-function initFilters() {
-  document.querySelectorAll(".season-btn").forEach(btn => {
-    btn.onclick = () => {
-      document.querySelectorAll(".season-btn").forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
-
-      const s = btn.dataset.season;
-
-      if (s === "all") render(allVideos);
-      else render(allVideos.filter(v => v.season == s));
-    };
   });
 }
 
