@@ -76,3 +76,34 @@ body {
   height: 450px;
   border: none;
 }
+/* ✨ UX TOUCHES: FOCUS STATES */
+.card:focus-visible,
+#hero-btn:focus-visible,
+#close:focus-visible,
+#next:focus-visible {
+  outline: 3px solid #e50914;
+  outline-offset: 4px;
+}
+
+#hero-btn, #next {
+  cursor: pointer;
+  background: white;
+  color: black;
+  border: none;
+  padding: 10px 20px;
+  font-weight: bold;
+  border-radius: 4px;
+  transition: 0.2s;
+}
+
+#hero-btn:hover, #next:hover {
+  background: #e6e6e6;
+}
+
+#close {
+  float: right;
+  font-size: 30px;
+  cursor: pointer;
+  padding: 0 10px;
+  border-radius: 4px;
+}
