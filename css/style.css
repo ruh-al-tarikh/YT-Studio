@@ -5,26 +5,30 @@ body {
   color: white;
 }
 
-/* 🎨 HEADER */
+/* 🎨 HEADER (MATCHED THEME) */
 .header {
   text-align: center;
   padding: 20px;
-  background: #8b0000;
+  background: linear-gradient(90deg, #8b0000, #b22222);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.5);
 }
 
-/* 📦 ABOUT BOX */
+/* 📦 ABOUT BOX (MATCHED COLOR) */
 .about-box {
   margin: 20px auto;
   width: 80%;
   padding: 20px;
   background: #1a1a1a;
-  border-left: 5px solid #8b0000;
+  border-left: 5px solid #b22222;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.4);
 }
 
 /* 🎬 FEATURED */
 .featured {
   height: 70vh;
   background-size: cover;
+  background-position: center;
   display: none;
 }
 
@@ -33,23 +37,33 @@ body {
   background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
 }
 
-/* 📺 SEASON BAR */
-.season-bar {
-  text-align: center;
-  margin: 10px;
-}
-
-.season-btn {
-  padding: 8px 15px;
-  margin: 5px;
-  background: #222;
+/* ▶ BUTTON */
+button {
+  padding: 10px 15px;
+  background: #b22222;
   color: white;
   border: none;
   cursor: pointer;
+  transition: 0.3s;
+}
+
+button:hover {
+  background: #ff4444;
+  transform: scale(1.05);
+}
+
+/* 📺 SEASON BAR */
+.season-bar {
+  text-align: center;
+  margin: 15px;
+}
+
+.season-btn {
+  margin: 5px;
 }
 
 .season-btn.active {
-  background: #8b0000;
+  background: #ff4444;
 }
 
 /* GRID */
@@ -66,6 +80,11 @@ body {
   border-radius: 10px;
   overflow: hidden;
   cursor: pointer;
+  transition: 0.3s;
+}
+
+.card:hover {
+  transform: scale(1.05);
 }
 
 .card img {
@@ -77,11 +96,10 @@ body {
   padding: 10px;
 }
 
-/* PROGRESS BAR */
+/* PROGRESS */
 .progress {
   height: 4px;
   background: red;
-  width: 0%;
 }
 
 /* MODAL */
