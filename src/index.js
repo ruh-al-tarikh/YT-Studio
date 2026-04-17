@@ -36,7 +36,8 @@ export default {
       return json({ videos });
 
     } catch (err) {
-      return json({ error: err.message }, 500);
+      // ✅ Sentinel: Don't leak internal error details
+      return json({ error: "Internal Server Error" }, 500);
     }
   }
 };
@@ -46,7 +47,11 @@ function json(data, status = 200) {
     status,
     headers: {
       "Content-Type": "application/json",
-      "Access-Control-Allow-Origin": "*"
+      "Access-Control-Allow-Origin": "*",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "Strict-Transport-Security": "max-age=31536000; includeSubDomains"
     }
   });
 }
