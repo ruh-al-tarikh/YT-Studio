@@ -1,6 +1,8 @@
 const WORKER_URL = "https://yt-studio-api.ruhdevopsytstudio.workers.dev";
 
 const grid = document.getElementById("video-grid");
+const continueRow = document.getElementById("continue-row");
+const continueSection = document.getElementById("continue-section");
 
 const modal = document.getElementById("video-modal");
 const player = document.getElementById("modal-player");
@@ -25,13 +27,11 @@ function parseMeta(title) {
   };
 }
 
-/* FEATURED */
+/* 🎬 FEATURED */
 function setFeatured(video) {
   const section = document.getElementById("featured");
   const title = document.getElementById("featured-title");
   const btn = document.getElementById("featured-btn");
-
-  if (!video) return;
 
   section.style.display = "block";
   section.style.backgroundImage = `url(${video.thumbnail})`;
@@ -40,7 +40,7 @@ function setFeatured(video) {
   btn.onclick = () => openModal(0);
 }
 
-/* OPEN MODAL */
+/* 🎥 OPEN */
 function openModal(index) {
   currentIndex = index;
 
@@ -53,53 +53,79 @@ function openModal(index) {
   titleEl.textContent = v.title;
   metaEl.textContent = `Season ${v.season} • Episode ${v.episode}`;
 
+  // 💾 SAVE PROGRESS
   localStorage.setItem("lastWatched", index);
+  renderContinue();
 }
 
-/* NEXT */
+/* ⏭ NEXT */
 nextBtn.onclick = () => {
   if (currentIndex < allVideos.length - 1) {
     openModal(currentIndex + 1);
   }
 };
 
-/* CLOSE */
+/* ❌ CLOSE */
 closeBtn.onclick = () => {
   modal.style.display = "none";
   player.src = "";
 };
 
-/* FILTER (FIXED) */
-function initFilters() {
-  const buttons = document.querySelectorAll(".season-btn");
+/* 📺 CONTINUE ROW */
+function renderContinue() {
+  const last = localStorage.getItem("lastWatched");
 
-  buttons.forEach(btn => {
+  if (last === null) {
+    continueSection.style.display = "none";
+    return;
+  }
+
+  const index = Number(last);
+  const v = allVideos[index];
+
+  if (!v) return;
+
+  continueSection.style.display = "block";
+  continueRow.innerHTML = "";
+
+  const card = document.createElement("div");
+  card.className = "continue-card";
+
+  card.innerHTML = `
+    <img src="${v.thumbnail}">
+    <h4>Continue: ${v.title}</h4>
+  `;
+
+  card.onclick = () => openModal(index);
+
+  continueRow.appendChild(card);
+}
+
+/* 🎛 FILTER */
+function initFilters() {
+  document.querySelectorAll(".season-btn").forEach(btn => {
     btn.onclick = () => {
-      buttons.forEach(b => b.classList.remove("active"));
+      document.querySelectorAll(".season-btn").forEach(b => b.classList.remove("active"));
       btn.classList.add("active");
 
-      const season = btn.dataset.season;
+      const s = btn.dataset.season;
 
-      if (season === "all") {
-        render(allVideos);
-      } else {
-        const filtered = allVideos.filter(v => v.season == season);
-        render(filtered);
-      }
+      if (s === "all") render(allVideos);
+      else render(allVideos.filter(v => v.season == s));
     };
   });
 }
 
-/* LOAD */
+/* 📺 LOAD */
 async function loadVideos() {
   try {
-    grid.innerHTML = "<p>Loading episodes...</p>";
+    grid.innerHTML = "Loading...";
 
     const res = await fetch(WORKER_URL);
     const data = await res.json();
 
-    if (!data.videos || data.videos.length === 0) {
-      grid.innerHTML = "<p>No videos found</p>";
+    if (!data.videos || !data.videos.length) {
+      grid.innerHTML = "No videos found";
       return;
     }
 
@@ -110,15 +136,15 @@ async function loadVideos() {
 
     setFeatured(allVideos[0]);
     render(allVideos);
+    renderContinue();
     initFilters();
 
-  } catch (err) {
-    console.error(err);
-    grid.innerHTML = "<p>Failed to load videos</p>";
+  } catch {
+    grid.innerHTML = "Failed to load videos";
   }
 }
 
-/* RENDER */
+/* 🎥 RENDER */
 function render(videos) {
   grid.innerHTML = "";
 
@@ -126,13 +152,10 @@ function render(videos) {
     const card = document.createElement("div");
     card.className = "card";
 
-    const progress = localStorage.getItem("lastWatched") == i ? "100%" : "0%";
-
     card.innerHTML = `
       <img src="${v.thumbnail}">
       <h3>S${v.season} • E${v.episode}</h3>
       <p>${v.title}</p>
-      <div class="progress" style="width:${progress}"></div>
     `;
 
     card.onclick = () => openModal(i);
