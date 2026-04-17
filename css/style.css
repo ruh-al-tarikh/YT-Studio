@@ -1,86 +1,93 @@
+/* 🔥 GLOBAL */
 body {
   margin: 0;
-  font-family: Arial;
+  font-family: Arial, sans-serif;
   background: #0b0b0b;
   color: white;
 }
 
-/* 🎨 HEADER (MATCHED THEME) */
+/* 🎨 HEADER (GRADIENT MATCH) */
 .header {
   text-align: center;
-  padding: 20px;
+  padding: 25px;
   background: linear-gradient(90deg, #8b0000, #b22222);
-  box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+  box-shadow: 0 3px 10px rgba(0,0,0,0.6);
 }
 
-/* 📦 ABOUT BOX (MATCHED COLOR) */
+.header h1 {
+  margin: 0;
+  font-size: 28px;
+}
+
+.header p {
+  margin: 5px 0 0;
+  opacity: 0.8;
+}
+
+/* 📦 ABOUT BOX */
 .about-box {
-  margin: 20px auto;
   width: 80%;
+  margin: 20px auto;
   padding: 20px;
-  background: #1a1a1a;
+  background: #141414;
   border-left: 5px solid #b22222;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.4);
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.5);
+  line-height: 1.6;
 }
 
-/* 🎬 FEATURED */
+/* 🎬 FEATURED HERO */
 .featured {
   height: 70vh;
   background-size: cover;
   background-position: center;
   display: none;
+  position: relative;
 }
 
 .featured-overlay {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
   padding: 40px;
-  background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+  background: linear-gradient(to top, rgba(0,0,0,0.95), transparent);
 }
 
-/* ▶ BUTTON */
-button {
-  padding: 10px 15px;
-  background: #b22222;
-  color: white;
-  border: none;
-  cursor: pointer;
-  transition: 0.3s;
+#featured-btn {
+  margin-top: 10px;
 }
 
-button:hover {
-  background: #ff4444;
-  transform: scale(1.05);
-}
-
-/* 📺 SEASON BAR */
-.season-bar {
-  text-align: center;
-  margin: 15px;
-}
-
-.season-btn {
-  margin: 5px;
-}
-
-.season-btn.active {
-  background: #ff4444;
-}
-
-/* GRID */
-#video-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+/* 📺 ROW SYSTEM (NETFLIX STYLE) */
+.row {
+  display: flex;
   gap: 15px;
-  padding: 20px;
+  overflow-x: auto;
+  padding: 10px 20px;
 }
 
-/* CARD */
+.row::-webkit-scrollbar {
+  height: 6px;
+}
+
+.row::-webkit-scrollbar-thumb {
+  background: #b22222;
+  border-radius: 5px;
+}
+
+/* 🏷 SECTION HEADINGS */
+h2 {
+  margin-left: 20px;
+  margin-top: 20px;
+}
+
+/* 🎬 CARD */
 .card {
+  min-width: 220px;
   background: #141414;
   border-radius: 10px;
   overflow: hidden;
   cursor: pointer;
-  transition: 0.3s;
+  transition: 0.3s ease;
 }
 
 .card:hover {
@@ -89,44 +96,42 @@ button:hover {
 
 .card img {
   width: 100%;
+  display: block;
 }
 
 .card h3 {
   font-size: 14px;
-  padding: 10px;
+  padding: 8px 10px 0;
+  margin: 0;
 }
 
-/* PROGRESS */
-.progress {
-  height: 4px;
-  background: red;
+.card p {
+  font-size: 12px;
+  padding: 0 10px 10px;
+  opacity: 0.8;
 }
 
-/* MODAL */
-.modal {
-  display: none;
-  position: fixed;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.95);
+/* ▶ BUTTONS */
+button {
+  padding: 10px 15px;
+  background: #b22222;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: 0.3s ease;
+  border-radius: 5px;
 }
 
-.modal-content {
-  width: 80%;
-  margin: 3% auto;
+button:hover {
+  background: #ff4444;
+  transform: scale(1.05);
 }
 
-#modal-player {
-  width: 100%;
-  height: 450px;
+/* 📺 CONTINUE WATCHING */
+#continue-section {
+  padding: 10px 20px;
 }
 
-.details {
-  padding: 10px;
-  background: #111;
-}
-
-/* 📺 CONTINUE ROW */
 #continue-row {
   display: flex;
   gap: 15px;
@@ -146,4 +151,55 @@ button:hover {
 
 .continue-card h4 {
   padding: 10px;
+}
+
+/* 🎥 MODAL PLAYER */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 999;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.95);
+}
+
+.modal-content {
+  width: 80%;
+  margin: 3% auto;
+}
+
+#modal-player {
+  width: 100%;
+  height: 450px;
+  border: none;
+}
+
+/* 📺 DETAILS PANEL */
+.details {
+  padding: 15px;
+  background: #111;
+}
+
+.details h2 {
+  margin: 0 0 10px;
+}
+
+/* ⏭ NEXT BUTTON */
+#next-btn {
+  margin-top: 10px;
+}
+
+/* 📱 RESPONSIVE */
+@media (max-width: 768px) {
+  .featured {
+    height: 50vh;
+  }
+
+  #modal-player {
+    height: 250px;
+  }
+
+  .card {
+    min-width: 160px;
+  }
 }

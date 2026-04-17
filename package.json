@@ -12,5 +12,9 @@
     "@cloudflare/vitest-pool-workers": "^0.14.7",
     "vitest": "~4.1.4",
     "wrangler": "^4.83.0"
+  },
+  "dependencies": {
+    "@grafana/faro-web-sdk": "^2.3.1",
+    "@grafana/faro-web-tracing": "^2.3.1"
   }
 }

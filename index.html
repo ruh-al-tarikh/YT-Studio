@@ -8,21 +8,17 @@
 
 <body>
 
-  <!-- 🎨 HEADER -->
   <div class="header">
     <h1>🎬 Ruh Al Tarikh</h1>
     <p>Islamic Documentary Series</p>
   </div>
 
-  <!-- 📦 ABOUT BOX -->
   <div class="about-box">
     <p>
-      A cinematic Tamil Islamic documentary series exploring history,
-      prophecy, and hidden truths.
+      A cinematic Tamil Islamic documentary series exploring history and hidden truths.
     </p>
   </div>
 
-  <!-- 🎬 FEATURED -->
   <section class="featured" id="featured">
     <div class="featured-overlay">
       <h1 id="featured-title"></h1>
@@ -30,28 +26,33 @@
     </div>
   </section>
 
-  <!-- 📺 CONTINUE WATCHING -->
-  <div id="continue-section" style="display:none; padding:20px;">
+  <!-- 📺 CONTINUE -->
+  <div id="continue-section" style="display:none;">
     <h2>Continue Watching</h2>
-    <div id="continue-row"></div>
-</div>
-
-  <!-- 📺 SEASON FILTER -->
-  <div class="season-bar">
-    <button class="season-btn active" data-season="all">All</button>
-    <button class="season-btn" data-season="1">Season 1</button>
-    <button class="season-btn" data-season="2">Season 2</button>
+    <div id="continue-row" class="row"></div>
   </div>
 
-  <!-- GRID -->
-  <div id="video-grid"></div>
+  <!-- 🔥 TRENDING -->
+  <h2>🔥 Trending</h2>
+  <div id="trending-row" class="row"></div>
+
+  <!-- 🆕 LATEST -->
+  <h2>🆕 Latest</h2>
+  <div id="latest-row" class="row"></div>
+
+  <!-- 📺 SEASON ROW -->
+  <h2>Season 1</h2>
+  <div id="season1-row" class="row"></div>
+
+  <h2>Season 2</h2>
+  <div id="season2-row" class="row"></div>
 
   <!-- 🎥 MODAL -->
   <div id="video-modal" class="modal">
     <div class="modal-content">
       <span id="close-modal">&times;</span>
 
-      <iframe id="modal-player" allow="autoplay; fullscreen"></iframe>
+      <iframe id="modal-player" allow="autoplay"></iframe>
 
       <div class="details">
         <h2 id="episode-title"></h2>
