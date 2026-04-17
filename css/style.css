@@ -125,3 +125,25 @@ button:hover {
   padding: 10px;
   background: #111;
 }
+
+/* 📺 CONTINUE ROW */
+#continue-row {
+  display: flex;
+  gap: 15px;
+  overflow-x: auto;
+}
+
+.continue-card {
+  min-width: 250px;
+  background: #141414;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.continue-card img {
+  width: 100%;
+}
+
+.continue-card h4 {
+  padding: 10px;
+}
