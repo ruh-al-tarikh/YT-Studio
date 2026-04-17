@@ -4,7 +4,7 @@ const grid = document.getElementById("video-grid");
 
 let allVideos = [];
 
-/* 🎬 HERO FEATURE */
+/* HERO */
 function setFeatured(video) {
   const section = document.getElementById("featured");
   const title = document.getElementById("featured-title");
@@ -22,27 +22,22 @@ function setFeatured(video) {
   };
 }
 
-/* 📺 LOAD VIDEOS */
+/* LOAD */
 async function loadVideos() {
   try {
     grid.innerHTML = "<p>🎬 Loading...</p>";
 
     const res = await fetch(WORKER_URL);
-
-    if (!res.ok) throw new Error("API failed");
-
     const data = await res.json();
 
-    if (!data.videos || data.videos.length === 0) {
+    if (!data.videos || !data.videos.length) {
       grid.innerHTML = "<p>No videos found</p>";
       return;
     }
 
     allVideos = data.videos;
 
-    // 🎬 Set latest video as hero
     setFeatured(allVideos[0]);
-
     render(allVideos);
 
   } catch (err) {
@@ -51,7 +46,7 @@ async function loadVideos() {
   }
 }
 
-/* 🎥 RENDER GRID */
+/* RENDER WITH HOVER PREVIEW */
 function render(videos) {
   grid.innerHTML = "";
 
@@ -61,6 +56,14 @@ function render(videos) {
 
     card.innerHTML = `
       <img src="${v.thumbnail}">
+      
+      <!-- 🎥 HOVER PREVIEW -->
+      <iframe
+        class="preview"
+        src="https://www.youtube.com/embed/${v.videoId}?autoplay=1&mute=1&controls=0"
+        allow="autoplay"
+      ></iframe>
+
       <h3>${v.title}</h3>
     `;
 
