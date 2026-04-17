@@ -6,7 +6,11 @@ const modal = document.getElementById("video-modal");
 const player = document.getElementById("modal-player");
 const closeBtn = document.getElementById("close-modal");
 
+const titleEl = document.getElementById("episode-title");
+const nextBtn = document.getElementById("next-btn");
+
 let allVideos = [];
+let currentIndex = 0;
 
 /* 🎬 HERO */
 function setFeatured(video) {
@@ -18,16 +22,29 @@ function setFeatured(video) {
   section.style.backgroundImage = `url(${video.thumbnail})`;
   title.textContent = video.title;
 
-  btn.onclick = () => openModal(video.videoId);
+  btn.onclick = () => openModal(0);
 }
 
 /* 🎥 OPEN MODAL */
-function openModal(videoId) {
+function openModal(index) {
+  currentIndex = index;
+
+  const video = allVideos[index];
+
   modal.style.display = "block";
-  player.src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+  player.src = `https://www.youtube.com/embed/${video.videoId}?autoplay=1`;
+
+  titleEl.textContent = video.title;
 }
 
-/* ❌ CLOSE MODAL */
+/* ⏭ NEXT EPISODE */
+nextBtn.onclick = () => {
+  if (currentIndex < allVideos.length - 1) {
+    openModal(currentIndex + 1);
+  }
+};
+
+/* ❌ CLOSE */
 closeBtn.onclick = () => {
   modal.style.display = "none";
   player.src = "";
@@ -40,16 +57,16 @@ window.onclick = (e) => {
   }
 };
 
-/* LOAD */
+/* 📺 LOAD */
 async function loadVideos() {
   try {
-    grid.innerHTML = "<p>🎬 Loading...</p>";
+    grid.innerHTML = "Loading...";
 
     const res = await fetch(WORKER_URL);
     const data = await res.json();
 
     if (!data.videos || !data.videos.length) {
-      grid.innerHTML = "<p>No videos found</p>";
+      grid.innerHTML = "No videos found";
       return;
     }
 
@@ -59,8 +76,7 @@ async function loadVideos() {
     render(allVideos);
 
   } catch (err) {
-    console.error(err);
-    grid.innerHTML = "<p>❌ Failed to load videos</p>";
+    grid.innerHTML = "Failed to load videos";
   }
 }
 
@@ -68,20 +84,16 @@ async function loadVideos() {
 function render(videos) {
   grid.innerHTML = "";
 
-  videos.forEach(v => {
+  videos.forEach((v, i) => {
     const card = document.createElement("div");
     card.className = "card";
 
     card.innerHTML = `
       <img src="${v.thumbnail}">
-      <iframe class="preview"
-        src="https://www.youtube.com/embed/${v.videoId}?autoplay=1&mute=1&controls=0"
-        allow="autoplay">
-      </iframe>
       <h3>${v.title}</h3>
     `;
 
-    card.onclick = () => openModal(v.videoId);
+    card.onclick = () => openModal(i);
 
     grid.appendChild(card);
   });
