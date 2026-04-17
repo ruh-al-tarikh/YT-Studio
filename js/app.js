@@ -52,13 +52,22 @@ function renderRows() {
 function createCard(v, i) {
   const div = document.createElement("div");
   div.className = "card";
+  div.setAttribute("role", "button");
+  div.setAttribute("tabindex", "0");
+  div.setAttribute("aria-label", `Play ${v.title}`);
 
   div.innerHTML = `
-    <img src="https://i.ytimg.com/vi/${v.videoId}/mqdefault.jpg">
+    <img src="https://i.ytimg.com/vi/${v.videoId}/mqdefault.jpg" alt="">
   `;
 
   div.onmouseenter = () => hoverPreview(div, v.videoId);
   div.onclick = () => open(v);
+  div.onkeydown = (e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      open(v);
+    }
+  };
 
   return div;
 }
@@ -90,10 +99,24 @@ function open(v) {
 }
 
 /* ❌ CLOSE */
-document.getElementById("close").onclick = () => {
+const closeModal = () => {
   document.getElementById("modal").style.display = "none";
   document.getElementById("player").src = "";
 };
+
+document.getElementById("close").onclick = closeModal;
+document.getElementById("close").onkeydown = (e) => {
+  if (e.key === "Enter" || e.key === " ") {
+    e.preventDefault();
+    closeModal();
+  }
+};
+
+window.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") {
+    closeModal();
+  }
+});
 
 /* ⏭ NEXT */
 document.getElementById("next").onclick = () => {
