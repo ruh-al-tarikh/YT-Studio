@@ -28,14 +28,27 @@ function openModal(index) {
 
   modal.style.display = "block";
 
-  // ✅ FIXED EMBED (VIDEO + AUTOPLAY)
-  player.src = `https://www.youtube.com/embed/${video.videoId}?autoplay=1&rel=0&modestbranding=1`;
+  // ✅ HARD RESET (fix broken iframe state)
+  player.src = "";
+
+  // ✅ FIXED EMBED URL (CRITICAL UPDATE)
+  const embedUrl =
+    `https://www.youtube.com/embed/${video.videoId}` +
+    `?autoplay=1` +
+    `&rel=0` +
+    `&modestbranding=1` +
+    `&playsinline=1` +
+    `&origin=https://ruhdevops.github.io`;
+
+  // small delay ensures iframe reload properly
+  setTimeout(() => {
+    player.src = embedUrl;
+  }, 50);
 
   document.getElementById("episode-title").textContent = video.title;
   document.getElementById("episode-meta").textContent =
     `Season ${video.season} • Episode ${video.episode}`;
 
-  // 💾 SAVE PROGRESS
   localStorage.setItem("lastWatched", index);
 }
 
