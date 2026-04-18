@@ -3,7 +3,7 @@ const API = "https://yt-studio-api.ruhdevopsytstudio.workers.dev";
 let videos = [];
 let current = 0;
 
-/* 🚀 LOAD */
+/* LOAD */
 async function load() {
   const res = await fetch(API);
   const data = await res.json();
@@ -12,42 +12,43 @@ async function load() {
 
   if (!videos.length) return;
 
-  setupHero(videos[0]);
-  renderRows();
+  setHero(videos[0]);
+  render(videos);
 }
 
-function setupHero(v) {
+/* HERO */
+function setHero(v) {
+  const hero = document.getElementById("hero");
+
+  hero.style.background =
+    `linear-gradient(to top, black, transparent),
+     url(https://i.ytimg.com/vi/${v.videoId}/maxresdefault.jpg) center/cover`;
+
   document.getElementById("hero-title").textContent = v.title;
 
-  const heroVideo = document.getElementById("hero-video");
-
-  // 🎬 autoplay muted preview
-  heroVideo.src =
-    `https://www.youtube.com/embed/${v.videoId}` +
-    `?autoplay=1&mute=1&controls=0&loop=1&playlist=${v.videoId}&rel=0`;
-
-  document.getElementById("hero-btn").onclick = () => open(videos[0]);
+  document.getElementById("hero-btn").onclick = () => open(v);
 }
 
-/* 📺 ROWS */
-function renderRows() {
-  const trending = document.getElementById("row-trending");
-  const latest = document.getElementById("row-latest");
+/* RENDER */
+function render(list) {
+  const row = document.getElementById("video-row");
+  row.innerHTML = "";
 
-  trending.innerHTML = "";
-  latest.innerHTML = "";
+  list.forEach((v, i) => {
+    const card = document.createElement("div");
+    card.className = "card";
 
-  videos.slice(0, 10).forEach((v, i) => {
-    const card = createCard(v, i);
-    trending.appendChild(card);
-  });
+    card.innerHTML = `
+      <img src="https://i.ytimg.com/vi/${v.videoId}/mqdefault.jpg">
+    `;
 
-  videos.slice().reverse().slice(0, 10).forEach((v, i) => {
-    const card = createCard(v, i);
-    latest.appendChild(card);
+    card.onclick = () => open(v);
+
+    row.appendChild(card);
   });
 }
 
+HEAD
 /* 🎬 CARD */
 function createCard(v, i) {
   const div = document.createElement("div");
@@ -83,6 +84,9 @@ function hoverPreview(el, id) {
 }
 
 /* 🎬 MODAL */
+
+/* OPEN MODAL */
+ a34406d (Premium UI upgrade: hero cinematic + smooth cards + clean OTT layout)
 function open(v) {
   current = videos.indexOf(v);
 
@@ -92,18 +96,23 @@ function open(v) {
   modal.style.display = "block";
 
   player.src =
-    `https://www.youtube.com/embed/${v.videoId}?autoplay=1&rel=0`;
+    `https://www.youtube.com/embed/${v.videoId}?autoplay=1&origin=https://ruhdevops.github.io`;
 
   document.getElementById("title").textContent = v.title;
-  document.getElementById("meta").textContent = "Now Playing";
 }
 
+ HEAD
 /* ❌ CLOSE */
 const closeModal = () => {
+
+/* CLOSE */
+document.getElementById("close").onclick = () => {
+>>>>>>> a34406d (Premium UI upgrade: hero cinematic + smooth cards + clean OTT layout)
   document.getElementById("modal").style.display = "none";
   document.getElementById("player").src = "";
 };
 
+ HEAD
 document.getElementById("close").onclick = closeModal;
 document.getElementById("close").onkeydown = (e) => {
   if (e.key === "Enter" || e.key === " ") {
@@ -119,6 +128,9 @@ window.addEventListener("keydown", (e) => {
 });
 
 /* ⏭ NEXT */
+
+/* NEXT */
+>>>>>>> a34406d (Premium UI upgrade: hero cinematic + smooth cards + clean OTT layout)
 document.getElementById("next").onclick = () => {
   if (current < videos.length - 1) {
     open(videos[current + 1]);
