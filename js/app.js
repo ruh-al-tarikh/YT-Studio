@@ -4,63 +4,65 @@ let videos = [];
 
 /* LOAD */
 async function init() {
-  try {
-    const res = await fetch(API);
+  const res = await fetch(API);
+  const data = await res.json();
 
-    if (!res.ok) throw new Error("API failed");
+  videos = data.videos || [];
 
-    const data = await res.json();
-    videos = data.videos || [];
+  if (!videos.length) return;
 
-    if (!videos.length) {
-      document.getElementById("hero-title").textContent = "No videos found";
-      return;
-    }
-
-    setupHero(videos[0]);
-    render(videos);
-
-  } catch (err) {
-    console.error(err);
-    document.getElementById("hero-title").textContent = "Failed to load videos";
-  }
+  setHero(videos[0]);
+  render(videos);
 }
 
 /* HERO */
-function setupHero(v) {
-  const hero = document.getElementById("hero");
-
-  hero.style.background =
-    `linear-gradient(to top, black, transparent),
-     url(https://i.ytimg.com/vi/${v.videoId}/maxresdefault.jpg) center/cover`;
-
+function setHero(v) {
   document.getElementById("hero-title").textContent = v.title;
-
-  document.getElementById("hero-btn").onclick = () => open(v);
 
   document.getElementById("bg").style.backgroundImage =
     `url(https://i.ytimg.com/vi/${v.videoId}/maxresdefault.jpg)`;
+
+  document.querySelector(".hero").style.background =
+    `linear-gradient(to top, black, transparent),
+     url(https://i.ytimg.com/vi/${v.videoId}/maxresdefault.jpg) center/cover`;
+
+  document.getElementById("hero-btn").onclick = () => open(v);
 }
 
 /* GRID */
 function render(list) {
   const grid = document.getElementById("grid");
+  const preview = document.getElementById("hover-preview");
+
   grid.innerHTML = "";
 
   list.forEach(v => {
     const card = document.createElement("div");
     card.className = "card";
 
-    const img = document.createElement("img");
-    img.src = `https://i.ytimg.com/vi/${v.videoId}/mqdefault.jpg`;
+    card.innerHTML = `
+      <img src="https://i.ytimg.com/vi/${v.videoId}/mqdefault.jpg">
+    `;
 
-    card.appendChild(img);
+    /* 🎥 SMART HOVER PREVIEW */
+    card.addEventListener("mouseenter", (e) => {
+      preview.style.display = "block";
+      preview.src =
+        `https://www.youtube.com/embed/${v.videoId}?autoplay=1&mute=1&controls=0&rel=0`;
 
-    // SAFE HOVER (no iframe)
-    card.onmouseenter = () => {
       document.getElementById("bg").style.backgroundImage =
         `url(https://i.ytimg.com/vi/${v.videoId}/maxresdefault.jpg)`;
-    };
+    });
+
+    card.addEventListener("mousemove", (e) => {
+      preview.style.top = (e.clientY + 15) + "px";
+      preview.style.left = (e.clientX + 15) + "px";
+    });
+
+    card.addEventListener("mouseleave", () => {
+      preview.style.display = "none";
+      preview.src = "";
+    });
 
     card.onclick = () => open(v);
 
@@ -75,12 +77,8 @@ function open(v) {
 
   modal.style.display = "block";
 
-  player.src = ""; // reset first
-
-  setTimeout(() => {
-    player.src =
-      `https://www.youtube.com/embed/${v.videoId}?autoplay=1&origin=https://ruhdevops.github.io`;
-  }, 100);
+  player.src =
+    `https://www.youtube.com/embed/${v.videoId}?autoplay=1&origin=https://ruhdevops.github.io`;
 
   document.getElementById("video-title").textContent = v.title;
 }
@@ -91,5 +89,4 @@ document.getElementById("close").onclick = () => {
   document.getElementById("player").src = "";
 };
 
-/* INIT */
 init();
