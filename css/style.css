@@ -1,95 +1,64 @@
-/* 🔥 BASE */
 body {
   margin: 0;
-  font-family: 'Segoe UI', sans-serif;
+  font-family: Arial;
   background: #0b0b0b;
   color: white;
-  overflow-x: hidden;
 }
 
-/* 🌫 BACKGROUND BLUR */
-#bg-blur {
+/* BACKGROUND */
+#bg {
   position: fixed;
   inset: 0;
   background-size: cover;
   background-position: center;
   filter: blur(40px);
-  opacity: 0.25;
+  opacity: 0.2;
   z-index: -1;
-  transition: 0.5s;
-}
-
-/* 🧊 GLASS EFFECT */
-.glass {
-  backdrop-filter: blur(12px);
-  background: rgba(20,20,20,0.5);
-  border-radius: 10px;
+  transition: 0.4s;
 }
 
 /* HEADER */
-.glass-header {
-  position: fixed;
-  width: 100%;
+.header {
   padding: 15px;
-  backdrop-filter: blur(10px);
-  background: rgba(0,0,0,0.4);
-  z-index: 10;
+  text-align: center;
+  background: #111;
 }
 
 /* HERO */
 .hero {
-  height: 70vh;
+  height: 60vh;
   display: flex;
   align-items: flex-end;
+  background: #111;
 }
 
 .hero-overlay {
-  padding: 40px;
-  width: 100%;
+  padding: 30px;
 }
 
-.hero h1 {
-  font-size: 42px;
-}
-
-/* BUTTON */
-button {
-  background: #b22222;
-  border: none;
-  padding: 10px 18px;
-  color: white;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-/* ROW */
-.row {
-  display: flex;
+/* GRID */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 15px;
   padding: 20px;
-  overflow-x: auto;
 }
 
 /* CARD */
 .card {
-  min-width: 220px;
-  border-radius: 12px;
-  overflow: hidden;
   background: #141414;
+  border-radius: 10px;
+  overflow: hidden;
   cursor: pointer;
-  transition: 0.3s;
-  position: relative;
+  transition: 0.25s;
 }
 
 .card:hover {
-  transform: scale(1.1);
+  transform: scale(1.05);
 }
 
-.card img,
-.card iframe {
+.card img {
   width: 100%;
-  height: 130px;
-  object-fit: cover;
 }
 
 /* MODAL */
@@ -97,14 +66,13 @@ button {
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.9);
+  background: rgba(0,0,0,0.95);
 }
 
-.modal-content {
+.modal-box {
   width: 90%;
   max-width: 900px;
-  margin: 50px auto;
-  padding: 20px;
+  margin: 40px auto;
 }
 
 #player {
