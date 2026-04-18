@@ -1,18 +1,4 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>YT Studio | Cinematic Video Gallery</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
-</html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -22,7 +8,7 @@
 
 <body>
 
-  <!-- BACKGROUND -->
+  <!-- 🌫 BACKGROUND -->
   <div id="bg"></div>
 
   <!-- HEADER -->
@@ -31,12 +17,15 @@
   </header>
 
   <!-- HERO -->
-  <section id="hero" class="hero">
+  <section class="hero">
     <div class="hero-overlay">
-      <h1 id="hero-title">Loading episodes...</h1>
+      <h1 id="hero-title">Loading...</h1>
       <button id="hero-btn">▶ Watch</button>
     </div>
   </section>
+
+  <!-- PREVIEW PLAYER (SMART HOVER) -->
+  <iframe id="hover-preview"></iframe>
 
   <!-- GRID -->
   <h2 class="section">Episodes</h2>

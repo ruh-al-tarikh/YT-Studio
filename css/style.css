@@ -11,10 +11,10 @@ body {
   inset: 0;
   background-size: cover;
   background-position: center;
-  filter: blur(40px);
-  opacity: 0.2;
+  filter: blur(45px);
+  opacity: 0.18;
   z-index: -1;
-  transition: 0.4s;
+  transition: 0.3s;
 }
 
 /* HEADER */
@@ -29,7 +29,6 @@ body {
   height: 60vh;
   display: flex;
   align-items: flex-end;
-  background: #111;
 }
 
 .hero-overlay {
@@ -59,6 +58,19 @@ body {
 
 .card img {
   width: 100%;
+}
+
+/* 🎥 SMART HOVER PREVIEW PLAYER */
+#hover-preview {
+  position: fixed;
+  width: 320px;
+  height: 180px;
+  border: none;
+  display: none;
+  z-index: 999;
+  pointer-events: none;
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.6);
 }
 
 /* MODAL */
