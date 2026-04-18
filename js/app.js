@@ -1,23 +1,33 @@
 const API = "https://yt-studio-api.ruhdevopsytstudio.workers.dev";
 
 let videos = [];
-let current = 0;
 
 /* LOAD */
-async function load() {
-  const res = await fetch(API);
-  const data = await res.json();
+async function init() {
+  try {
+    const res = await fetch(API);
 
-  videos = data.videos || [];
+    if (!res.ok) throw new Error("API failed");
 
-  if (!videos.length) return;
+    const data = await res.json();
+    videos = data.videos || [];
 
-  setHero(videos[0]);
-  render(videos);
+    if (!videos.length) {
+      document.getElementById("hero-title").textContent = "No videos found";
+      return;
+    }
+
+    setupHero(videos[0]);
+    render(videos);
+
+  } catch (err) {
+    console.error(err);
+    document.getElementById("hero-title").textContent = "Failed to load videos";
+  }
 }
 
 /* HERO */
-function setHero(v) {
+function setupHero(v) {
   const hero = document.getElementById("hero");
 
   hero.style.background =
@@ -25,63 +35,54 @@ function setHero(v) {
      url(https://i.ytimg.com/vi/${v.videoId}/maxresdefault.jpg) center/cover`;
 
   document.getElementById("hero-title").textContent = v.title;
+
   document.getElementById("hero-btn").onclick = () => open(v);
+
+  document.getElementById("bg").style.backgroundImage =
+    `url(https://i.ytimg.com/vi/${v.videoId}/maxresdefault.jpg)`;
 }
 
-/* RENDER */
+/* GRID */
 function render(list) {
-  const row = document.getElementById("video-row");
-  row.innerHTML = "";
+  const grid = document.getElementById("grid");
+  grid.innerHTML = "";
 
-  list.forEach((v, i) => {
+  list.forEach(v => {
     const card = document.createElement("div");
     card.className = "card";
 
-    // default image
-    card.innerHTML = `
-      <img src="https://i.ytimg.com/vi/${v.videoId}/mqdefault.jpg">
-    `;
+    const img = document.createElement("img");
+    img.src = `https://i.ytimg.com/vi/${v.videoId}/mqdefault.jpg`;
 
-    // 🎥 HOVER PREVIEW
+    card.appendChild(img);
+
+    // SAFE HOVER (no iframe)
     card.onmouseenter = () => {
-      card.innerHTML = `
-        <iframe 
-          src="https://www.youtube.com/embed/${v.videoId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${v.videoId}"
-          frameborder="0">
-        </iframe>
-      `;
-
-      // 🌫 BACKGROUND BLUR UPDATE
-      document.getElementById("bg-blur").style.backgroundImage =
+      document.getElementById("bg").style.backgroundImage =
         `url(https://i.ytimg.com/vi/${v.videoId}/maxresdefault.jpg)`;
-    };
-
-    // restore thumbnail
-    card.onmouseleave = () => {
-      card.innerHTML = `
-        <img src="https://i.ytimg.com/vi/${v.videoId}/mqdefault.jpg">
-      `;
     };
 
     card.onclick = () => open(v);
 
-    row.appendChild(card);
+    grid.appendChild(card);
   });
 }
 
 /* MODAL */
 function open(v) {
-  current = videos.indexOf(v);
-
   const modal = document.getElementById("modal");
   const player = document.getElementById("player");
 
   modal.style.display = "block";
 
-  player.src =
-    `https://www.youtube.com/embed/${v.videoId}?autoplay=1&origin=https://ruhdevops.github.io`;
+  player.src = ""; // reset first
 
-  document.getElementById("title").textContent = v.title;
+  setTimeout(() => {
+    player.src =
+      `https://www.youtube.com/embed/${v.videoId}?autoplay=1&origin=https://ruhdevops.github.io`;
+  }, 100);
+
+  document.getElementById("video-title").textContent = v.title;
 }
 
 /* CLOSE */
@@ -90,11 +91,5 @@ document.getElementById("close").onclick = () => {
   document.getElementById("player").src = "";
 };
 
-/* NEXT */
-document.getElementById("next").onclick = () => {
-  if (current < videos.length - 1) {
-    open(videos[current + 1]);
-  }
-};
-
-load();
+/* INIT */
+init();

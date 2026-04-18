@@ -22,34 +22,32 @@
 
 <body>
 
-  <!-- 🌫 BLUR BACKGROUND -->
-  <div id="bg-blur"></div>
+  <!-- BACKGROUND -->
+  <div id="bg"></div>
 
-  <!-- 🧊 GLASS HEADER -->
-  <header class="glass-header">
+  <!-- HEADER -->
+  <header class="header">
     <h1>🎬 Ruh Al Tarikh</h1>
   </header>
 
-  <!-- 🎬 HERO -->
-  <section class="hero" id="hero">
-    <div class="hero-overlay glass">
-      <h1 id="hero-title">Loading...</h1>
-      <p>Islamic Documentary Series</p>
-      <button id="hero-btn">▶ Watch Now</button>
+  <!-- HERO -->
+  <section id="hero" class="hero">
+    <div class="hero-overlay">
+      <h1 id="hero-title">Loading episodes...</h1>
+      <button id="hero-btn">▶ Watch</button>
     </div>
   </section>
 
-  <!-- 📺 ROW -->
-  <h2 class="section-title">Episodes</h2>
-  <div id="video-row" class="row"></div>
+  <!-- GRID -->
+  <h2 class="section">Episodes</h2>
+  <div id="grid" class="grid"></div>
 
-  <!-- 🎥 MODAL -->
+  <!-- MODAL -->
   <div id="modal" class="modal">
-    <div class="modal-content glass">
+    <div class="modal-box">
       <span id="close">×</span>
-      <iframe id="player" allow="autoplay; encrypted-media; fullscreen"></iframe>
-      <h2 id="title"></h2>
-      <button id="next">Next ▶</button>
+      <iframe id="player" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+      <h2 id="video-title"></h2>
     </div>
   </div>
 
