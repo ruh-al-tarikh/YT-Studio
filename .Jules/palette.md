@@ -1,13 +1,14 @@
-# UX Journal - YT-Studio Fixes
+# Palette UX Journal - Jules
 
-## Critical Insights
-- **Root Cause of Infinite Loading:** The JS was executing before the DOM was fully parsed, and there was no fallback for the primary API. Fetching the API also blocked the rendering of the "Loading..." state clearance.
-- **App Isolation:** By wrapping the video system in #app-root, we ensure that future global UI changes (like adding more SaaS sections) won't accidentally target or break the video player's logic.
-- **Typography:** The oversized H1 in the hero was dominating the UI. Normalizing it to 2.8rem (serif) creates a more premium, SaaS-like feel.
+## Accessibility Insights
+- **Tap Targets:** Increased all buttons and interactive elements to at least 44px for better mobile accessibility.
+- **ARIA Labels:** Added aria-labels to the modal close button.
+- **Contrast:** Maintained high contrast with OKLCH colors and premium dark theme tokens.
 
-## Reusable UX Patterns
-- **API Fallback:** Always provide a local data/*.json fallback for high-traffic or unreliable worker-based APIs in static sites.
-- **Null-Safe Selectors:** Using if (!element) return; guards prevents JS crashes during partial DOM updates or structural refactors.
+## Patterns
+- **Iframe Facade:** Used thumbnails and only load iframes on interaction (modal/preview) to save bandwidth and improve TTI.
+- **Data Resiliency:** Implemented a multi-tier fetch strategy: Cache -> API -> Fallback JSON.
 
-## Rejected Design Changes
-- **React Migration:** Considered finishing the React migration mentioned in memory, but decided against it to avoid breaking existing legacy DOM logic as per instructions.
+## Design Decisions
+- **Typography:** Normalized heading scales to prevent oversized titles on smaller screens.
+- **Error States:** Added a explicit "Retry" path for data fetch failures to prevent "silent" failures or infinite spinners.
