@@ -18,6 +18,7 @@
     <h1>🎬 Ruh Al Tarikh</h1>
   </header>
 
+  <!-- APP ROOT START -->
   <div id="app-root">
     <!-- HERO -->
     <section class="hero">
@@ -47,6 +48,8 @@
       </div>
     </div>
   </div>
+  </div>
+  <!-- APP ROOT END -->
 
   <!-- SAAS LANDING START -->
   <main class="saas-landing">
@@ -123,5 +126,18 @@
   <!-- SAAS LANDING END -->
 
   <script src="js/app.js" type="module"></script>
+  <!-- 🎥 HOVER PREVIEW -->
+  <iframe id="hover-preview"></iframe>
+
+  <!-- MODAL -->
+  <div id="modal" class="modal">
+    <div class="modal-box">
+      <span id="close">×</span>
+      <iframe id="player" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+      <h2 id="video-title"></h2>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
 </body>
 </html>
