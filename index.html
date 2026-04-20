@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ruh Al Tarikh</title>
   <link rel="stylesheet" href="css/style.css">
   <!-- Google Fonts -->
@@ -20,6 +21,12 @@
 
   <!-- APP ROOT START -->
   <div id="app-root">
+    <!-- ERROR STATE -->
+    <div id="error-container" class="error-container" style="display: none;">
+      <p id="error-message"></p>
+      <button id="retry-btn" class="saas-btn saas-btn-primary">Retry</button>
+    </div>
+
     <!-- HERO -->
     <section class="hero">
       <div class="hero-overlay">
@@ -29,25 +36,24 @@
     </section>
 
     <!-- ⭐ CONTINUE WATCHING -->
-    <h2 class="section">Continue Watching</h2>
-    <div id="continue-row" class="row"></div>
+    <h2 class="section" id="continue-section" style="display: none;">Continue Watching</h2>
+    <div id="continue-row" class="row" style="display: none;"></div>
 
     <!-- 📺 ALL EPISODES -->
     <h2 class="section">Episodes</h2>
     <div id="grid" class="grid"></div>
 
     <!-- 🎥 HOVER PREVIEW -->
-    <iframe id="hover-preview"></iframe>
+    <iframe id="hover-preview" title="Video Preview"></iframe>
 
     <!-- MODAL -->
     <div id="modal" class="modal">
       <div class="modal-box">
-        <span id="close">×</span>
-        <iframe id="player" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+        <span id="close" aria-label="Close modal">×</span>
+        <iframe id="player" allow="autoplay; encrypted-media" allowfullscreen title="Video Player"></iframe>
         <h2 id="video-title"></h2>
       </div>
     </div>
-  </div>
   </div>
   <!-- APP ROOT END -->
 
@@ -125,19 +131,6 @@
   </main>
   <!-- SAAS LANDING END -->
 
-  <script src="js/app.js" type="module"></script>
-  <!-- 🎥 HOVER PREVIEW -->
-  <iframe id="hover-preview"></iframe>
-
-  <!-- MODAL -->
-  <div id="modal" class="modal">
-    <div class="modal-box">
-      <span id="close">×</span>
-      <iframe id="player" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-      <h2 id="video-title"></h2>
-    </div>
-  </div>
-
-  <script src="js/app.js"></script>
+  <script src="js/app.js" type="module" defer></script>
 </body>
 </html>
