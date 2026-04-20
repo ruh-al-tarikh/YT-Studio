@@ -49,6 +49,8 @@
     <!-- MODAL -->
     <div id="modal" class="modal">
       <div class="modal-box">
+        <span id="close" role="button" tabindex="0" aria-label="Close modal">×</span>
+        <iframe id="player" allow="autoplay; encrypted-media" allowfullscreen></iframe>
         <span id="close" aria-label="Close modal">×</span>
         <iframe id="player" allow="autoplay; encrypted-media" allowfullscreen title="Video Player"></iframe>
         <h2 id="video-title"></h2>
@@ -56,7 +58,6 @@
     </div>
   </div>
   <!-- APP ROOT END -->
-
   <!-- SAAS LANDING START -->
   <main class="saas-landing">
     <!-- SECTION 1: HERO (PREMIUM) -->
@@ -131,6 +132,7 @@
   </main>
   <!-- SAAS LANDING END -->
 
+  <script src="js/app.js" type="module"></script>
   <script src="js/app.js" type="module" defer></script>
 </body>
 </html>
