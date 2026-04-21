@@ -105,7 +105,11 @@
     videos.forEach(v => {
       const card = document.createElement("div");
       card.className = "card";
-      card.innerHTML = `<img src="${v.thumbnail}" loading="lazy" alt="${v.title}">`;
+      card.innerHTML = `
+        <img src="${v.thumbnail}" loading="lazy" alt="${v.title}">
+        <div class="card-title">${v.title.substring(0, 80)}${v.title.length > 80 ? '...' : ''}</div>
+        <div class="progress-bar"><div class="progress-fill" style="width: 0%"></div></div>
+    `;
       card.onclick = () => openModal(v);
       fragment.appendChild(card);
     });
@@ -133,7 +137,11 @@
       const v = videos.find(x => x.id === item.id);
       const card = document.createElement("div");
       card.className = "card";
-      card.innerHTML = `<img src="${v.thumbnail}" loading="lazy"><div class="progress" style="width: ${item.percent}%"></div>`;
+      card.innerHTML = `
+        <img src="${v.thumbnail}" loading="lazy" alt="${v.title}">
+        <div class="card-title">${v.title.substring(0, 80)}${v.title.length > 80 ? '...' : ''}</div>
+        <div class="progress-bar"><div class="progress-fill" style="width: 0%"></div></div>
+    `;
       card.onclick = () => openModal(v, item.time);
       fragment.appendChild(card);
     });
@@ -201,6 +209,8 @@
 
   document.addEventListener("DOMContentLoaded", init);
 })();
+
+
 
 
 
