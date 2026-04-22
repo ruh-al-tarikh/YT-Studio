@@ -1,5 +1,10 @@
+import { injectSpeedInsights } from '@vercel/speed-insights';
+
 (function() {
   'use strict';
+
+  // Initialize Vercel Speed Insights
+  injectSpeedInsights();
 
   /* CONFIG */
   const API = "https://yt-studio-api.ruhdevopsytstudio.workers.dev";
