@@ -1,0 +1,95 @@
+name: 🚀 Production CI/CD Pipeline
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+  workflow_dispatch:
+  schedule:
+    - cron: "0 3 * * 1" # weekly (Monday 3AM)
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: 🧪 Build & Test
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+
+    steps:
+      # 📥 Checkout
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ⚙️ Setup Node
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "npm"
+
+      # 📦 Install dependencies (fast & reliable)
+      - name: Install dependencies
+        run: npm ci
+
+      # 🔍 Lint (optional)
+      - name: Lint
+        run: npm run lint --if-present
+
+      # 🧱 Build (Webpack)
+      - name: Build
+        run: npm run build --if-present
+        env:
+          NODE_ENV: production
+
+      # 🧪 Test
+      - name: Run tests
+        run: npm test --if-present
+
+      # 📤 Upload artifacts
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: app-build
+          path: |
+            dist
+            build
+          if-no-files-found: ignore
+
+  security:
+    name: 🔐 Security Audit
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+
+      - name: Install deps
+        run: npm ci
+
+      - name: Run audit
+        run: npm audit --audit-level=high
+
+  deploy:
+    name: 🚀 Deploy (Optional)
+    runs-on: ubuntu-latest
+    needs: [build, security]
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Deploy step
+        run: echo "Add your deployment script here"
