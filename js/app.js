@@ -34,26 +34,42 @@
   };
 
   /* DATA HELPERS */
-  async function fetchVideos() {
+    async function fetchVideos() {
     const cached = localStorage.getItem(CACHE_KEY);
     if (cached) {
       try {
         const { data, timestamp } = JSON.parse(cached);
-        if (Date.now() - timestamp < CACHE_EXPIRY) return data;
-      } catch (e) { localStorage.removeItem(CACHE_KEY); }
+        if (Date.now() - timestamp < CACHE_EXPIRY && data.length) {
+          console.log("Using cached videos:", data.length);
+          return data;
+        }
+      } catch(e) { localStorage.removeItem(CACHE_KEY); }
     }
 
     try {
+      console.log("Fetching from API:", API);
       const res = await fetch(API);
-      if (!res.ok) throw new Error("API error: " + res.status);
+      if (!res.ok) throw new Error(`API error: ${res.status}`);
       const json = await res.json();
-      const fetchedVideos = (json.videos || []).map(v => ({
-        id: v.id,
+      console.log("API response:", json);
+      
+      // Fallback: if no videos, use sample data
+      let fetchedVideos = (json.videos || []).map(v => ({
+        id: v.id || v.videoId,
+        videoId: v.videoId || v.id,
         title: v.title || "Untitled",
-        thumbnail: v.thumbnail || `https://i.ytimg.com/vi/${v.id}/mqdefault.jpg`,
-        publishedAt: v.publishedAt,
+        thumbnail: v.thumbnail || `https://i.ytimg.com/vi/${v.id || v.videoId}/mqdefault.jpg`,
+        publishedAt: v.publishedAt || new Date().toISOString(),
         channel: v.channel || "Ruh Al Tarikh"
       }));
+
+      if (fetchedVideos.length === 0) {
+        console.warn("No videos from API, using fallback sample");
+        fetchedVideos = [
+          { id: "Zzcdtm7Il9U", title: "துல்கர்னய்னின் சுவர் பற்றிய உண்மை", thumbnail: "https://i.ytimg.com/vi/Zzcdtm7Il9U/mqdefault.jpg" },
+          { id: "dQw4w9WgXcQ", title: "Sample Video", thumbnail: "https://i.ytimg.com/vi/dQw4w9WgXcQ/mqdefault.jpg" }
+        ];
+      }
 
       localStorage.setItem(CACHE_KEY, JSON.stringify({ data: fetchedVideos, timestamp: Date.now() }));
       return fetchedVideos;
@@ -221,6 +237,7 @@
     init();
   });
 })();
+
 
 
 
