@@ -34,26 +34,30 @@
   };
 
   /* DATA HELPERS */
-    async function fetchVideos() {
+      async function fetchVideos() {
     const cached = localStorage.getItem(CACHE_KEY);
     if (cached) {
       try {
         const { data, timestamp } = JSON.parse(cached);
-        if (Date.now() - timestamp < CACHE_EXPIRY && data.length) {
+        if (Date.now() - timestamp < CACHE_EXPIRY && data && data.length) {
           console.log("Using cached videos:", data.length);
           return data;
         }
-      } catch(e) { localStorage.removeItem(CACHE_KEY); }
+      } catch(e) {
+        console.warn("Cache read error, clearing", e);
+        localStorage.removeItem(CACHE_KEY);
+      }
     }
 
     try {
       console.log("Fetching from API:", API);
       const res = await fetch(API);
-      if (!res.ok) throw new Error(`API error: ${res.status}`);
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+      }
       const json = await res.json();
-      console.log("API response:", json);
-      
-      // Fallback: if no videos, use sample data
+      console.log("API response status:", json.error || "OK");
+
       let fetchedVideos = (json.videos || []).map(v => ({
         id: v.id || v.videoId,
         videoId: v.videoId || v.id,
@@ -66,8 +70,7 @@
       if (fetchedVideos.length === 0) {
         console.warn("No videos from API, using fallback sample");
         fetchedVideos = [
-          { id: "Zzcdtm7Il9U", title: "துல்கர்னய்னின் சுவர் பற்றிய உண்மை", thumbnail: "https://i.ytimg.com/vi/Zzcdtm7Il9U/mqdefault.jpg" },
-          { id: "dQw4w9WgXcQ", title: "Sample Video", thumbnail: "https://i.ytimg.com/vi/dQw4w9WgXcQ/mqdefault.jpg" }
+          { id: "Zzcdtm7Il9U", title: "துல்கர்னய்னின் சுவர் பற்றிய உண்மை", thumbnail: "https://i.ytimg.com/vi/Zzcdtm7Il9U/mqdefault.jpg" }
         ];
       }
 
@@ -75,7 +78,7 @@
       return fetchedVideos;
     } catch (e) {
       console.error("Fetch failed:", e);
-      throw e;
+      throw new Error(`Network error: ${e.message}`);
     }
   }
 
@@ -188,7 +191,7 @@
   function openModal(v, start = 0) {
     currentVideo = v;
     setLastPlayed(v);
-    if (elements.modal) elements.modal.style.display = "block";
+    if (elements.modal) elements.modal.style.display = "flex";
     if (elements.videoTitle) elements.videoTitle.textContent = v.title;
 
     // Iframe Facade: Only load the actual player when requested
@@ -237,6 +240,8 @@
     init();
   });
 })();
+
+
 
 
 
