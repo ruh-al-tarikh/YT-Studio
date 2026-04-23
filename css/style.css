@@ -1076,3 +1076,26 @@ body.dark-mode .close-dashboard { color: #000; }
 @media (max-width: 768px) {
   .dashboard-btn { padding: 4px 10px; font-size: 12px; }
 }
+.trending-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: linear-gradient(135deg, #ff416c, #ff4b2b);
+  color: white;
+  font-size: 11px;
+  font-weight: bold;
+  padding: 4px 10px;
+  border-radius: 20px;
+  z-index: 4;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  letter-spacing: 0.5px;
+}
+#trending-section {
+  margin-top: 10px;
+}
+#trending-row {
+  margin-bottom: 20px;
+}
+@media (max-width: 768px) {
+  .trending-badge { font-size: 9px; padding: 3px 8px; }
+}
