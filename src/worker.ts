@@ -2,7 +2,7 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
 
-    // API ROUTE (D1)
+    // API ROUTE
     if (url.pathname.startsWith("/api/orders")) {
       const result = await env.MY_DB
         .prepare(`
@@ -18,7 +18,7 @@ export default {
       });
     }
 
-    // STATIC FILES (DO NOT CHANGE UI)
+    // STATIC FILES (UNCHANGED WEBSITE)
     return env.ASSETS.fetch(request);
   }
 };
