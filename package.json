@@ -3,5 +3,9 @@
   "version": "1.0.0",
   "scripts": {
     "build": "echo Static site - build complete"
+  },
+  "dependencies": {
+    "@vercel/analytics": "^2.0.1",
+    "@vercel/speed-insights": "^2.0.0"
   }
 }
