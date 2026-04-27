@@ -9,6 +9,7 @@
   const WATCH_LATER_KEY = 'watch_later';
   const THEME_KEY = 'ui_theme';
   const SEARCH_HISTORY_KEY = 'search_history';
+  const BOOKMARKS_KEY = 'video_bookmarks';
   const ASSUMED_VIDEO_DURATION = 600;
   const ITEMS_PER_PAGE = 12;
 
@@ -103,7 +104,14 @@
     theme: 'dark',
     paginationIndex: 0,
     lastSearchTerm: '',
-    showedHints: localStorage.getItem('keyboard_hints_shown') || false
+    showedHints: localStorage.getItem('keyboard_hints_shown') || false,
+    playbackSpeed: parseFloat(localStorage.getItem('playback_speed') || '1'),
+    bookmarks: JSON.parse(localStorage.getItem(BOOKMARKS_KEY) || '{}'),
+    advancedFilters: {
+      dateFrom: null,
+      dateTo: null,
+      searchDescription: false
+    }
   };
 
   function sanitizeText(value) {
@@ -366,8 +374,28 @@
 
     return state.videos.filter((video) => {
       const matchesCategory = state.activeCategory === 'all' || video.category === state.activeCategory;
-      const matchesSearch = !search || `${video.title} ${video.channel} ${video.category}`.toLowerCase().includes(search);
-      return matchesCategory && matchesSearch;
+      
+      let matchesSearch = !search;
+      if (search) {
+        const titleMatch = video.title.toLowerCase().includes(search);
+        const channelMatch = video.channel.toLowerCase().includes(search);
+        const categoryMatch = video.category.toLowerCase().includes(search);
+        const descriptionMatch = state.advancedFilters.searchDescription && video.description.toLowerCase().includes(search);
+        matchesSearch = titleMatch || channelMatch || categoryMatch || descriptionMatch;
+      }
+
+      let matchesDate = true;
+      if (state.advancedFilters.dateFrom || state.advancedFilters.dateTo) {
+        const videoDate = new Date(video.publishedAt);
+        if (state.advancedFilters.dateFrom) {
+          matchesDate = matchesDate && videoDate >= new Date(state.advancedFilters.dateFrom);
+        }
+        if (state.advancedFilters.dateTo) {
+          matchesDate = matchesDate && videoDate <= new Date(state.advancedFilters.dateTo);
+        }
+      }
+
+      return matchesCategory && matchesSearch && matchesDate;
     });
   }
 
@@ -386,17 +414,22 @@
   function getRecommendedVideos() {
     const progress = getProgress();
     const watchedCategories = {};
+    const watchedTimes = {};
 
     state.videos.forEach(video => {
       if (progress[video.id]) {
-        watchedCategories[video.category] = (watchedCategories[video.category] || 0) + 1;
+        const watchPercent = progress[video.id].percent || 0;
+        watchedCategories[video.category] = (watchedCategories[video.category] || 0) + watchPercent;
+        watchedTimes[video.category] = (watchedTimes[video.category] || 0) + 1;
       }
     });
 
-    const topCategories = Object.entries(watchedCategories)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 2)
-      .map(entry => entry[0]);
+    const categoryScores = Object.entries(watchedCategories).map(([cat, time]) => ({
+      category: cat,
+      score: time + (watchedTimes[cat] * 5)
+    })).sort((a, b) => b.score - a.score);
+
+    const topCategories = categoryScores.slice(0, 3).map(entry => entry.category);
 
     if (topCategories.length === 0) {
       return state.videos.slice(0, 8);
@@ -404,7 +437,11 @@
 
     const recommended = state.videos
       .filter(v => topCategories.includes(v.category) && !progress[v.id])
-      .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
+      .sort((a, b) => {
+        const aScore = categoryScores.find(c => c.category === a.category)?.score || 0;
+        const bScore = categoryScores.find(c => c.category === b.category)?.score || 0;
+        return (bScore - aScore) || (new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
+      })
       .slice(0, 8);
 
     return recommended.length > 0 ? recommended : state.videos.slice(0, 8);
@@ -666,6 +703,61 @@
       : '<div class="empty-state compact">No resume queue yet.</div>';
   }
 
+  function setPlaybackSpeed(speed) {
+    state.playbackSpeed = speed;
+    localStorage.setItem('playback_speed', speed);
+    updatePlaybackSpeedUI();
+    showToast(`Playback speed: ${speed}x`);
+  }
+
+  function updatePlaybackSpeedUI() {
+    const speedButtons = document.querySelectorAll('[data-speed]');
+    speedButtons.forEach(btn => {
+      btn.classList.toggle('active', parseFloat(btn.getAttribute('data-speed')) === state.playbackSpeed);
+    });
+  }
+
+  function saveBookmark(videoId, time, title) {
+    if (!state.bookmarks[videoId]) {
+      state.bookmarks[videoId] = [];
+    }
+    state.bookmarks[videoId].push({
+      time,
+      title: title || `Bookmark at ${Math.floor(time / 60)}:${String(time % 60).padStart(2, '0')}`,
+      timestamp: Date.now()
+    });
+    localStorage.setItem(BOOKMARKS_KEY, JSON.stringify(state.bookmarks));
+    showToast('Bookmark saved!');
+  }
+
+  function renderBookmarks(videoId) {
+    const bookmarkList = document.getElementById('bookmarkList');
+    if (!bookmarkList) return;
+
+    const bookmarks = state.bookmarks[videoId] || [];
+    if (bookmarks.length === 0) {
+      bookmarkList.innerHTML = '<p class="bookmark-empty">No bookmarks yet. Use the bookmark button to save timestamps.</p>';
+      return;
+    }
+
+    bookmarkList.innerHTML = bookmarks
+      .sort((a, b) => b.timestamp - a.timestamp)
+      .map((bm, i) => `
+        <div class="bookmark-item">
+          <button class="bookmark-jump" data-time="${bm.time}" type="button">
+            <i class="fa-solid fa-play" aria-hidden="true"></i>
+          </button>
+          <div class="bookmark-text">
+            <strong>${sanitizeText(bm.title)}</strong>
+            <span class="bookmark-time">${Math.floor(bm.time / 60)}:${String(bm.time % 60).padStart(2, '0')}</span>
+          </div>
+          <button class="bookmark-delete" data-index="${i}" type="button" aria-label="Delete bookmark">
+            <i class="fa-solid fa-trash" aria-hidden="true"></i>
+          </button>
+        </div>
+      `).join('');
+  }
+
   function openModal(video, start = 0) {
     if (!video || !elements.modal || !elements.player || !elements.videoTitle) {
       return;
@@ -678,6 +770,9 @@
     elements.videoTitle.textContent = video.title;
     elements.shareLink.value = `${window.location.origin}?video=${video.id}`;
     elements.player.src = `https://www.youtube.com/embed/${video.id}?autoplay=1&start=${start}`;
+
+    updatePlaybackSpeedUI();
+    renderBookmarks(video.id);
 
     if (state.progressInterval) {
       window.clearInterval(state.progressInterval);
@@ -706,7 +801,9 @@
       state.progressInterval = null;
     }
     elements.transcriptPanel.setAttribute('aria-hidden', 'true');
+    document.getElementById('bookmarkPanel')?.setAttribute('aria-hidden', 'true');
     elements.sharePanel.setAttribute('aria-hidden', 'true');
+    state.playbackSpeed = 1;
     renderContinue();
     renderDashboard();
     renderHighlights();
@@ -800,6 +897,18 @@
       elements.transcriptPanel.setAttribute('aria-hidden', 'true');
     });
 
+    const toggleBookmarks = document.getElementById('toggleBookmarks');
+    const closeBookmarks = document.getElementById('closeBookmarks');
+    toggleBookmarks?.addEventListener('click', () => {
+      const panel = document.getElementById('bookmarkPanel');
+      const isOpen = panel?.getAttribute('aria-hidden') === 'false';
+      panel?.setAttribute('aria-hidden', isOpen ? 'true' : 'false');
+    });
+
+    closeBookmarks?.addEventListener('click', () => {
+      document.getElementById('bookmarkPanel')?.setAttribute('aria-hidden', 'true');
+    });
+
     elements.shareEpisode?.addEventListener('click', () => {
       const isOpen = elements.sharePanel.getAttribute('aria-hidden') === 'false';
       elements.sharePanel.setAttribute('aria-hidden', isOpen ? 'true' : 'false');
@@ -887,7 +996,61 @@
       });
     });
 
+    const dateFromInput = document.getElementById('dateFilterFrom');
+    const dateToInput = document.getElementById('dateFilterTo');
+    const descSearchCheckbox = document.getElementById('searchDescriptionCheckbox');
+
+    dateFromInput?.addEventListener('change', (e) => {
+      state.advancedFilters.dateFrom = e.target.value || null;
+      renderGrid();
+    });
+
+    dateToInput?.addEventListener('change', (e) => {
+      state.advancedFilters.dateTo = e.target.value || null;
+      renderGrid();
+    });
+
+    descSearchCheckbox?.addEventListener('change', (e) => {
+      state.advancedFilters.searchDescription = e.target.checked;
+      renderGrid();
+    });
+
     document.addEventListener('click', (event) => {
+      const speedBtn = event.target.closest('[data-speed]');
+      if (speedBtn) {
+        setPlaybackSpeed(parseFloat(speedBtn.getAttribute('data-speed')));
+        return;
+      }
+
+      const bookmarkBtn = event.target.closest('.bookmark-save');
+      if (bookmarkBtn && state.currentVideo) {
+        const title = prompt('Bookmark title (optional):');
+        saveBookmark(state.currentVideo.id, 0, title || undefined);
+        renderBookmarks(state.currentVideo.id);
+        return;
+      }
+
+      const jumpBtn = event.target.closest('.bookmark-jump');
+      if (jumpBtn) {
+        const time = parseInt(jumpBtn.getAttribute('data-time'));
+        if (state.currentVideo) {
+          openModal(state.currentVideo, time);
+        }
+        return;
+      }
+
+      const deleteBtn = event.target.closest('.bookmark-delete');
+      if (deleteBtn) {
+        const index = parseInt(deleteBtn.getAttribute('data-index'));
+        if (state.currentVideo && state.bookmarks[state.currentVideo.id]) {
+          state.bookmarks[state.currentVideo.id].splice(index, 1);
+          localStorage.setItem(BOOKMARKS_KEY, JSON.stringify(state.bookmarks));
+          renderBookmarks(state.currentVideo.id);
+          showToast('Bookmark deleted');
+        }
+        return;
+      }
+
       handleCardClick(event.target);
 
       if (event.target === elements.modal) {
@@ -907,6 +1070,7 @@
         toggleOverlay(elements.watchLaterPage, false);
         toggleOverlay(elements.dashboardModal, false);
         elements.transcriptPanel.setAttribute('aria-hidden', 'true');
+        document.getElementById('bookmarkPanel')?.setAttribute('aria-hidden', 'true');
         elements.sharePanel.setAttribute('aria-hidden', 'true');
       }
 
