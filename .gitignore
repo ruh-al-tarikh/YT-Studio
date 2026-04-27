@@ -40,3 +40,9 @@ pnpm-lock.yaml
 .dev.vars*
 !.dev.vars.example
 !.env.example
+.agents/
+.cortex/
+.kilocode/
+remote-mcp-server-authless/
+skills/
+skills-lock.json
