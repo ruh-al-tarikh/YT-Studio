@@ -1,3 +1,6 @@
+[![CircleCI](https://dl.circleci.com/status-badge/img/gh/ruhdevops/YT-Studio/tree/main.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/ruhdevops/YT-Studio/tree/main)
+
+
 <!-- 🌌 HERO (Snake Animation) -->
 <p align="center">
   <img src="https://raw.githubusercontent.com/platane/platane/output/github-contribution-grid-snake-dark.svg" width="100%" />
