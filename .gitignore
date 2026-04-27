@@ -14,3 +14,5 @@ dist/
 .history/
 coverage/
 .nyc_output/
+gcr-key*.json
+sandbox/
