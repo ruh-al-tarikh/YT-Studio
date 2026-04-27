@@ -13,6 +13,14 @@
   const ASSUMED_VIDEO_DURATION = 600;
   const ITEMS_PER_PAGE = 12;
 
+  // API Configuration for retry logic
+  const API_CONFIG = {
+    timeout: 8000,
+    retries: 3,
+    backoffMultiplier: 1.5,
+    initialDelay: 500
+  };
+
   const CATEGORY_RULES = [
     { key: 'quran', label: 'Quran', terms: ['quran', 'qur', 'surah', 'ayah', 'allah', 'tafsir', 'islam'] },
     { key: 'prophecy', label: 'Prophecy', terms: ['prophecy', 'prophet', 'end times', 'dajjal', 'gog', 'magog', 'signs'] },
@@ -111,8 +119,68 @@
       dateFrom: null,
       dateTo: null,
       searchDescription: false
-    }
+    },
+    searchDebounceTimer: null
   };
+
+  /**
+   * Fetch with retry logic and exponential backoff
+   * @param {string} url - URL to fetch
+   * @param {object} options - Fetch options
+   * @returns {Promise<Response>} Response object
+   */
+  async function fetchWithRetry(url, options = {}) {
+    let lastError;
+    let delay = API_CONFIG.initialDelay;
+
+    for (let attempt = 0; attempt < API_CONFIG.retries; attempt++) {
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), API_CONFIG.timeout);
+
+        const response = await fetch(url, {
+          ...options,
+          signal: controller.signal
+        });
+
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        return response;
+      } catch (error) {
+        lastError = error;
+        
+        if (error.name === 'AbortError') {
+          lastError = new Error(`Request timeout (${API_CONFIG.timeout}ms) - Attempt ${attempt + 1}/${API_CONFIG.retries}`);
+        }
+
+        console.warn(`API fetch attempt ${attempt + 1} failed:`, lastError);
+
+        if (attempt < API_CONFIG.retries - 1) {
+          await new Promise(resolve => setTimeout(resolve, delay));
+          delay *= API_CONFIG.backoffMultiplier;
+        }
+      }
+    }
+
+    throw lastError;
+  }
+
+  /**
+   * Debounce helper function
+   * @param {function} func - Function to debounce
+   * @param {number} delay - Delay in milliseconds
+   * @returns {function} Debounced function
+   */
+  function debounce(func, delay) {
+    return function(...args) {
+      clearTimeout(state.searchDebounceTimer);
+      state.searchDebounceTimer = setTimeout(() => func.apply(this, args), delay);
+    };
+  }
 
   function sanitizeText(value) {
     return String(value || '')
@@ -181,44 +249,51 @@
           return data.map(mapVideo);
         }
       } catch (error) {
+        console.error('Cache read error:', error);
         localStorage.removeItem(CACHE_KEY);
       }
     }
 
-    const response = await fetch(API);
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
+    try {
+      const response = await fetchWithRetry(API);
+      const json = await response.json();
+      const fetchedVideos = (json.videos || []).map(mapVideo);
+
+      if (!fetchedVideos.length) {
+        return [
+          mapVideo({
+            id: 'Zzcdtm7Il9U',
+            title: 'The hidden wall of Dhul-Qarnayn explained',
+            thumbnail: 'https://i.ytimg.com/vi/Zzcdtm7Il9U/mqdefault.jpg'
+          })
+        ];
+      }
+
+      localStorage.setItem(CACHE_KEY, JSON.stringify({ data: fetchedVideos, timestamp: Date.now() }));
+      return fetchedVideos;
+    } catch (error) {
+      console.error('API fetch failed after retries:', error);
+      throw new Error(`Failed to load archive: ${error.message}`);
     }
-
-    const json = await response.json();
-    const fetchedVideos = (json.videos || []).map(mapVideo);
-
-    if (!fetchedVideos.length) {
-      return [
-        mapVideo({
-          id: 'Zzcdtm7Il9U',
-          title: 'The hidden wall of Dhul-Qarnayn explained',
-          thumbnail: 'https://i.ytimg.com/vi/Zzcdtm7Il9U/mqdefault.jpg'
-        })
-      ];
-    }
-
-    localStorage.setItem(CACHE_KEY, JSON.stringify({ data: fetchedVideos, timestamp: Date.now() }));
-    return fetchedVideos;
   }
 
   function getProgress() {
     try {
       return JSON.parse(localStorage.getItem(PROGRESS_KEY) || '{}');
     } catch (error) {
+      console.error('Progress read error:', error);
       return {};
     }
   }
 
   function saveProgress(id, time, percent) {
-    const progress = getProgress();
-    progress[id] = { time, percent, updatedAt: Date.now() };
-    localStorage.setItem(PROGRESS_KEY, JSON.stringify(progress));
+    try {
+      const progress = getProgress();
+      progress[id] = { time, percent, updatedAt: Date.now() };
+      localStorage.setItem(PROGRESS_KEY, JSON.stringify(progress));
+    } catch (error) {
+      console.error('Failed to save progress:', error);
+    }
   }
 
   function getSavedList() {
@@ -226,12 +301,17 @@
       const saved = JSON.parse(localStorage.getItem(WATCH_LATER_KEY) || '[]');
       return Array.isArray(saved) ? saved : [];
     } catch (error) {
+      console.error('Watch later read error:', error);
       return [];
     }
   }
 
   function saveSavedList(list) {
-    localStorage.setItem(WATCH_LATER_KEY, JSON.stringify(list));
+    try {
+      localStorage.setItem(WATCH_LATER_KEY, JSON.stringify(list));
+    } catch (error) {
+      console.error('Failed to save watch later list:', error);
+    }
   }
 
   function isSaved(id) {
@@ -258,7 +338,11 @@
   }
 
   function setLastPlayed(video) {
-    localStorage.setItem(LAST_PLAYED_KEY, JSON.stringify({ id: video.id, timestamp: Date.now() }));
+    try {
+      localStorage.setItem(LAST_PLAYED_KEY, JSON.stringify({ id: video.id, timestamp: Date.now() }));
+    } catch (error) {
+      console.error('Failed to save last played:', error);
+    }
   }
 
   function getLastPlayed() {
@@ -266,6 +350,7 @@
       const last = JSON.parse(localStorage.getItem(LAST_PLAYED_KEY));
       return last ? state.videos.find((video) => video.id === last.id) || null : null;
     } catch (error) {
+      console.error('Last played read error:', error);
       return null;
     }
   }
@@ -279,7 +364,7 @@
       history = history.slice(0, 10);
       localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(history));
     } catch (error) {
-      // Silent fail
+      console.error('Failed to save search history:', error);
     }
   }
 
@@ -287,6 +372,7 @@
     try {
       return JSON.parse(localStorage.getItem(SEARCH_HISTORY_KEY) || '[]');
     } catch (error) {
+      console.error('Search history read error:', error);
       return [];
     }
   }
@@ -590,13 +676,15 @@
       ? '<i class="fa-solid fa-bookmark" aria-hidden="true"></i><span>Saved</span>'
       : '<i class="fa-regular fa-bookmark" aria-hidden="true"></i><span>Save</span>';
 
-    if (elements.bg) {
-      elements.bg.style.backgroundImage = `url(${image})`;
-    }
-
+    // Remove skeleton animation when data loads
     if (elements.heroSection) {
+      elements.heroSection.classList.remove('skeleton-hero');
       elements.heroSection.style.backgroundImage =
         `linear-gradient(90deg, rgba(5, 10, 20, 0.94) 0%, rgba(5, 10, 20, 0.72) 48%, rgba(5, 10, 20, 0.18) 100%), url(${image})`;
+    }
+
+    if (elements.bg) {
+      elements.bg.style.backgroundImage = `url(${image})`;
     }
   }
 
@@ -718,16 +806,21 @@
   }
 
   function saveBookmark(videoId, time, title) {
-    if (!state.bookmarks[videoId]) {
-      state.bookmarks[videoId] = [];
+    try {
+      if (!state.bookmarks[videoId]) {
+        state.bookmarks[videoId] = [];
+      }
+      state.bookmarks[videoId].push({
+        time,
+        title: title || `Bookmark at ${Math.floor(time / 60)}:${String(time % 60).padStart(2, '0')}`,
+        timestamp: Date.now()
+      });
+      localStorage.setItem(BOOKMARKS_KEY, JSON.stringify(state.bookmarks));
+      showToast('Bookmark saved!');
+    } catch (error) {
+      console.error('Failed to save bookmark:', error);
+      showToast('Failed to save bookmark');
     }
-    state.bookmarks[videoId].push({
-      time,
-      title: title || `Bookmark at ${Math.floor(time / 60)}:${String(time % 60).padStart(2, '0')}`,
-      timestamp: Date.now()
-    });
-    localStorage.setItem(BOOKMARKS_KEY, JSON.stringify(state.bookmarks));
-    showToast('Bookmark saved!');
   }
 
   function renderBookmarks(videoId) {
@@ -868,6 +961,12 @@
     }
   }
 
+  // Debounced search to prevent excessive calculations
+  const debouncedSearch = debounce(() => {
+    renderGrid();
+    renderHighlights();
+  }, 300);
+
   function bindEvents() {
     elements.heroBtn?.addEventListener('click', () => openModal(state.heroVideo, getProgress()[state.heroVideo?.id]?.time || 0));
     elements.heroSaveBtn?.addEventListener('click', () => {
@@ -945,12 +1044,12 @@
       elements.keyboardHints.setAttribute('aria-hidden', 'true');
     });
 
+    // Use debounced search for input event
     elements.searchInput?.addEventListener('input', (event) => {
       state.searchTerm = event.target.value || '';
       elements.clearSearch.style.display = state.searchTerm ? 'inline-flex' : 'none';
       renderSearchSuggestions(state.searchTerm);
-      renderGrid();
-      renderHighlights();
+      debouncedSearch(); // Debounced function
     });
 
     elements.searchInput?.addEventListener('focus', (event) => {
@@ -1120,7 +1219,8 @@
       renderHighlights();
       showKeyboardHints();
     } catch (error) {
-      showError('Failed to load content. Please try again.');
+      console.error('Initialization error:', error);
+      showError(error.message || 'Failed to load content. Please try again.');
     } finally {
       hideLoading();
     }
