@@ -2,6 +2,6 @@
   "name": "yt-studio",
   "version": "1.0.0",
   "scripts": {
-    "build": "mkdir dist && cp -r css js index.html dist/ 2>/dev/null || echo 'Build complete'"
+    "build": "echo 'Static site - build complete'"
   }
 }
