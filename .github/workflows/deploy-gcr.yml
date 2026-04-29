@@ -1,0 +1,35 @@
+name: Build and Push to GCR
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v2
+      with:
+        credentials_json: ${{ secrets.GCP_SA_KEY }}
+        project_id: yt-studio-493116
+    
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@v2
+    
+    - name: Configure Docker for GCR
+      run: gcloud auth configure-docker gcr.io
+    
+    - name: Build Docker image
+      run: |
+        docker build -t gcr.io/yt-studio-493116/yt-studio:latest .
+        docker tag gcr.io/yt-studio-493116/yt-studio:latest gcr.io/yt-studio-493116/yt-studio:${{ github.sha }}
+    
+    - name: Push to GCR
+      run: |
+        docker push gcr.io/yt-studio-493116/yt-studio:latest
+        docker push gcr.io/yt-studio-493116/yt-studio:${{ github.sha }}

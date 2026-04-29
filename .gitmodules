@@ -1,0 +1,3 @@
+[submodule "yt-studio-api"]
+	path = yt-studio-api
+	url = https://github.com/ruhdevops/yt-studio-api.git

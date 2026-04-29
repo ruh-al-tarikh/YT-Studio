@@ -1,0 +1,31 @@
+{
+<<<<<<< HEAD
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "yt-studio",
+  "compatibility_date": "2026-04-25",
+
+=======
+  "name": "yt-studio",
+>>>>>>> b538432 (Fix: Wrangler API - Add CORS headers, /api/videos endpoint, YouTube API key, update frontend)
+  "main": "src/worker.ts",
+  "compatibility_date": "2026-04-28",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS"
+  },
+  "env": {
+    "development": {
+      "vars": {
+        "ENVIRONMENT": "development",
+        "API_URL": "http://localhost:8787"
+      }
+    },
+    "production": {
+      "vars": {
+        "ENVIRONMENT": "production",
+        "API_URL": "https://yt-studio-api.ruhdevopsytstudio.workers.dev"
+      }
+    }
+  }
+}

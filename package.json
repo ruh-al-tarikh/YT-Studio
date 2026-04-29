@@ -1,0 +1,22 @@
+{
+  "name": "yt-studio",
+  "version": "1.0.0",
+  "description": "Ruh Al Tarikh - Cinematic archive for Islamic history, scripture, prophecy, and deep discussion",
+  "author": "Azeez Mohammed Rizwan",
+  "license": "MIT",
+  "scripts": {
+    "dev": "echo 'Dev server not configured - use static files directly'",
+    "build": "echo 'Static site - build complete'",
+    "preview": "echo 'Preview not configured'",
+    "test": "echo 'No tests specified' && exit 0",
+    "lint": "echo 'Linting not configured'"
+  },
+  "dependencies": {
+    "@vercel/analytics": "^2.0.1",
+    "@vercel/speed-insights": "^2.0.0"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  }
+}
