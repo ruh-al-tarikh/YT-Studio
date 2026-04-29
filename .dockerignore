@@ -10,9 +10,13 @@ node_modules/
 dist/
 .vite/
 .vercel/
+.wrangler/
 README.md
 .editorconfig
 .prettierrc
 .idea/
 .vscode/
 coverage/
+.wrangler/
+workflows-starter/
+yt-studio-api/
