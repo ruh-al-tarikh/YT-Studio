@@ -115,7 +115,7 @@ describe('setLastPlayed / getLastPlayed', () => {
     expect(getLastPlayed(storage, [])).toBeNull();
   });
 
-  it('returns null when stored id no longer exists in videos', () => {
+  it('returns undefined when stored id no longer exists in videos', () => {
     const storage = makeStorage();
     setLastPlayed(storage, { id: 'removed' });
     expect(getLastPlayed(storage, [{ id: 'other' }])).toBeUndefined();
@@ -128,18 +128,21 @@ describe('isCacheValid', () => {
   });
 
   it('returns true for fresh cache with data', () => {
-    const cached = JSON.stringify({ data: [{ id: '1' }], timestamp: Date.now() - 1000 });
-    expect(isCacheValid(cached, Date.now())).toBe(true);
+    const now = Date.now();
+    const cached = JSON.stringify({ data: [{ id: '1' }], timestamp: now - 1000 });
+    expect(isCacheValid(cached, now)).toBe(true);
   });
 
   it('returns false for expired cache', () => {
-    const cached = JSON.stringify({ data: [{ id: '1' }], timestamp: Date.now() - CACHE_EXPIRY - 1 });
-    expect(isCacheValid(cached, Date.now())).toBe(false);
+    const now = Date.now();
+    const cached = JSON.stringify({ data: [{ id: '1' }], timestamp: now - CACHE_EXPIRY - 1 });
+    expect(isCacheValid(cached, now)).toBe(false);
   });
 
   it('returns false for cache with empty data', () => {
-    const cached = JSON.stringify({ data: [], timestamp: Date.now() });
-    expect(isCacheValid(cached, Date.now())).toBe(false);
+    const now = Date.now();
+    const cached = JSON.stringify({ data: [], timestamp: now });
+    expect(isCacheValid(cached, now)).toBe(false);
   });
 
   it('returns false for malformed JSON', () => {
