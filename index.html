@@ -3,6 +3,304 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Ruh Al Tarikh - YT Studio Archive</title>
+		<meta
+			name="description"
+			content="Cinematic archive for Ruh Al Tarikh episodes exploring Islamic history, scripture, prophecy, and deep discussion."
+		/>
+
+		<!-- Favicons -->
+		<link rel="icon" type="image/svg+xml" href="/public/favicon.svg" />
+
+		<!-- Fonts -->
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Manrope:wght@400;500;600;700;800&display=swap"
+			rel="stylesheet"
+		/>
+
+		<!-- Icons -->
+		<link
+			rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+		/>
+
+		<!-- Styles -->
+		<link rel="stylesheet" href="css/style.css" />
+	</head>
+	<body class="dark-mode">
+		<div id="bg" class="bg-layer"></div>
+
+		<header class="header">
+			<div class="header-content">
+				<div class="brand">
+					<h1 class="logo">Ruh Al Tarikh</h1>
+					<span class="badge">Studio Archive</span>
+				</div>
+
+				<div class="header-actions">
+					<div class="search-box">
+						<i class="fa-solid fa-magnifying-glass search-icon"></i>
+						<input
+							type="text"
+							id="searchInput"
+							placeholder="Search episodes... (Type '/' to focus)"
+							aria-label="Search episodes"
+						/>
+						<div id="searchSuggestions" class="search-suggestions" style="display: none"></div>
+					</div>
+
+					<button id="themeToggle" class="icon-button" type="button" aria-label="Toggle theme">
+						<i class="fa-solid fa-moon"></i>
+					</button>
+
+					<button id="viewWatchLater" class="pill-button" type="button">
+						<i class="fa-solid fa-clock-rotate-left"></i>
+						<span>Watch Later</span>
+						<span id="watch-later-count" class="counter" style="display: none">0</span>
+					</button>
+
+					<button id="openDashboard" class="pill-button" type="button">
+						<i class="fa-solid fa-chart-simple"></i>
+						<span>Dashboard</span>
+					</button>
+				</div>
+			</div>
+		</header>
+
+		<main class="main-content">
+			<div id="loading-state" class="loading-state" style="display: none">
+				<div class="spinner"></div>
+				<p>Loading premium content...</p>
+			</div>
+
+			<div id="error-container" class="error-container" style="display: none">
+				<p id="error-message"></p>
+				<button id="retry-btn" type="button">Retry</button>
+			</div>
+
+			<section class="hero" aria-labelledby="hero-title">
+				<div class="hero-overlay">
+					<div class="hero-copy">
+						<p class="hero-kicker">Featured episode</p>
+						<h2 id="hero-title">Loading...</h2>
+						<p id="hero-subtitle" class="hero-subtitle">A curated spotlight from the latest archive.</p>
+						<div class="hero-meta">
+							<span id="hero-category" class="meta-chip">History</span>
+							<span id="hero-date" class="meta-chip">Recently added</span>
+						</div>
+						<div class="hero-actions">
+							<button id="hero-btn" class="primary-button" type="button">
+								<i class="fa-solid fa-play" aria-hidden="true"></i>
+								<span>Watch now</span>
+							</button>
+							<button id="hero-save-btn" class="secondary-button" type="button">
+								<i class="fa-regular fa-bookmark" aria-hidden="true"></i>
+								<span>Save</span>
+							</button>
+						</div>
+					</div>
+					<aside class="hero-aside" aria-label="Archive highlights">
+						<div class="hero-stat">
+							<span class="stat-label">Episodes</span>
+							<strong id="stat-total">0</strong>
+						</div>
+						<div class="hero-stat">
+							<span class="stat-label">In progress</span>
+							<strong id="stat-progress">0</strong>
+						</div>
+						<div class="hero-stat">
+							<span class="stat-label">Saved</span>
+							<strong id="stat-saved">0</strong>
+						</div>
+					</aside>
+				</div>
+			</section>
+
+			<section class="highlights" aria-label="Quick highlights">
+				<article class="highlight-card">
+					<span class="highlight-label">Latest focus</span>
+					<h3 id="highlight-latest-title">Loading latest episode...</h3>
+					<p id="highlight-latest-copy">Fresh drops from the archive show up here first.</p>
+				</article>
+				<article class="highlight-card">
+					<span class="highlight-label">Current theme</span>
+					<h3 id="highlight-theme-title">History</h3>
+					<p id="highlight-theme-copy">The archive groups episodes by historical inquiry, scripture, and debate.</p>
+				</article>
+				<article class="highlight-card">
+					<span class="highlight-label">Viewing rhythm</span>
+					<h3 id="highlight-progress-title">No active sessions yet</h3>
+					<p id="highlight-progress-copy">Start an episode and your progress will be tracked here.</p>
+				</article>
+			</section>
+
+			<section id="continue-block" class="content-section" style="display: none">
+				<div class="section-heading">
+					<h2 class="section-title">Continue Watching</h2>
+					<p class="section-copy">Jump back into unfinished episodes.</p>
+				</div>
+				<div id="continue-row" class="row"></div>
+			</section>
+
+			<section id="trending-block" class="content-section" style="display: none">
+				<div class="section-heading">
+					<h2 class="section-title">Trending in the Archive</h2>
+					<p class="section-copy">A blend of recent drops and frequently resumed talks.</p>
+				</div>
+				<div id="trending-row" class="row"></div>
+			</section>
+
+			<section id="recommended-block" class="content-section" style="display: none">
+				<div class="section-heading">
+					<h2 class="section-title">Recommended For You</h2>
+					<p class="section-copy">Episodes based on your viewing history.</p>
+				</div>
+				<div id="recommended-row" class="row"></div>
+			</section>
+
+			<section class="content-section">
+				<div class="section-heading">
+					<h2 class="section-title">Episodes</h2>
+					<p class="section-copy">Every upload, searchable and filterable in one place.</p>
+				</div>
+				<div id="results-meta" class="results-meta"></div>
+				<div id="grid" class="grid"></div>
+				<div id="loadMoreContainer" style="display: none; text-align: center; padding: 30px 0">
+					<button id="loadMoreBtn" class="primary-button" type="button">Load More Episodes</button>
+				</div>
+			</section>
+		</main>
+
+		<div id="modal" class="modal" aria-hidden="true">
+			<div class="modal-content">
+				<button id="close" class="close-btn" type="button" aria-label="Close player">
+					<i class="fa-solid fa-xmark" aria-hidden="true"></i>
+				</button>
+				<div class="modal-body">
+					<div class="video-container">
+						<iframe
+							id="player"
+							title="YouTube player"
+							allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
+							allowfullscreen
+						></iframe>
+					</div>
+					<div class="video-sidebar">
+						<button id="toggleTranscript" class="sidebar-btn" type="button" aria-label="Toggle transcript panel" title="View episode notes">
+							<i class="fa-solid fa-note-sticky" aria-hidden="true"></i>
+						</button>
+						<button id="shareEpisode" class="sidebar-btn" type="button" aria-label="Share episode" title="Share this episode">
+							<i class="fa-solid fa-share-nodes" aria-hidden="true"></i>
+						</button>
+					</div>
+					<div id="transcriptPanel" class="transcript-panel" aria-hidden="true">
+						<div class="transcript-header">
+							<h3>Episode Notes</h3>
+							<button id="closeTranscript" class="close-transcript" type="button" aria-label="Close transcript">
+								<i class="fa-solid fa-xmark" aria-hidden="true"></i>
+							</button>
+						</div>
+						<div id="transcriptContent" class="transcript-content">
+							<p class="transcript-placeholder">Transcript & notes coming soon for this episode.</p>
+						</div>
+					</div>
+					<div id="sharePanel" class="share-panel" aria-hidden="true">
+						<div class="share-header">
+							<h3>Share Episode</h3>
+							<button id="closeShare" class="close-share" type="button" aria-label="Close share">
+								<i class="fa-solid fa-xmark" aria-hidden="true"></i>
+							</button>
+						</div>
+						<div class="share-content">
+							<div class="share-link-block">
+								<label for="shareLink">Copy link</label>
+								<div class="copy-input-group">
+									<input type="text" id="shareLink" readonly />
+									<button id="copyLinkBtn" class="copy-btn" type="button" aria-label="Copy link">Copy</button>
+								</div>
+							</div>
+							<div class="share-social">
+								<p>Share on</p>
+								<div class="social-buttons">
+									<button id="shareTwitter" class="social-btn twitter" type="button" aria-label="Share on Twitter" title="Twitter">
+										<i class="fa-brands fa-twitter" aria-hidden="true"></i>
+									</button>
+									<button id="shareFacebook" class="social-btn facebook" type="button" aria-label="Share on Facebook" title="Facebook">
+										<i class="fa-brands fa-facebook" aria-hidden="true"></i>
+									</button>
+									<button id="shareWhatsApp" class="social-btn whatsapp" type="button" aria-label="Share on WhatsApp" title="WhatsApp">
+										<i class="fa-brands fa-whatsapp" aria-hidden="true"></i>
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<h2 id="video-title" class="modal-title"></h2>
+			</div>
+		</div>
+
+		<section id="watchLaterPage" class="watch-later-page" style="display: none" aria-hidden="true">
+			<div class="watch-later-shell">
+				<div class="watch-later-header">
+					<div>
+						<p class="overlay-kicker">Saved queue</p>
+						<h2>Watch Later</h2>
+					</div>
+					<button id="closeWatchLater" class="icon-button" type="button" aria-label="Close watch later">
+						<i class="fa-solid fa-xmark" aria-hidden="true"></i>
+					</button>
+				</div>
+				<div id="watchLaterContainer" class="overlay-grid"></div>
+			</div>
+		</section>
+
+		<section id="dashboardModal" class="dashboard-modal" style="display: none" aria-hidden="true">
+			<div class="dashboard-content">
+				<div class="dashboard-header">
+					<div>
+						<p class="overlay-kicker">Viewer snapshot</p>
+						<h2>Archive Dashboard</h2>
+					</div>
+					<button id="closeDashboard" class="icon-button" type="button" aria-label="Close dashboard">
+						<i class="fa-solid fa-xmark" aria-hidden="true"></i>
+					</button>
+				</div>
+				<div class="dashboard-stats">
+					<article class="stat-card">
+						<h3>Episodes Loaded</h3>
+						<p id="dashboard-total">0</p>
+					</article>
+					<article class="stat-card">
+						<h3>Saved for Later</h3>
+						<p id="dashboard-saved">0</p>
+					</article>
+					<article class="stat-card">
+						<h3>Active Sessions</h3>
+						<p id="dashboard-progress">0</p>
+					</article>
+					<article class="stat-card">
+						<h3>Hours Estimated</h3>
+						<p id="dashboard-hours">0.0h</p>
+					</article>
+				</div>
+				<div class="dashboard-panels">
+					<section class="dashboard-panel">
+						<h3>Category Spread</h3>
+						<div id="dashboardCategories" class="dashboard-list"></div>
+					</section>
+					<section class="dashboard-panel">
+						<h3>Resume Queue</h3>
+						<div id="dashboardResumeList" class="dashboard-list"></div>
+					</section>
+				</div>
+			</div>
+		</section>
+
+		<div id="toast" class="toast" aria-live="polite"></div>
+
 		<title>Ruh Al Tarikh</title>
 		<meta
 			name="description"
@@ -341,6 +639,11 @@
 			</div>
 		</footer>
 		<script src="js/analytics.js" type="module" defer></script>
+
+		<!-- Vercel Web Analytics -->
+		<script src="js/analytics.js" type="module" defer></script>
+		<script src="js/app.js" type="module" defer></script>
+
 		<script src="js/app.js" type="module" defer></script>
 		<!-- Cloudflare Web Analytics -->
 		<script
