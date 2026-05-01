@@ -1,8 +1,13 @@
-import { defineConfig } from 'vite';
+import { defineConfig } from 'vite'
+import Devtools from 'vite-plugin-devtools'
 
 export default defineConfig({
-  root: '.',
-  build: {
-    outDir: 'dist'
-  }
-});
+  plugins: [
+    Devtools({
+      // Enable devtools UI
+      insertDevtools: true,
+      // Customize behavior
+      silent: false,
+    })
+  ],
+})
