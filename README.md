@@ -35,8 +35,8 @@ A cinematic archive for **Ruh Al Tarikh** episodes exploring Islamic history, sc
 
 ### Local Development
 ```bash
-npm install
-npm run dev
+pnpm install
+pnpm dev
 # Visit http://localhost:5173
 ```
 
