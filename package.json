@@ -14,9 +14,13 @@
   },
   "dependencies": {
     "@vercel/analytics": "^2.0.1",
-    "@vercel/speed-insights": "^2.0.0"
+    "@vercel/speed-insights": "^2.0.0",
+    "compression": "^1.8.1",
+    "express": "^5.2.1"
   },
   "devDependencies": {
+    "@types/compression": "^1.8.1",
+    "@types/express": "^5.0.6",
     "vite": "^8.0.10"
   },
   "engines": {
