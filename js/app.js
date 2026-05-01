@@ -294,6 +294,36 @@
     const slice = state.filtered.slice(0, CONFIG.ITEMS_PER_PAGE * (state.page + 1));
     el.grid.innerHTML = slice.map(card).join('');
 
+    const loadMoreContainer = $('loadMoreContainer');
+    if (loadMoreContainer) {
+      loadMoreContainer.style.display =
+        slice.length < state.filtered.length ? 'block' : 'none';
+    }
+  }
+
+  /* ----------------------------
+   * MODAL / PLAYER
+   * ---------------------------- */
+  function openPlayer(v) {
+    if (!v) return;
+    state.current = v;
+
+    const videoId = v.id || v.videoId;
+    el.player.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`;
+    el.modal.style.display = 'flex';
+    el.modal.setAttribute('aria-hidden', 'false');
+    el.body.style.overflow = 'hidden';
+
+    const titleEl = $('video-title');
+    if (titleEl) titleEl.textContent = v.title;
+  }
+
+  function closePlayer() {
+    el.player.src = '';
+    el.modal.style.display = 'none';
+    el.modal.setAttribute('aria-hidden', 'true');
+    el.body.style.overflow = '';
+    state.current = null;
     if (el.loadMoreContainer) {
       el.loadMoreContainer.style.display = slice.length < state.filtered.length ? 'block' : 'none';
     }
@@ -313,6 +343,8 @@
     if (!v || !el.heroTitle) return;
 
     el.heroTitle.textContent = v.title;
+    el.heroSubtitle.textContent = v.description || '';
+    el.bg.style.backgroundImage = `url(${v.thumbnail})`;
     if (el.heroSubtitle) el.heroSubtitle.textContent = v.description;
     if (el.heroCategory) el.heroCategory.textContent = categoryLabel(v.category);
     if (el.bg) el.bg.style.backgroundImage = `url(${v.thumbnail})`;
@@ -327,12 +359,43 @@
    * EVENTS
    * ---------------------------- */
   function bind() {
+    // Search input
     // Search
     el.search?.addEventListener('input', (e) => {
       state.search = e.target.value;
       state.page = 0;
       if (el.clearSearch) el.clearSearch.style.display = state.search ? 'block' : 'none';
       clearTimeout(state.debounceTimer);
+      state.debounceTimer = setTimeout(() => {
+        state.page = 0;
+        render();
+      }, 250);
+    });
+
+    // Clear search
+    $('clearSearch')?.addEventListener('click', () => {
+      if (el.search) {
+        el.search.value = '';
+        state.search = '';
+        state.page = 0;
+        render();
+      }
+    });
+
+    // Filter chips
+    document.querySelector('.filter-chips')?.addEventListener('click', (e) => {
+      const chip = e.target.closest('.chip');
+      if (!chip) return;
+
+      document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+
+      state.category = chip.dataset.cat;
+      state.page = 0;
+      render();
+    });
+
+    // Load more
       state.debounceTimer = setTimeout(render, 300);
     });
 
@@ -350,6 +413,46 @@
       render();
     });
 
+    // Hero Play
+    el.heroBtn?.addEventListener('click', () => {
+      if (state.hero) openPlayer(state.hero);
+    });
+
+    // Modal Close
+    el.closeModal?.addEventListener('click', closePlayer);
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closePlayer();
+    });
+
+    // Video Grid - Event delegation
+    el.grid?.addEventListener('click', (e) => {
+      const card = e.target.closest('.card');
+      if (!card) return;
+
+      const id = card.dataset.id;
+      const video = state.videos.find(v => (v.id === id || v.videoId === id));
+      if (video) openPlayer(video);
+    });
+
+    // Handle clicks outside modal content to close
+    el.modal?.addEventListener('click', (e) => {
+      if (e.target === el.modal) closePlayer();
+    });
+
+    // Theme toggle
+    $('darkModeToggle')?.addEventListener('click', () => {
+      const isDark = el.body.classList.toggle('light-theme');
+      const icon = $('darkModeToggle').querySelector('i');
+      if (icon) {
+        icon.className = isDark ? 'fa-regular fa-sun' : 'fa-regular fa-moon';
+      }
+    });
+
+    // Retry button
+    $('retry-btn')?.addEventListener('click', () => {
+      el.error.style.display = 'none';
+      init();
     // Chips
     el.chips.forEach(chip => {
       chip.addEventListener('click', () => {
