@@ -1,0 +1,726 @@
+docker	Set up job	﻿2026-05-01T08:51:16.1770837Z Current runner version: '2.334.0'
+docker	Set up job	2026-05-01T08:51:16.1793065Z ##[group]Runner Image Provisioner
+docker	Set up job	2026-05-01T08:51:16.1793813Z Hosted Compute Agent
+docker	Set up job	2026-05-01T08:51:16.1794414Z Version: 20260213.493
+docker	Set up job	2026-05-01T08:51:16.1794978Z Commit: 5c115507f6dd24b8de37d8bbe0bb4509d0cc0fa3
+docker	Set up job	2026-05-01T08:51:16.1795639Z Build Date: 2026-02-13T00:28:41Z
+docker	Set up job	2026-05-01T08:51:16.1796279Z Worker ID: {af0d7ed4-ebbb-496d-9db4-fc223307242e}
+docker	Set up job	2026-05-01T08:51:16.1797103Z Azure Region: westcentralus
+docker	Set up job	2026-05-01T08:51:16.1797654Z ##[endgroup]
+docker	Set up job	2026-05-01T08:51:16.1799016Z ##[group]Operating System
+docker	Set up job	2026-05-01T08:51:16.1799588Z Ubuntu
+docker	Set up job	2026-05-01T08:51:16.1799994Z 24.04.4
+docker	Set up job	2026-05-01T08:51:16.1800430Z LTS
+docker	Set up job	2026-05-01T08:51:16.1800837Z ##[endgroup]
+docker	Set up job	2026-05-01T08:51:16.1801252Z ##[group]Runner Image
+docker	Set up job	2026-05-01T08:51:16.1801753Z Image: ubuntu-24.04
+docker	Set up job	2026-05-01T08:51:16.1802226Z Version: 20260413.86.1
+docker	Set up job	2026-05-01T08:51:16.1803073Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260413.86/images/ubuntu/Ubuntu2404-Readme.md
+docker	Set up job	2026-05-01T08:51:16.1804552Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260413.86
+docker	Set up job	2026-05-01T08:51:16.1805323Z ##[endgroup]
+docker	Set up job	2026-05-01T08:51:16.1806339Z ##[group]GITHUB_TOKEN Permissions
+docker	Set up job	2026-05-01T08:51:16.1808352Z Contents: read
+docker	Set up job	2026-05-01T08:51:16.1808899Z Metadata: read
+docker	Set up job	2026-05-01T08:51:16.1809315Z Packages: read
+docker	Set up job	2026-05-01T08:51:16.1809752Z ##[endgroup]
+docker	Set up job	2026-05-01T08:51:16.1812079Z Secret source: Actions
+docker	Set up job	2026-05-01T08:51:16.1812774Z Prepare workflow directory
+docker	Set up job	2026-05-01T08:51:16.2123285Z Prepare all required actions
+docker	Set up job	2026-05-01T08:51:16.2161472Z Getting action download info
+docker	Set up job	2026-05-01T08:51:16.6353624Z Download action repository 'actions/checkout@v4' (SHA:34e114876b0b11c390a56381ad16ebd13914f8d5)
+docker	Set up job	2026-05-01T08:51:16.7100272Z Download action repository 'docker/login-action@v3' (SHA:c94ce9fb468520275223c153574b00df6fe4bcc9)
+docker	Set up job	2026-05-01T08:51:17.7954041Z Download action repository 'docker/setup-buildx-action@v3' (SHA:8d2750c68a42422c14e847fe6c8ac0403b4cbd6f)
+docker	Set up job	2026-05-01T08:51:18.7660341Z Download action repository 'docker/build-push-action@v6' (SHA:10e90e3645eae34f1e60eeb005ba3a3d33f178e8)
+docker	Set up job	2026-05-01T08:51:19.9784938Z Complete job name: docker
+docker	Checkout	﻿2026-05-01T08:51:20.0344716Z ##[group]Run actions/checkout@v4
+docker	Checkout	2026-05-01T08:51:20.0345319Z with:
+docker	Checkout	2026-05-01T08:51:20.0345599Z   repository: ruhdevops/YT-Studio
+docker	Checkout	2026-05-01T08:51:20.0346161Z   token: ***
+docker	Checkout	2026-05-01T08:51:20.0346538Z   ssh-strict: true
+docker	Checkout	2026-05-01T08:51:20.0346791Z   ssh-user: git
+docker	Checkout	2026-05-01T08:51:20.0347104Z   persist-credentials: true
+docker	Checkout	2026-05-01T08:51:20.0347401Z   clean: true
+docker	Checkout	2026-05-01T08:51:20.0347670Z   sparse-checkout-cone-mode: true
+docker	Checkout	2026-05-01T08:51:20.0347976Z   fetch-depth: 1
+docker	Checkout	2026-05-01T08:51:20.0348244Z   fetch-tags: false
+docker	Checkout	2026-05-01T08:51:20.0348493Z   show-progress: true
+docker	Checkout	2026-05-01T08:51:20.0348771Z   lfs: false
+docker	Checkout	2026-05-01T08:51:20.0349034Z   submodules: false
+docker	Checkout	2026-05-01T08:51:20.0349270Z   set-safe-directory: true
+docker	Checkout	2026-05-01T08:51:20.0349825Z ##[endgroup]
+docker	Checkout	2026-05-01T08:51:20.1418309Z Syncing repository: ruhdevops/YT-Studio
+docker	Checkout	2026-05-01T08:51:20.1421057Z ##[group]Getting Git version info
+docker	Checkout	2026-05-01T08:51:20.1421854Z Working directory is '/home/runner/work/YT-Studio/YT-Studio'
+docker	Checkout	2026-05-01T08:51:20.1423060Z [command]/usr/bin/git version
+docker	Checkout	2026-05-01T08:51:20.1447222Z git version 2.53.0
+docker	Checkout	2026-05-01T08:51:20.1470417Z ##[endgroup]
+docker	Checkout	2026-05-01T08:51:20.1492433Z Temporarily overriding HOME='/home/runner/work/_temp/0f1c9a1a-ea7f-472d-8175-798f36ba4884' before making global git config changes
+docker	Checkout	2026-05-01T08:51:20.1494296Z Adding repository directory to the temporary git global config as a safe directory
+docker	Checkout	2026-05-01T08:51:20.1499917Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/YT-Studio/YT-Studio
+docker	Checkout	2026-05-01T08:51:20.1529194Z Deleting the contents of '/home/runner/work/YT-Studio/YT-Studio'
+docker	Checkout	2026-05-01T08:51:20.1533015Z ##[group]Initializing the repository
+docker	Checkout	2026-05-01T08:51:20.1539059Z [command]/usr/bin/git init /home/runner/work/YT-Studio/YT-Studio
+docker	Checkout	2026-05-01T08:51:20.1600994Z hint: Using 'master' as the name for the initial branch. This default branch name
+docker	Checkout	2026-05-01T08:51:20.1602096Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+docker	Checkout	2026-05-01T08:51:20.1603282Z hint: to use in all of your new repositories, which will suppress this warning,
+docker	Checkout	2026-05-01T08:51:20.1604077Z hint: call:
+docker	Checkout	2026-05-01T08:51:20.1604843Z hint:
+docker	Checkout	2026-05-01T08:51:20.1605509Z hint: 	git config --global init.defaultBranch <name>
+docker	Checkout	2026-05-01T08:51:20.1606099Z hint:
+docker	Checkout	2026-05-01T08:51:20.1606818Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+docker	Checkout	2026-05-01T08:51:20.1607616Z hint: 'development'. The just-created branch can be renamed via this command:
+docker	Checkout	2026-05-01T08:51:20.1608334Z hint:
+docker	Checkout	2026-05-01T08:51:20.1608737Z hint: 	git branch -m <name>
+docker	Checkout	2026-05-01T08:51:20.1609193Z hint:
+docker	Checkout	2026-05-01T08:51:20.1609811Z hint: Disable this message with "git config set advice.defaultBranchName false"
+docker	Checkout	2026-05-01T08:51:20.1610740Z Initialized empty Git repository in /home/runner/work/YT-Studio/YT-Studio/.git/
+docker	Checkout	2026-05-01T08:51:20.1616666Z [command]/usr/bin/git remote add origin https://github.com/ruhdevops/YT-Studio
+docker	Checkout	2026-05-01T08:51:20.1643821Z ##[endgroup]
+docker	Checkout	2026-05-01T08:51:20.1644752Z ##[group]Disabling automatic garbage collection
+docker	Checkout	2026-05-01T08:51:20.1649117Z [command]/usr/bin/git config --local gc.auto 0
+docker	Checkout	2026-05-01T08:51:20.1670972Z ##[endgroup]
+docker	Checkout	2026-05-01T08:51:20.1671717Z ##[group]Setting up auth
+docker	Checkout	2026-05-01T08:51:20.1678331Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+docker	Checkout	2026-05-01T08:51:20.1701436Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+docker	Checkout	2026-05-01T08:51:20.1918639Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+docker	Checkout	2026-05-01T08:51:20.1940922Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+docker	Checkout	2026-05-01T08:51:20.2106246Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+docker	Checkout	2026-05-01T08:51:20.2134697Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+docker	Checkout	2026-05-01T08:51:20.2312273Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+docker	Checkout	2026-05-01T08:51:20.2339187Z ##[endgroup]
+docker	Checkout	2026-05-01T08:51:20.2340263Z ##[group]Fetching the repository
+docker	Checkout	2026-05-01T08:51:20.2348917Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +da9f32a83d80a5257c56c2da38baa75a3d532203:refs/remotes/origin/main
+docker	Checkout	2026-05-01T08:51:20.7043162Z From https://github.com/ruhdevops/YT-Studio
+docker	Checkout	2026-05-01T08:51:20.7044264Z  * [new ref]         da9f32a83d80a5257c56c2da38baa75a3d532203 -> origin/main
+docker	Checkout	2026-05-01T08:51:20.7068671Z ##[endgroup]
+docker	Checkout	2026-05-01T08:51:20.7069341Z ##[group]Determining the checkout info
+docker	Checkout	2026-05-01T08:51:20.7070246Z ##[endgroup]
+docker	Checkout	2026-05-01T08:51:20.7076640Z [command]/usr/bin/git sparse-checkout disable
+docker	Checkout	2026-05-01T08:51:20.7108558Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+docker	Checkout	2026-05-01T08:51:20.7129206Z ##[group]Checking out the ref
+docker	Checkout	2026-05-01T08:51:20.7133944Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+docker	Checkout	2026-05-01T08:51:20.7199955Z Switched to a new branch 'main'
+docker	Checkout	2026-05-01T08:51:20.7201104Z branch 'main' set up to track 'origin/main'.
+docker	Checkout	2026-05-01T08:51:20.7207532Z ##[endgroup]
+docker	Checkout	2026-05-01T08:51:20.7236347Z [command]/usr/bin/git log -1 --format=%H
+docker	Checkout	2026-05-01T08:51:20.7254117Z da9f32a83d80a5257c56c2da38baa75a3d532203
+docker	Log in to Docker Hub	﻿2026-05-01T08:51:20.7427990Z ##[group]Run docker/login-action@v3
+docker	Log in to Docker Hub	2026-05-01T08:51:20.7428256Z with:
+docker	Log in to Docker Hub	2026-05-01T08:51:20.7428433Z   username: synapsexlocal
+docker	Log in to Docker Hub	2026-05-01T08:51:20.7428771Z   password: ***
+docker	Log in to Docker Hub	2026-05-01T08:51:20.7428953Z   logout: true
+docker	Log in to Docker Hub	2026-05-01T08:51:20.7429253Z ##[endgroup]
+docker	Log in to Docker Hub	2026-05-01T08:51:21.0241014Z Logging into docker.io...
+docker	Log in to Docker Hub	2026-05-01T08:51:21.4700810Z Login Succeeded!
+docker	Set up Docker Buildx	﻿2026-05-01T08:51:21.4821016Z ##[group]Run docker/setup-buildx-action@v3
+docker	Set up Docker Buildx	2026-05-01T08:51:21.4821303Z with:
+docker	Set up Docker Buildx	2026-05-01T08:51:21.4821467Z   driver: cloud
+docker	Set up Docker Buildx	2026-05-01T08:51:21.4821667Z   endpoint: synapsexlocal/ytweb
+docker	Set up Docker Buildx	2026-05-01T08:51:21.4821879Z   version: latest
+docker	Set up Docker Buildx	2026-05-01T08:51:21.4822064Z   use: true
+docker	Set up Docker Buildx	2026-05-01T08:51:21.4822233Z   keep-state: false
+docker	Set up Docker Buildx	2026-05-01T08:51:21.4822416Z   cache-binary: true
+docker	Set up Docker Buildx	2026-05-01T08:51:21.4822605Z   cleanup: true
+docker	Set up Docker Buildx	2026-05-01T08:51:21.4822776Z   install: false
+docker	Set up Docker Buildx	2026-05-01T08:51:21.4822957Z ##[endgroup]
+docker	Set up Docker Buildx	2026-05-01T08:51:21.7090426Z ##[group]Docker info
+docker	Set up Docker Buildx	2026-05-01T08:51:21.7111840Z [command]/usr/bin/docker version
+docker	Set up Docker Buildx	2026-05-01T08:51:21.7278254Z Client: Docker Engine - Community
+docker	Set up Docker Buildx	2026-05-01T08:51:21.7279937Z  Version:           28.0.4
+docker	Set up Docker Buildx	2026-05-01T08:51:21.7280312Z  API version:       1.48
+docker	Set up Docker Buildx	2026-05-01T08:51:21.7280811Z  Go version:        go1.23.7
+docker	Set up Docker Buildx	2026-05-01T08:51:21.7281321Z  Git commit:        b8034c0
+docker	Set up Docker Buildx	2026-05-01T08:51:21.7281924Z  Built:             Tue Mar 25 15:07:16 2025
+docker	Set up Docker Buildx	2026-05-01T08:51:21.7282469Z  OS/Arch:           linux/amd64
+docker	Set up Docker Buildx	2026-05-01T08:51:21.7283024Z  Context:           default
+docker	Set up Docker Buildx	2026-05-01T08:51:21.7283356Z 
+docker	Set up Docker Buildx	2026-05-01T08:51:21.7283687Z Server: Docker Engine - Community
+docker	Set up Docker Buildx	2026-05-01T08:51:21.7284089Z  Engine:
+docker	Set up Docker Buildx	2026-05-01T08:51:21.7284775Z   Version:          28.0.4
+docker	Set up Docker Buildx	2026-05-01T08:51:21.7285149Z   API version:      1.48 (minimum version 1.24)
+docker	Set up Docker Buildx	2026-05-01T08:51:21.7285416Z   Go version:       go1.23.7
+docker	Set up Docker Buildx	2026-05-01T08:51:21.7285670Z   Git commit:       6430e49
+docker	Set up Docker Buildx	2026-05-01T08:51:21.7286064Z   Built:            Tue Mar 25 15:07:16 2025
+docker	Set up Docker Buildx	2026-05-01T08:51:21.7286621Z   OS/Arch:          linux/amd64
+docker	Set up Docker Buildx	2026-05-01T08:51:21.7287163Z   Experimental:     false
+docker	Set up Docker Buildx	2026-05-01T08:51:21.7287527Z  containerd:
+docker	Set up Docker Buildx	2026-05-01T08:51:21.7287845Z   Version:          v2.2.2
+docker	Set up Docker Buildx	2026-05-01T08:51:21.7288336Z   GitCommit:        301b2dac98f15c27117da5c8af12118a041a31d9
+docker	Set up Docker Buildx	2026-05-01T08:51:21.7288838Z  runc:
+docker	Set up Docker Buildx	2026-05-01T08:51:21.7289139Z   Version:          1.3.4
+docker	Set up Docker Buildx	2026-05-01T08:51:21.7289447Z   GitCommit:        v1.3.4-0-gd6d73eb8
+docker	Set up Docker Buildx	2026-05-01T08:51:21.7289683Z  docker-init:
+docker	Set up Docker Buildx	2026-05-01T08:51:21.7289876Z   Version:          0.19.0
+docker	Set up Docker Buildx	2026-05-01T08:51:21.7290084Z   GitCommit:        de40ad0
+docker	Set up Docker Buildx	2026-05-01T08:51:21.7322982Z [command]/usr/bin/docker info
+docker	Set up Docker Buildx	2026-05-01T08:51:21.8306849Z Client: Docker Engine - Community
+docker	Set up Docker Buildx	2026-05-01T08:51:21.8311681Z  Version:    28.0.4
+docker	Set up Docker Buildx	2026-05-01T08:51:21.8312066Z  Context:    default
+docker	Set up Docker Buildx	2026-05-01T08:51:21.8312404Z  Debug Mode: false
+docker	Set up Docker Buildx	2026-05-01T08:51:21.8312707Z  Plugins:
+docker	Set up Docker Buildx	2026-05-01T08:51:21.8313039Z   buildx: Docker Buildx (Docker Inc.)
+docker	Set up Docker Buildx	2026-05-01T08:51:21.8313461Z     Version:  v0.33.0
+docker	Set up Docker Buildx	2026-05-01T08:51:21.8313928Z     Path:     /usr/libexec/docker/cli-plugins/docker-buildx
+docker	Set up Docker Buildx	2026-05-01T08:51:21.8314482Z   compose: Docker Compose (Docker Inc.)
+docker	Set up Docker Buildx	2026-05-01T08:51:21.8314902Z     Version:  v2.38.2
+docker	Set up Docker Buildx	2026-05-01T08:51:21.8315362Z     Path:     /usr/libexec/docker/cli-plugins/docker-compose
+docker	Set up Docker Buildx	2026-05-01T08:51:21.8315744Z 
+docker	Set up Docker Buildx	2026-05-01T08:51:21.8315903Z Server:
+docker	Set up Docker Buildx	2026-05-01T08:51:21.8316175Z  Containers: 0
+docker	Set up Docker Buildx	2026-05-01T08:51:21.8316760Z   Running: 0
+docker	Set up Docker Buildx	2026-05-01T08:51:21.8317067Z   Paused: 0
+docker	Set up Docker Buildx	2026-05-01T08:51:21.8317352Z   Stopped: 0
+docker	Set up Docker Buildx	2026-05-01T08:51:21.8317630Z  Images: 6
+docker	Set up Docker Buildx	2026-05-01T08:51:21.8317932Z  Server Version: 28.0.4
+docker	Set up Docker Buildx	2026-05-01T08:51:21.8318311Z  Storage Driver: overlay2
+docker	Set up Docker Buildx	2026-05-01T08:51:21.8318593Z   Backing Filesystem: extfs
+docker	Set up Docker Buildx	2026-05-01T08:51:21.8318868Z   Supports d_type: true
+docker	Set up Docker Buildx	2026-05-01T08:51:21.8319079Z   Using metacopy: false
+docker	Set up Docker Buildx	2026-05-01T08:51:21.8319285Z   Native Overlay Diff: false
+docker	Set up Docker Buildx	2026-05-01T08:51:21.8319502Z   userxattr: false
+docker	Set up Docker Buildx	2026-05-01T08:51:21.8319695Z  Logging Driver: json-file
+docker	Set up Docker Buildx	2026-05-01T08:51:21.8319928Z  Cgroup Driver: systemd
+docker	Set up Docker Buildx	2026-05-01T08:51:21.8320119Z  Cgroup Version: 2
+docker	Set up Docker Buildx	2026-05-01T08:51:21.8320298Z  Plugins:
+docker	Set up Docker Buildx	2026-05-01T08:51:21.8320501Z   Volume: local
+docker	Set up Docker Buildx	2026-05-01T08:51:21.8320821Z   Network: bridge host ipvlan macvlan null overlay
+docker	Set up Docker Buildx	2026-05-01T08:51:21.8321216Z   Log: awslogs fluentd gcplogs gelf journald json-file local splunk syslog
+docker	Set up Docker Buildx	2026-05-01T08:51:21.8322004Z  Swarm: inactive
+docker	Set up Docker Buildx	2026-05-01T08:51:21.8322307Z  Runtimes: io.containerd.runc.v2 runc
+docker	Set up Docker Buildx	2026-05-01T08:51:21.8322950Z  Default Runtime: runc
+docker	Set up Docker Buildx	2026-05-01T08:51:21.8323192Z  Init Binary: docker-init
+docker	Set up Docker Buildx	2026-05-01T08:51:21.8323555Z  containerd version: 301b2dac98f15c27117da5c8af12118a041a31d9
+docker	Set up Docker Buildx	2026-05-01T08:51:21.8323947Z  runc version: v1.3.4-0-gd6d73eb8
+docker	Set up Docker Buildx	2026-05-01T08:51:21.8324283Z  init version: de40ad0
+docker	Set up Docker Buildx	2026-05-01T08:51:21.8324490Z  Security Options:
+docker	Set up Docker Buildx	2026-05-01T08:51:21.8324745Z   apparmor
+docker	Set up Docker Buildx	2026-05-01T08:51:21.8324971Z   seccomp
+docker	Set up Docker Buildx	2026-05-01T08:51:21.8325142Z    Profile: builtin
+docker	Set up Docker Buildx	2026-05-01T08:51:21.8325329Z   cgroupns
+docker	Set up Docker Buildx	2026-05-01T08:51:21.8325519Z  Kernel Version: 6.17.0-1010-azure
+docker	Set up Docker Buildx	2026-05-01T08:51:21.8325829Z  Operating System: Ubuntu 24.04.4 LTS
+docker	Set up Docker Buildx	2026-05-01T08:51:21.8326094Z  OSType: linux
+docker	Set up Docker Buildx	2026-05-01T08:51:21.8326294Z  Architecture: x86_64
+docker	Set up Docker Buildx	2026-05-01T08:51:21.8326701Z  CPUs: 4
+docker	Set up Docker Buildx	2026-05-01T08:51:21.8326877Z  Total Memory: 15.61GiB
+docker	Set up Docker Buildx	2026-05-01T08:51:21.8327173Z  Name: runnervmeorf1
+docker	Set up Docker Buildx	2026-05-01T08:51:21.8327410Z  ID: e27c7740-8587-4822-9bec-fa47c65630a3
+docker	Set up Docker Buildx	2026-05-01T08:51:21.8327674Z  Docker Root Dir: /var/lib/docker
+docker	Set up Docker Buildx	2026-05-01T08:51:21.8327899Z  Debug Mode: false
+docker	Set up Docker Buildx	2026-05-01T08:51:21.8328098Z  Username: synapsexlocal
+docker	Set up Docker Buildx	2026-05-01T08:51:21.8328382Z  Experimental: false
+docker	Set up Docker Buildx	2026-05-01T08:51:21.8328633Z  Insecure Registries:
+docker	Set up Docker Buildx	2026-05-01T08:51:21.8334569Z   ::1/128
+docker	Set up Docker Buildx	2026-05-01T08:51:21.8334910Z   127.0.0.0/8
+docker	Set up Docker Buildx	2026-05-01T08:51:21.8335247Z  Live Restore Enabled: false
+docker	Set up Docker Buildx	2026-05-01T08:51:21.8335516Z 
+docker	Set up Docker Buildx	2026-05-01T08:51:21.8336022Z ##[endgroup]
+docker	Set up Docker Buildx	2026-05-01T08:51:21.8786755Z ##[group]Download buildx from GitHub Releases
+docker	Set up Docker Buildx	2026-05-01T08:51:22.0301956Z Use 0.31.1-desktop.1 version spec cache key for v0.31.1-desktop.1
+docker	Set up Docker Buildx	2026-05-01T08:51:22.2527388Z Cache hit for: buildx-dl-bin-cloud-0.31.1-desktop.1-linux-x64
+docker	Set up Docker Buildx	2026-05-01T08:51:23.4337210Z Received 25868953 of 25868953 (100.0%), 27.0 MBs/sec
+docker	Set up Docker Buildx	2026-05-01T08:51:23.4339645Z Cache Size: ~25 MB (25868953 B)
+docker	Set up Docker Buildx	2026-05-01T08:51:23.4367340Z [command]/usr/bin/tar -xf /home/runner/work/_temp/1e5f1692-540a-410b-9c2f-a519f11ba1e7/cache.tzst -P -C /home/runner/work/YT-Studio/YT-Studio --use-compress-program unzstd
+docker	Set up Docker Buildx	2026-05-01T08:51:23.5631778Z Cache restored successfully
+docker	Set up Docker Buildx	2026-05-01T08:51:23.5644468Z Restored buildx-dl-bin-cloud-0.31.1-desktop.1-linux-x64 from GitHub Actions cache
+docker	Set up Docker Buildx	2026-05-01T08:51:23.6100052Z Cached to hosted tool cache /opt/hostedtoolcache/buildx-dl-bin-cloud/0.31.1-desktop.1/linux-x64
+docker	Set up Docker Buildx	2026-05-01T08:51:23.6960505Z Buildx binary found in /home/runner/.docker/buildx/.bin/0.31.1-desktop.1/linux-x64/docker-buildx
+docker	Set up Docker Buildx	2026-05-01T08:51:23.6961696Z ##[endgroup]
+docker	Set up Docker Buildx	2026-05-01T08:51:23.6962192Z ##[group]Install buildx
+docker	Set up Docker Buildx	2026-05-01T08:51:23.6962496Z Docker plugin mode
+docker	Set up Docker Buildx	2026-05-01T08:51:23.8038726Z Fixing perms
+docker	Set up Docker Buildx	2026-05-01T08:51:23.8039583Z Plugin path: /home/runner/.docker/cli-plugins/docker-buildx
+docker	Set up Docker Buildx	2026-05-01T08:51:23.8040472Z ##[endgroup]
+docker	Set up Docker Buildx	2026-05-01T08:51:23.8041026Z ##[group]Buildx version
+docker	Set up Docker Buildx	2026-05-01T08:51:23.8063514Z [command]/usr/bin/docker buildx version
+docker	Set up Docker Buildx	2026-05-01T08:51:23.8553635Z github.com/docker/buildx v0.31.1-desktop.1 3d153e82f8d99923062781d390607dabe1679613
+docker	Set up Docker Buildx	2026-05-01T08:51:23.8567436Z ##[endgroup]
+docker	Set up Docker Buildx	2026-05-01T08:51:23.8573668Z ##[group]Creating a new builder instance
+docker	Set up Docker Buildx	2026-05-01T08:51:23.9632822Z [command]/usr/bin/docker buildx create --name builder-3e662c00-10db-4e25-97f8-c9bb220f4a60 --driver cloud --use synapsexlocal/ytweb
+docker	Set up Docker Buildx	2026-05-01T08:51:24.9558888Z builder-3e662c00-10db-4e25-97f8-c9bb220f4a60
+docker	Set up Docker Buildx	2026-05-01T08:51:24.9575845Z ##[endgroup]
+docker	Set up Docker Buildx	2026-05-01T08:51:24.9576562Z ##[group]Booting builder
+docker	Set up Docker Buildx	2026-05-01T08:51:24.9607505Z [command]/usr/bin/docker buildx inspect --bootstrap --builder builder-3e662c00-10db-4e25-97f8-c9bb220f4a60
+docker	Set up Docker Buildx	2026-05-01T08:51:25.4039494Z Name:          builder-3e662c00-10db-4e25-97f8-c9bb220f4a60
+docker	Set up Docker Buildx	2026-05-01T08:51:25.4125202Z Driver:        cloud
+docker	Set up Docker Buildx	2026-05-01T08:51:25.4125629Z Last Activity: 2026-05-01 08:51:24 +0000 UTC
+docker	Set up Docker Buildx	2026-05-01T08:51:25.4125949Z 
+docker	Set up Docker Buildx	2026-05-01T08:51:25.4126056Z Nodes:
+docker	Set up Docker Buildx	2026-05-01T08:51:25.4126294Z Name:             linux-amd64
+docker	Set up Docker Buildx	2026-05-01T08:51:25.4127029Z Endpoint:         cloud://synapsexlocal/ytweb_linux-amd64
+docker	Set up Docker Buildx	2026-05-01T08:51:25.4127922Z Driver Options:   internal.cloud.health.address="https://build-cloud.docker.com:443/v2/" internal.cloud.proxy.address="tcp://build-cloud.docker.com:443" internal.cloud.registry.address="build-cloud.docker.com:443"
+docker	Set up Docker Buildx	2026-05-01T08:51:25.4128854Z Status:           running
+docker	Set up Docker Buildx	2026-05-01T08:51:25.4129052Z BuildKit version: v0.28.0
+docker	Set up Docker Buildx	2026-05-01T08:51:25.4129559Z Platforms:        linux/amd64*, linux/amd64/v2, linux/amd64/v3, linux/amd64/v4, linux/386
+docker	Set up Docker Buildx	2026-05-01T08:51:25.4130086Z Labels:
+docker	Set up Docker Buildx	2026-05-01T08:51:25.4130419Z  org.mobyproject.buildkit.worker.executor:         oci
+docker	Set up Docker Buildx	2026-05-01T08:51:25.4131127Z  org.mobyproject.buildkit.worker.hostname:         synapsexlocal_ytweb_linux-amd64
+docker	Set up Docker Buildx	2026-05-01T08:51:25.4131887Z  org.mobyproject.buildkit.worker.network:          host
+docker	Set up Docker Buildx	2026-05-01T08:51:25.4132505Z  org.mobyproject.buildkit.worker.oci.process-mode: sandbox
+docker	Set up Docker Buildx	2026-05-01T08:51:25.4133145Z  org.mobyproject.buildkit.worker.selinux.enabled:  false
+docker	Set up Docker Buildx	2026-05-01T08:51:25.4133813Z  org.mobyproject.buildkit.worker.snapshotter:      overlayfs
+docker	Set up Docker Buildx	2026-05-01T08:51:25.4134310Z GC Policy rule#0:
+docker	Set up Docker Buildx	2026-05-01T08:51:25.4134609Z  All:            true
+docker	Set up Docker Buildx	2026-05-01T08:51:25.4134929Z  Max Used Space: 25GiB
+docker	Set up Docker Buildx	2026-05-01T08:51:25.4135127Z 
+docker	Set up Docker Buildx	2026-05-01T08:51:25.4135248Z Name:             linux-arm64
+docker	Set up Docker Buildx	2026-05-01T08:51:25.4135665Z Endpoint:         cloud://synapsexlocal/ytweb_linux-arm64
+docker	Set up Docker Buildx	2026-05-01T08:51:25.4137109Z Driver Options:   internal.cloud.health.address="https://build-cloud.docker.com:443/v2/" internal.cloud.proxy.address="tcp://build-cloud.docker.com:443" internal.cloud.registry.address="build-cloud.docker.com:443"
+docker	Set up Docker Buildx	2026-05-01T08:51:25.4138404Z Status:           running
+docker	Set up Docker Buildx	2026-05-01T08:51:25.4138749Z BuildKit version: v0.28.0
+docker	Set up Docker Buildx	2026-05-01T08:51:25.4139166Z Platforms:        linux/arm64*, linux/arm/v6, linux/arm/v7
+docker	Set up Docker Buildx	2026-05-01T08:51:25.4139612Z Labels:
+docker	Set up Docker Buildx	2026-05-01T08:51:25.4139994Z  org.mobyproject.buildkit.worker.executor:         oci
+docker	Set up Docker Buildx	2026-05-01T08:51:25.4140714Z  org.mobyproject.buildkit.worker.hostname:         synapsexlocal_ytweb_linux-arm64
+docker	Set up Docker Buildx	2026-05-01T08:51:25.4141520Z  org.mobyproject.buildkit.worker.network:          host
+docker	Set up Docker Buildx	2026-05-01T08:51:25.4142150Z  org.mobyproject.buildkit.worker.oci.process-mode: sandbox
+docker	Set up Docker Buildx	2026-05-01T08:51:25.4142814Z  org.mobyproject.buildkit.worker.selinux.enabled:  false
+docker	Set up Docker Buildx	2026-05-01T08:51:25.4143589Z  org.mobyproject.buildkit.worker.snapshotter:      overlayfs
+docker	Set up Docker Buildx	2026-05-01T08:51:25.4144236Z GC Policy rule#0:
+docker	Set up Docker Buildx	2026-05-01T08:51:25.4144569Z  All:            true
+docker	Set up Docker Buildx	2026-05-01T08:51:25.4144926Z  Max Used Space: 25GiB
+docker	Set up Docker Buildx	2026-05-01T08:51:25.4146040Z ##[endgroup]
+docker	Set up Docker Buildx	2026-05-01T08:51:25.8556292Z ##[group]Inspect builder
+docker	Set up Docker Buildx	2026-05-01T08:51:25.8558810Z {
+docker	Set up Docker Buildx	2026-05-01T08:51:25.8559110Z   "nodes": [
+docker	Set up Docker Buildx	2026-05-01T08:51:25.8559360Z     {
+docker	Set up Docker Buildx	2026-05-01T08:51:25.8559635Z       "name": "linux-amd64",
+docker	Set up Docker Buildx	2026-05-01T08:51:25.8560137Z       "endpoint": "cloud://synapsexlocal/ytweb_linux-amd64",
+docker	Set up Docker Buildx	2026-05-01T08:51:25.8560647Z       "driver-opts": [
+docker	Set up Docker Buildx	2026-05-01T08:51:25.8561226Z         "internal.cloud.health.address=https://build-cloud.docker.com:443/v2/",
+docker	Set up Docker Buildx	2026-05-01T08:51:25.8562060Z         "internal.cloud.proxy.address=tcp://build-cloud.docker.com:443",
+docker	Set up Docker Buildx	2026-05-01T08:51:25.8562740Z         "internal.cloud.registry.address=build-cloud.docker.com:443"
+docker	Set up Docker Buildx	2026-05-01T08:51:25.8563198Z       ],
+docker	Set up Docker Buildx	2026-05-01T08:51:25.8563442Z       "status": "running",
+docker	Set up Docker Buildx	2026-05-01T08:51:25.8563748Z       "buildkit": "v0.28.0",
+docker	Set up Docker Buildx	2026-05-01T08:51:25.8564089Z       "platforms": "linux/amd64",
+docker	Set up Docker Buildx	2026-05-01T08:51:25.8564424Z       "features": {
+docker	Set up Docker Buildx	2026-05-01T08:51:25.8564877Z         "Automatically load images to the Docker Engine image store": true,
+docker	Set up Docker Buildx	2026-05-01T08:51:25.8565413Z         "Cache export": true,
+docker	Set up Docker Buildx	2026-05-01T08:51:25.8565744Z         "Direct push": true,
+docker	Set up Docker Buildx	2026-05-01T08:51:25.8566072Z         "Docker exporter": true,
+docker	Set up Docker Buildx	2026-05-01T08:51:25.8566599Z         "Enable proxy over the session": true,
+docker	Set up Docker Buildx	2026-05-01T08:51:25.8567024Z         "Multi-platform build": true,
+docker	Set up Docker Buildx	2026-05-01T08:51:25.8567421Z         "OCI exporter": true
+docker	Set up Docker Buildx	2026-05-01T08:51:25.8568075Z       },
+docker	Set up Docker Buildx	2026-05-01T08:51:25.8568334Z       "labels": {
+docker	Set up Docker Buildx	2026-05-01T08:51:25.8568729Z         "org.mobyproject.buildkit.worker.executor": "oci",
+docker	Set up Docker Buildx	2026-05-01T08:51:25.8569592Z         "org.mobyproject.buildkit.worker.hostname": "synapsexlocal_ytweb_linux-amd64",
+docker	Set up Docker Buildx	2026-05-01T08:51:25.8570371Z         "org.mobyproject.buildkit.worker.network": "host",
+docker	Set up Docker Buildx	2026-05-01T08:51:25.8571030Z         "org.mobyproject.buildkit.worker.oci.process-mode": "sandbox",
+docker	Set up Docker Buildx	2026-05-01T08:51:25.8571753Z         "org.mobyproject.buildkit.worker.selinux.enabled": "false",
+docker	Set up Docker Buildx	2026-05-01T08:51:25.8572381Z         "org.mobyproject.buildkit.worker.snapshotter": "overlayfs"
+docker	Set up Docker Buildx	2026-05-01T08:51:25.8572851Z       },
+docker	Set up Docker Buildx	2026-05-01T08:51:25.8573118Z       "gcPolicy": [
+docker	Set up Docker Buildx	2026-05-01T08:51:25.8573381Z         {
+docker	Set up Docker Buildx	2026-05-01T08:51:25.8573614Z           "all": true,
+docker	Set up Docker Buildx	2026-05-01T08:51:25.8573890Z           "maxUsedSpace": "25GiB"
+docker	Set up Docker Buildx	2026-05-01T08:51:25.8574207Z         }
+docker	Set up Docker Buildx	2026-05-01T08:51:25.8574434Z       ]
+docker	Set up Docker Buildx	2026-05-01T08:51:25.8574702Z     },
+docker	Set up Docker Buildx	2026-05-01T08:51:25.8575003Z     {
+docker	Set up Docker Buildx	2026-05-01T08:51:25.8575268Z       "name": "linux-arm64",
+docker	Set up Docker Buildx	2026-05-01T08:51:25.8575733Z       "endpoint": "cloud://synapsexlocal/ytweb_linux-arm64",
+docker	Set up Docker Buildx	2026-05-01T08:51:25.8576316Z       "driver-opts": [
+docker	Set up Docker Buildx	2026-05-01T08:51:25.8577014Z         "internal.cloud.health.address=https://build-cloud.docker.com:443/v2/",
+docker	Set up Docker Buildx	2026-05-01T08:51:25.8577898Z         "internal.cloud.proxy.address=tcp://build-cloud.docker.com:443",
+docker	Set up Docker Buildx	2026-05-01T08:51:25.8578629Z         "internal.cloud.registry.address=build-cloud.docker.com:443"
+docker	Set up Docker Buildx	2026-05-01T08:51:25.8579126Z       ],
+docker	Set up Docker Buildx	2026-05-01T08:51:25.8579398Z       "status": "running",
+docker	Set up Docker Buildx	2026-05-01T08:51:25.8579770Z       "buildkit": "v0.28.0",
+docker	Set up Docker Buildx	2026-05-01T08:51:25.8580118Z       "platforms": "linux/arm64",
+docker	Set up Docker Buildx	2026-05-01T08:51:25.8580465Z       "features": {
+docker	Set up Docker Buildx	2026-05-01T08:51:25.8580931Z         "Automatically load images to the Docker Engine image store": true,
+docker	Set up Docker Buildx	2026-05-01T08:51:25.8581486Z         "Cache export": true,
+docker	Set up Docker Buildx	2026-05-01T08:51:25.8581844Z         "Direct push": true,
+docker	Set up Docker Buildx	2026-05-01T08:51:25.8582203Z         "Docker exporter": true,
+docker	Set up Docker Buildx	2026-05-01T08:51:25.8582594Z         "Enable proxy over the session": true,
+docker	Set up Docker Buildx	2026-05-01T08:51:25.8583035Z         "Multi-platform build": true,
+docker	Set up Docker Buildx	2026-05-01T08:51:25.8583421Z         "OCI exporter": true
+docker	Set up Docker Buildx	2026-05-01T08:51:25.8583757Z       },
+docker	Set up Docker Buildx	2026-05-01T08:51:25.8584003Z       "labels": {
+docker	Set up Docker Buildx	2026-05-01T08:51:25.8584380Z         "org.mobyproject.buildkit.worker.executor": "oci",
+docker	Set up Docker Buildx	2026-05-01T08:51:25.8585111Z         "org.mobyproject.buildkit.worker.hostname": "synapsexlocal_ytweb_linux-arm64",
+docker	Set up Docker Buildx	2026-05-01T08:51:25.8585860Z         "org.mobyproject.buildkit.worker.network": "host",
+docker	Set up Docker Buildx	2026-05-01T08:51:25.8586784Z         "org.mobyproject.buildkit.worker.oci.process-mode": "sandbox",
+docker	Set up Docker Buildx	2026-05-01T08:51:25.8587494Z         "org.mobyproject.buildkit.worker.selinux.enabled": "false",
+docker	Set up Docker Buildx	2026-05-01T08:51:25.8588171Z         "org.mobyproject.buildkit.worker.snapshotter": "overlayfs"
+docker	Set up Docker Buildx	2026-05-01T08:51:25.8588676Z       },
+docker	Set up Docker Buildx	2026-05-01T08:51:25.8588914Z       "gcPolicy": [
+docker	Set up Docker Buildx	2026-05-01T08:51:25.8589176Z         {
+docker	Set up Docker Buildx	2026-05-01T08:51:25.8589418Z           "all": true,
+docker	Set up Docker Buildx	2026-05-01T08:51:25.8589721Z           "maxUsedSpace": "25GiB"
+docker	Set up Docker Buildx	2026-05-01T08:51:25.8590037Z         }
+docker	Set up Docker Buildx	2026-05-01T08:51:25.8590231Z       ]
+docker	Set up Docker Buildx	2026-05-01T08:51:25.8590453Z     }
+docker	Set up Docker Buildx	2026-05-01T08:51:25.8590729Z   ],
+docker	Set up Docker Buildx	2026-05-01T08:51:25.8591161Z   "name": "builder-3e662c00-10db-4e25-97f8-c9bb220f4a60",
+docker	Set up Docker Buildx	2026-05-01T08:51:25.8591675Z   "driver": "cloud",
+docker	Set up Docker Buildx	2026-05-01T08:51:25.8592060Z   "lastActivity": "2026-05-01T08:51:24.000Z"
+docker	Set up Docker Buildx	2026-05-01T08:51:25.8592492Z }
+docker	Set up Docker Buildx	2026-05-01T08:51:25.8593119Z ##[endgroup]
+docker	Build and push	﻿2026-05-01T08:51:25.8754299Z ##[group]Run docker/build-push-action@v6
+docker	Build and push	2026-05-01T08:51:25.8754572Z with:
+docker	Build and push	2026-05-01T08:51:25.8754745Z   context: .
+docker	Build and push	2026-05-01T08:51:25.8754915Z   push: true
+docker	Build and push	2026-05-01T08:51:25.8755134Z   tags: synapsexlocal/docker-build-cloud-demo:latest
+docker	Build and push	2026-05-01T08:51:25.8755425Z   cache-from: type=gha
+docker	Build and push	2026-05-01T08:51:25.8755629Z   cache-to: type=gha,mode=max
+docker	Build and push	2026-05-01T08:51:25.8755845Z   outputs: type=registry
+docker	Build and push	2026-05-01T08:51:25.8756161Z   load: false
+docker	Build and push	2026-05-01T08:51:25.8756336Z   no-cache: false
+docker	Build and push	2026-05-01T08:51:25.8756896Z   pull: false
+docker	Build and push	2026-05-01T08:51:25.8757241Z   github-token: ***
+docker	Build and push	2026-05-01T08:51:25.8757418Z ##[endgroup]
+docker	Build and push	2026-05-01T08:51:26.0990038Z ##[group]GitHub Actions runtime token ACs
+docker	Build and push	2026-05-01T08:51:26.1000299Z refs/heads/main: read/write
+docker	Build and push	2026-05-01T08:51:26.1001309Z ##[endgroup]
+docker	Build and push	2026-05-01T08:51:26.1001882Z ##[group]Docker info
+docker	Build and push	2026-05-01T08:51:26.1073171Z [command]/usr/bin/docker version
+docker	Build and push	2026-05-01T08:51:26.1267289Z Client: Docker Engine - Community
+docker	Build and push	2026-05-01T08:51:26.1267926Z  Version:           28.0.4
+docker	Build and push	2026-05-01T08:51:26.1268546Z  API version:       1.48
+docker	Build and push	2026-05-01T08:51:26.1269030Z  Go version:        go1.23.7
+docker	Build and push	2026-05-01T08:51:26.1269418Z  Git commit:        b8034c0
+docker	Build and push	2026-05-01T08:51:26.1269790Z  Built:             Tue Mar 25 15:07:16 2025
+docker	Build and push	2026-05-01T08:51:26.1270225Z  OS/Arch:           linux/amd64
+docker	Build and push	2026-05-01T08:51:26.1270591Z  Context:           default
+docker	Build and push	2026-05-01T08:51:26.1270827Z 
+docker	Build and push	2026-05-01T08:51:26.1270978Z Server: Docker Engine - Community
+docker	Build and push	2026-05-01T08:51:26.1271374Z  Engine:
+docker	Build and push	2026-05-01T08:51:26.1271627Z   Version:          28.0.4
+docker	Build and push	2026-05-01T08:51:26.1271944Z   API version:      1.48 (minimum version 1.24)
+docker	Build and push	2026-05-01T08:51:26.1272200Z   Go version:       go1.23.7
+docker	Build and push	2026-05-01T08:51:26.1272405Z   Git commit:       6430e49
+docker	Build and push	2026-05-01T08:51:26.1272619Z   Built:            Tue Mar 25 15:07:16 2025
+docker	Build and push	2026-05-01T08:51:26.1272852Z   OS/Arch:          linux/amd64
+docker	Build and push	2026-05-01T08:51:26.1273064Z   Experimental:     false
+docker	Build and push	2026-05-01T08:51:26.1273267Z  containerd:
+docker	Build and push	2026-05-01T08:51:26.1273437Z   Version:          v2.2.2
+docker	Build and push	2026-05-01T08:51:26.1273699Z   GitCommit:        301b2dac98f15c27117da5c8af12118a041a31d9
+docker	Build and push	2026-05-01T08:51:26.1273971Z  runc:
+docker	Build and push	2026-05-01T08:51:26.1274134Z   Version:          1.3.4
+docker	Build and push	2026-05-01T08:51:26.1274337Z   GitCommit:        v1.3.4-0-gd6d73eb8
+docker	Build and push	2026-05-01T08:51:26.1274562Z  docker-init:
+docker	Build and push	2026-05-01T08:51:26.1274733Z   Version:          0.19.0
+docker	Build and push	2026-05-01T08:51:26.1274933Z   GitCommit:        de40ad0
+docker	Build and push	2026-05-01T08:51:26.1311712Z [command]/usr/bin/docker info
+docker	Build and push	2026-05-01T08:51:26.1797723Z Client: Docker Engine - Community
+docker	Build and push	2026-05-01T08:51:26.1821496Z  Version:    28.0.4
+docker	Build and push	2026-05-01T08:51:26.1821969Z  Context:    default
+docker	Build and push	2026-05-01T08:51:26.1822318Z  Debug Mode: false
+docker	Build and push	2026-05-01T08:51:26.1822638Z  Plugins:
+docker	Build and push	2026-05-01T08:51:26.1822959Z   buildx: Docker Buildx (Docker Inc.)
+docker	Build and push	2026-05-01T08:51:26.1823413Z     Version:  v0.31.1-desktop.1
+docker	Build and push	2026-05-01T08:51:26.1823898Z     Path:     /home/runner/.docker/cli-plugins/docker-buildx
+docker	Build and push	2026-05-01T08:51:26.1824417Z   compose: Docker Compose (Docker Inc.)
+docker	Build and push	2026-05-01T08:51:26.1824844Z     Version:  v2.38.2
+docker	Build and push	2026-05-01T08:51:26.1825225Z     Path:     /usr/libexec/docker/cli-plugins/docker-compose
+docker	Build and push	2026-05-01T08:51:26.1825612Z 
+docker	Build and push	2026-05-01T08:51:26.1825715Z Server:
+docker	Build and push	2026-05-01T08:51:26.1825958Z  Containers: 0
+docker	Build and push	2026-05-01T08:51:26.1826229Z   Running: 0
+docker	Build and push	2026-05-01T08:51:26.1827095Z   Paused: 0
+docker	Build and push	2026-05-01T08:51:26.1827378Z   Stopped: 0
+docker	Build and push	2026-05-01T08:51:26.1827678Z  Images: 6
+docker	Build and push	2026-05-01T08:51:26.1827991Z  Server Version: 28.0.4
+docker	Build and push	2026-05-01T08:51:26.1828348Z  Storage Driver: overlay2
+docker	Build and push	2026-05-01T08:51:26.1828686Z   Backing Filesystem: extfs
+docker	Build and push	2026-05-01T08:51:26.1829020Z   Supports d_type: true
+docker	Build and push	2026-05-01T08:51:26.1829351Z   Using metacopy: false
+docker	Build and push	2026-05-01T08:51:26.1829678Z   Native Overlay Diff: false
+docker	Build and push	2026-05-01T08:51:26.1830006Z   userxattr: false
+docker	Build and push	2026-05-01T08:51:26.1830304Z  Logging Driver: json-file
+docker	Build and push	2026-05-01T08:51:26.1830634Z  Cgroup Driver: systemd
+docker	Build and push	2026-05-01T08:51:26.1830952Z  Cgroup Version: 2
+docker	Build and push	2026-05-01T08:51:26.1831233Z  Plugins:
+docker	Build and push	2026-05-01T08:51:26.1831498Z   Volume: local
+docker	Build and push	2026-05-01T08:51:26.1832253Z   Network: bridge host ipvlan macvlan null overlay
+docker	Build and push	2026-05-01T08:51:26.1832895Z   Log: awslogs fluentd gcplogs gelf journald json-file local splunk syslog
+docker	Build and push	2026-05-01T08:51:26.1833419Z  Swarm: inactive
+docker	Build and push	2026-05-01T08:51:26.1833733Z  Runtimes: runc io.containerd.runc.v2
+docker	Build and push	2026-05-01T08:51:26.1834141Z  Default Runtime: runc
+docker	Build and push	2026-05-01T08:51:26.1834464Z  Init Binary: docker-init
+docker	Build and push	2026-05-01T08:51:26.1834906Z  containerd version: 301b2dac98f15c27117da5c8af12118a041a31d9
+docker	Build and push	2026-05-01T08:51:26.1835521Z  runc version: v1.3.4-0-gd6d73eb8
+docker	Build and push	2026-05-01T08:51:26.1835752Z  init version: de40ad0
+docker	Build and push	2026-05-01T08:51:26.1835948Z  Security Options:
+docker	Build and push	2026-05-01T08:51:26.1836216Z   apparmor
+docker	Build and push	2026-05-01T08:51:26.1836591Z   seccomp
+docker	Build and push	2026-05-01T08:51:26.1836852Z    Profile: builtin
+docker	Build and push	2026-05-01T08:51:26.1837146Z   cgroupns
+docker	Build and push	2026-05-01T08:51:26.1837430Z  Kernel Version: 6.17.0-1010-azure
+docker	Build and push	2026-05-01T08:51:26.1837690Z  Operating System: Ubuntu 24.04.4 LTS
+docker	Build and push	2026-05-01T08:51:26.1837918Z  OSType: linux
+docker	Build and push	2026-05-01T08:51:26.1838099Z  Architecture: x86_64
+docker	Build and push	2026-05-01T08:51:26.1838407Z  CPUs: 4
+docker	Build and push	2026-05-01T08:51:26.1838678Z  Total Memory: 15.61GiB
+docker	Build and push	2026-05-01T08:51:26.1838948Z  Name: runnervmeorf1
+docker	Build and push	2026-05-01T08:51:26.1839149Z  ID: e27c7740-8587-4822-9bec-fa47c65630a3
+docker	Build and push	2026-05-01T08:51:26.1839399Z  Docker Root Dir: /var/lib/docker
+docker	Build and push	2026-05-01T08:51:26.1839622Z  Debug Mode: false
+docker	Build and push	2026-05-01T08:51:26.1839813Z  Username: synapsexlocal
+docker	Build and push	2026-05-01T08:51:26.1840019Z  Experimental: false
+docker	Build and push	2026-05-01T08:51:26.1840211Z  Insecure Registries:
+docker	Build and push	2026-05-01T08:51:26.1840424Z   ::1/128
+docker	Build and push	2026-05-01T08:51:26.1840578Z   127.0.0.0/8
+docker	Build and push	2026-05-01T08:51:26.1840752Z  Live Restore Enabled: false
+docker	Build and push	2026-05-01T08:51:26.1840896Z 
+docker	Build and push	2026-05-01T08:51:26.1841195Z ##[endgroup]
+docker	Build and push	2026-05-01T08:51:26.1841528Z ##[group]Proxy configuration
+docker	Build and push	2026-05-01T08:51:26.1841746Z No proxy configuration found
+docker	Build and push	2026-05-01T08:51:26.1842086Z ##[endgroup]
+docker	Build and push	2026-05-01T08:51:26.2340709Z ##[group]Buildx version
+docker	Build and push	2026-05-01T08:51:26.2363019Z [command]/usr/bin/docker buildx version
+docker	Build and push	2026-05-01T08:51:26.2836336Z github.com/docker/buildx v0.31.1-desktop.1 3d153e82f8d99923062781d390607dabe1679613
+docker	Build and push	2026-05-01T08:51:26.2851884Z ##[endgroup]
+docker	Build and push	2026-05-01T08:51:26.2852250Z ##[group]Builder info
+docker	Build and push	2026-05-01T08:51:26.7970974Z {
+docker	Build and push	2026-05-01T08:51:26.7971343Z   "nodes": [
+docker	Build and push	2026-05-01T08:51:26.7971625Z     {
+docker	Build and push	2026-05-01T08:51:26.7971893Z       "name": "linux-amd64",
+docker	Build and push	2026-05-01T08:51:26.7972394Z       "endpoint": "cloud://synapsexlocal/ytweb_linux-amd64",
+docker	Build and push	2026-05-01T08:51:26.7972942Z       "driver-opts": [
+docker	Build and push	2026-05-01T08:51:26.7973508Z         "internal.cloud.health.address=https://build-cloud.docker.com:443/v2/",
+docker	Build and push	2026-05-01T08:51:26.7974360Z         "internal.cloud.proxy.address=tcp://build-cloud.docker.com:443",
+docker	Build and push	2026-05-01T08:51:26.7975117Z         "internal.cloud.registry.address=build-cloud.docker.com:443"
+docker	Build and push	2026-05-01T08:51:26.7975667Z       ],
+docker	Build and push	2026-05-01T08:51:26.7975932Z       "status": "running",
+docker	Build and push	2026-05-01T08:51:26.7976298Z       "buildkit": "v0.28.0",
+docker	Build and push	2026-05-01T08:51:26.7977157Z       "platforms": "linux/amd64",
+docker	Build and push	2026-05-01T08:51:26.7977552Z       "features": {
+docker	Build and push	2026-05-01T08:51:26.7978050Z         "Automatically load images to the Docker Engine image store": true,
+docker	Build and push	2026-05-01T08:51:26.7978657Z         "Cache export": true,
+docker	Build and push	2026-05-01T08:51:26.7979077Z         "Direct push": true,
+docker	Build and push	2026-05-01T08:51:26.7979475Z         "Docker exporter": true,
+docker	Build and push	2026-05-01T08:51:26.7979884Z         "Enable proxy over the session": true,
+docker	Build and push	2026-05-01T08:51:26.7980311Z         "Multi-platform build": true,
+docker	Build and push	2026-05-01T08:51:26.7980741Z         "OCI exporter": true
+docker	Build and push	2026-05-01T08:51:26.7981106Z       },
+docker	Build and push	2026-05-01T08:51:26.7981377Z       "labels": {
+docker	Build and push	2026-05-01T08:51:26.7981792Z         "org.mobyproject.buildkit.worker.executor": "oci",
+docker	Build and push	2026-05-01T08:51:26.7982578Z         "org.mobyproject.buildkit.worker.hostname": "synapsexlocal_ytweb_linux-amd64",
+docker	Build and push	2026-05-01T08:51:26.7983454Z         "org.mobyproject.buildkit.worker.network": "host",
+docker	Build and push	2026-05-01T08:51:26.7984171Z         "org.mobyproject.buildkit.worker.oci.process-mode": "sandbox",
+docker	Build and push	2026-05-01T08:51:26.7985260Z         "org.mobyproject.buildkit.worker.selinux.enabled": "false",
+docker	Build and push	2026-05-01T08:51:26.7986024Z         "org.mobyproject.buildkit.worker.snapshotter": "overlayfs"
+docker	Build and push	2026-05-01T08:51:26.7986836Z       },
+docker	Build and push	2026-05-01T08:51:26.7987118Z       "gcPolicy": [
+docker	Build and push	2026-05-01T08:51:26.7987405Z         {
+docker	Build and push	2026-05-01T08:51:26.7987661Z           "all": true,
+docker	Build and push	2026-05-01T08:51:26.7987988Z           "maxUsedSpace": "25GiB"
+docker	Build and push	2026-05-01T08:51:26.7988556Z         }
+docker	Build and push	2026-05-01T08:51:26.7988795Z       ]
+docker	Build and push	2026-05-01T08:51:26.7989045Z     },
+docker	Build and push	2026-05-01T08:51:26.7989304Z     {
+docker	Build and push	2026-05-01T08:51:26.7989564Z       "name": "linux-arm64",
+docker	Build and push	2026-05-01T08:51:26.7990048Z       "endpoint": "cloud://synapsexlocal/ytweb_linux-arm64",
+docker	Build and push	2026-05-01T08:51:26.7990559Z       "driver-opts": [
+docker	Build and push	2026-05-01T08:51:26.7991108Z         "internal.cloud.health.address=https://build-cloud.docker.com:443/v2/",
+docker	Build and push	2026-05-01T08:51:26.7991937Z         "internal.cloud.proxy.address=tcp://build-cloud.docker.com:443",
+docker	Build and push	2026-05-01T08:51:26.7992680Z         "internal.cloud.registry.address=build-cloud.docker.com:443"
+docker	Build and push	2026-05-01T08:51:26.7993272Z       ],
+docker	Build and push	2026-05-01T08:51:26.7993539Z       "status": "running",
+docker	Build and push	2026-05-01T08:51:26.7993887Z       "buildkit": "v0.28.0",
+docker	Build and push	2026-05-01T08:51:26.7994269Z       "platforms": "linux/arm64",
+docker	Build and push	2026-05-01T08:51:26.7994654Z       "features": {
+docker	Build and push	2026-05-01T08:51:26.7995148Z         "Automatically load images to the Docker Engine image store": true,
+docker	Build and push	2026-05-01T08:51:26.7995776Z         "Cache export": true,
+docker	Build and push	2026-05-01T08:51:26.7996147Z         "Direct push": true,
+docker	Build and push	2026-05-01T08:51:26.7996712Z         "Docker exporter": true,
+docker	Build and push	2026-05-01T08:51:26.7997139Z         "Enable proxy over the session": true,
+docker	Build and push	2026-05-01T08:51:26.7997597Z         "Multi-platform build": true,
+docker	Build and push	2026-05-01T08:51:26.7998016Z         "OCI exporter": true
+docker	Build and push	2026-05-01T08:51:26.7998367Z       },
+docker	Build and push	2026-05-01T08:51:26.7998630Z       "labels": {
+docker	Build and push	2026-05-01T08:51:26.7999043Z         "org.mobyproject.buildkit.worker.executor": "oci",
+docker	Build and push	2026-05-01T08:51:26.7999826Z         "org.mobyproject.buildkit.worker.hostname": "synapsexlocal_ytweb_linux-arm64",
+docker	Build and push	2026-05-01T08:51:26.8000666Z         "org.mobyproject.buildkit.worker.network": "host",
+docker	Build and push	2026-05-01T08:51:26.8001341Z         "org.mobyproject.buildkit.worker.oci.process-mode": "sandbox",
+docker	Build and push	2026-05-01T08:51:26.8002090Z         "org.mobyproject.buildkit.worker.selinux.enabled": "false",
+docker	Build and push	2026-05-01T08:51:26.8002784Z         "org.mobyproject.buildkit.worker.snapshotter": "overlayfs"
+docker	Build and push	2026-05-01T08:51:26.8003337Z       },
+docker	Build and push	2026-05-01T08:51:26.8003625Z       "gcPolicy": [
+docker	Build and push	2026-05-01T08:51:26.8003935Z         {
+docker	Build and push	2026-05-01T08:51:26.8004187Z           "all": true,
+docker	Build and push	2026-05-01T08:51:26.8004520Z           "maxUsedSpace": "25GiB"
+docker	Build and push	2026-05-01T08:51:26.8004886Z         }
+docker	Build and push	2026-05-01T08:51:26.8005158Z       ]
+docker	Build and push	2026-05-01T08:51:26.8005398Z     }
+docker	Build and push	2026-05-01T08:51:26.8005645Z   ],
+docker	Build and push	2026-05-01T08:51:26.8006023Z   "name": "builder-3e662c00-10db-4e25-97f8-c9bb220f4a60",
+docker	Build and push	2026-05-01T08:51:26.8006664Z   "driver": "cloud",
+docker	Build and push	2026-05-01T08:51:26.8007016Z   "lastActivity": "2026-05-01T08:51:24.000Z"
+docker	Build and push	2026-05-01T08:51:26.8007436Z }
+docker	Build and push	2026-05-01T08:51:26.8008029Z ##[endgroup]
+docker	Build and push	2026-05-01T08:51:27.3540106Z [command]/usr/bin/docker buildx build --cache-from type=gha --cache-to type=gha,mode=max --iidfile /home/runner/work/_temp/docker-actions-toolkit-1VLp58/build-iidfile-b3cfa9cb51.txt --output type=registry --attest type=provenance,mode=max,builder-id=https://github.com/ruhdevops/YT-Studio/actions/runs/25208650647/attempts/1 --tag synapsexlocal/docker-build-cloud-demo:latest --metadata-file /home/runner/work/_temp/docker-actions-toolkit-1VLp58/build-metadata-ee6b8c2354.json --push .
+docker	Build and push	2026-05-01T08:51:28.1778388Z #0 building with "builder-3e662c00-10db-4e25-97f8-c9bb220f4a60" instance using cloud driver
+docker	Build and push	2026-05-01T08:51:28.1778846Z 
+docker	Build and push	2026-05-01T08:51:28.1778976Z #1 [internal] connected to docker build cloud service
+docker	Build and push	2026-05-01T08:51:28.1779257Z #1 DONE 0.0s
+docker	Build and push	2026-05-01T08:51:28.4424847Z 
+docker	Build and push	2026-05-01T08:51:28.4425416Z #2 [internal] load build definition from Dockerfile
+docker	Build and push	2026-05-01T08:51:28.4425991Z #2 transferring dockerfile: 357B 0.2s done
+docker	Build and push	2026-05-01T08:51:28.6512036Z #2 DONE 0.2s
+docker	Build and push	2026-05-01T08:51:28.6512311Z 
+docker	Build and push	2026-05-01T08:51:28.6512600Z #3 [internal] load metadata for docker.io/library/node:20-alpine
+docker	Build and push	2026-05-01T08:51:28.9013995Z #3 ...
+docker	Build and push	2026-05-01T08:51:28.9014280Z 
+docker	Build and push	2026-05-01T08:51:28.9014519Z #4 [auth] library/node:pull token for registry-1.docker.io
+docker	Build and push	2026-05-01T08:51:28.9014824Z #4 DONE 0.0s
+docker	Build and push	2026-05-01T08:51:28.9800445Z 
+docker	Build and push	2026-05-01T08:51:28.9801623Z #3 [internal] load metadata for docker.io/library/node:20-alpine
+docker	Build and push	2026-05-01T08:51:28.9802209Z #3 DONE 0.5s
+docker	Build and push	2026-05-01T08:51:29.0927430Z 
+docker	Build and push	2026-05-01T08:51:29.0928127Z #5 [internal] load .dockerignore
+docker	Build and push	2026-05-01T08:51:29.0928457Z #5 transferring context: 33B 0.0s
+docker	Build and push	2026-05-01T08:51:29.1935863Z #5 transferring context: 265B 0.1s done
+docker	Build and push	2026-05-01T08:51:29.1936370Z #5 DONE 0.2s
+docker	Build and push	2026-05-01T08:51:29.3152688Z 
+docker	Build and push	2026-05-01T08:51:29.3154218Z #6 importing cache manifest from gha:8089670774495749085
+docker	Build and push	2026-05-01T08:51:29.3154540Z #6 DONE 0.0s
+docker	Build and push	2026-05-01T08:51:29.5290084Z 
+docker	Build and push	2026-05-01T08:51:29.5290980Z #7 [builder 1/4] FROM docker.io/library/node:20-alpine@sha256:fb4cd12c85ee03686f6af5362a0b0d56d50c58a04632e6c0fb8363f609372293
+docker	Build and push	2026-05-01T08:51:29.5291789Z #7 resolve docker.io/library/node:20-alpine@sha256:fb4cd12c85ee03686f6af5362a0b0d56d50c58a04632e6c0fb8363f609372293 0.0s done
+docker	Build and push	2026-05-01T08:51:29.5292288Z #7 DONE 0.0s
+docker	Build and push	2026-05-01T08:51:29.5292392Z 
+docker	Build and push	2026-05-01T08:51:29.5292504Z #8 [builder 2/4] WORKDIR /app
+docker	Build and push	2026-05-01T08:51:29.5292730Z #8 CACHED
+docker	Build and push	2026-05-01T08:51:29.5292827Z 
+docker	Build and push	2026-05-01T08:51:29.5292910Z #9 [internal] load build context
+docker	Build and push	2026-05-01T08:51:29.7721110Z #9 transferring context: 635.30kB 0.4s done
+docker	Build and push	2026-05-01T08:51:29.7721452Z #9 DONE 0.4s
+docker	Build and push	2026-05-01T08:51:29.7721561Z 
+docker	Build and push	2026-05-01T08:51:29.7721667Z #10 [builder 3/4] COPY package*.json ./
+docker	Build and push	2026-05-01T08:51:29.7721904Z #10 CACHED
+docker	Build and push	2026-05-01T08:51:29.7722011Z 
+docker	Build and push	2026-05-01T08:51:29.7722196Z #11 [builder 4/4] RUN npm install --only=production --no-audit --fund=false
+docker	Build and push	2026-05-01T08:51:29.9576719Z #11 ...
+docker	Build and push	2026-05-01T08:51:29.9576919Z 
+docker	Build and push	2026-05-01T08:51:29.9577089Z #12 [stage-1 3/5] RUN apk add --no-cache tini
+docker	Build and push	2026-05-01T08:51:29.9577403Z #12 0.414 (1/1) Installing tini (0.19.0-r3)
+docker	Build and push	2026-05-01T08:51:29.9577676Z #12 0.418 Executing busybox-1.37.0-r30.trigger
+docker	Build and push	2026-05-01T08:51:29.9577945Z #12 0.425 OK: 10.9 MiB in 19 packages
+docker	Build and push	2026-05-01T08:51:29.9578178Z #12 DONE 0.5s
+docker	Build and push	2026-05-01T08:51:29.9762093Z 
+docker	Build and push	2026-05-01T08:51:29.9762574Z #11 [builder 4/4] RUN npm install --only=production --no-audit --fund=false
+docker	Build and push	2026-05-01T08:51:29.9763276Z #11 0.243 npm warn config only Use `--omit=dev` to omit dev dependencies from the install.
+docker	Build and push	2026-05-01T08:51:36.7830612Z #11 6.981 
+docker	Build and push	2026-05-01T08:51:36.7831036Z #11 6.981 added 2 packages in 7s
+docker	Build and push	2026-05-01T08:51:36.9785563Z #11 6.982 npm notice
+docker	Build and push	2026-05-01T08:51:36.9786204Z #11 6.982 npm notice New major version of npm available! 10.8.2 -> 11.13.0
+docker	Build and push	2026-05-01T08:51:36.9786820Z #11 6.982 npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.13.0
+docker	Build and push	2026-05-01T08:51:36.9787243Z #11 6.982 npm notice To update run: npm install -g npm@11.13.0
+docker	Build and push	2026-05-01T08:51:36.9787571Z #11 6.982 npm notice
+docker	Build and push	2026-05-01T08:51:36.9787748Z #11 DONE 7.0s
+docker	Build and push	2026-05-01T08:51:36.9787857Z 
+docker	Build and push	2026-05-01T08:51:36.9788027Z #13 [stage-1 4/5] COPY --from=builder /app/node_modules ./node_modules
+docker	Build and push	2026-05-01T08:51:36.9788334Z #13 DONE 0.0s
+docker	Build and push	2026-05-01T08:51:36.9788430Z 
+docker	Build and push	2026-05-01T08:51:36.9788515Z #14 [stage-1 5/5] COPY . .
+docker	Build and push	2026-05-01T08:51:36.9788705Z #14 DONE 0.0s
+docker	Build and push	2026-05-01T08:51:36.9788818Z 
+docker	Build and push	2026-05-01T08:51:36.9788891Z #15 exporting to image
+docker	Build and push	2026-05-01T08:51:36.9789084Z #15 exporting layers
+docker	Build and push	2026-05-01T08:51:37.0326245Z #15 exporting layers 0.2s done
+docker	Build and push	2026-05-01T08:51:37.1641389Z #15 exporting manifest sha256:e5fcbfb4f191b548cef66670f9219797a86108efb4f1ad006792d16af798a383 0.0s done
+docker	Build and push	2026-05-01T08:51:37.1642113Z #15 exporting config sha256:eb42d1174ffe89e0968e5a95cc3c216efcbf5f870e961c99b1c7f3b8d646f1b8 0.0s done
+docker	Build and push	2026-05-01T08:51:37.1642800Z #15 exporting attestation manifest sha256:41e0af98d99326f7acc3cdd5d9c57389618a4db20c60f3e39238c3e9a3b4da5d 0.0s done
+docker	Build and push	2026-05-01T08:51:37.1644071Z #15 exporting manifest list sha256:a4ec755724f569231d8bb752e979f8dc5bbe618e0466efdf4417c879e3dae2f2 0.0s done
+docker	Build and push	2026-05-01T08:51:37.1644529Z #15 DONE 0.3s
+docker	Build and push	2026-05-01T08:51:37.1644642Z 
+docker	Build and push	2026-05-01T08:51:37.1644884Z #16 [auth] synapsexlocal/docker-build-cloud-demo:pull,push token for registry-1.docker.io
+docker	Build and push	2026-05-01T08:51:37.3152377Z #16 DONE 0.0s
+docker	Build and push	2026-05-01T08:51:37.3152618Z 
+docker	Build and push	2026-05-01T08:51:37.3152772Z #17 exporting to GitHub Actions Cache
+docker	Build and push	2026-05-01T08:51:37.3153342Z #17 preparing build cache for export
+docker	Build and push	2026-05-01T08:51:38.8680555Z #17 preparing build cache for export 1.8s done
+docker	Build and push	2026-05-01T08:51:38.8680916Z #17 sending cache export
+docker	Build and push	2026-05-01T08:51:39.0272893Z #17 writing layer sha256:1d77eb7aa509ea7307a4a02464385beb531e36478310ff0d73a9ff7ec9a21c43
+docker	Build and push	2026-05-01T08:51:39.0324407Z #17 writing layer sha256:1d77eb7aa509ea7307a4a02464385beb531e36478310ff0d73a9ff7ec9a21c43 0.2s done
+docker	Build and push	2026-05-01T08:51:39.1805957Z #17 writing layer sha256:45662a24227854a43ccf201113b21695954164db37f34c12adae0025bb0509e1 0.1s done
+docker	Build and push	2026-05-01T08:51:39.3409589Z #17 writing layer sha256:4feea04c154301db6f4a496efa397b3db96603b1c009c797cfdde77bea8b3287
+docker	Build and push	2026-05-01T08:51:41.2968076Z #17 writing layer sha256:4feea04c154301db6f4a496efa397b3db96603b1c009c797cfdde77bea8b3287 2.1s done
+docker	Build and push	2026-05-01T08:51:41.4583813Z #17 writing layer sha256:52ac96bd2549d6f5ba2ec693df2e8b7ada7339b94ba5f3519e3e251e01186825
+docker	Build and push	2026-05-01T08:51:42.3458887Z #17 writing layer sha256:52ac96bd2549d6f5ba2ec693df2e8b7ada7339b94ba5f3519e3e251e01186825 1.0s done
+docker	Build and push	2026-05-01T08:51:42.5160115Z #17 writing layer sha256:a11ce3b297626755258958329266624e4ed3166d597c1ecb8df5233f88280abc 0.1s done
+docker	Build and push	2026-05-01T08:51:42.6773181Z #17 writing layer sha256:b2cbbfe903b0821005780971ddc5892edcc4ce74c5a48d82e1d2b382edac3122
+docker	Build and push	2026-05-01T08:51:42.7282679Z #17 writing layer sha256:b2cbbfe903b0821005780971ddc5892edcc4ce74c5a48d82e1d2b382edac3122 0.2s done
+docker	Build and push	2026-05-01T08:51:42.8888648Z #17 writing layer sha256:f1e91e88d7428eb3be122a1981c9cca4d467a02b36ce46fe5c3505ba97c0a7bb
+docker	Build and push	2026-05-01T08:51:42.9048495Z #17 writing layer sha256:f1e91e88d7428eb3be122a1981c9cca4d467a02b36ce46fe5c3505ba97c0a7bb 0.2s done
+docker	Build and push	2026-05-01T08:51:43.0661916Z #17 writing layer sha256:f41bb394da05643b4d70a1a6ad82ae6a3a82c1504881bf3e5f8540e378df91b0
+docker	Build and push	2026-05-01T08:51:43.0742990Z #17 writing layer sha256:f41bb394da05643b4d70a1a6ad82ae6a3a82c1504881bf3e5f8540e378df91b0 0.2s done
+docker	Build and push	2026-05-01T08:51:43.1797274Z #17 writing layer sha256:fff4e2c1b189bf87d63ad8bd07f7f4eb288d6f2b6a07a8bb44c60e8c075d2096 0.1s done
+docker	Build and push	2026-05-01T08:51:43.3707660Z #17 sending cache export 4.5s done
+docker	Build and push	2026-05-01T08:51:43.3708015Z #17 DONE 6.3s
+docker	Build and push	2026-05-01T08:51:43.8160171Z 
+docker	Build and push	2026-05-01T08:51:43.8160773Z #18 resolving provenance for metadata file
+docker	Build and push	2026-05-01T08:51:43.8638768Z #18 DONE 0.0s
+docker	Build and push	2026-05-01T08:51:43.9311435Z ##[group]ImageID
+docker	Build and push	2026-05-01T08:51:43.9312045Z sha256:a4ec755724f569231d8bb752e979f8dc5bbe618e0466efdf4417c879e3dae2f2
+docker	Build and push	2026-05-01T08:51:43.9313124Z ##[endgroup]
+docker	Build and push	2026-05-01T08:51:43.9313614Z ##[group]Digest
+docker	Build and push	2026-05-01T08:51:43.9314102Z sha256:a4ec755724f569231d8bb752e979f8dc5bbe618e0466efdf4417c879e3dae2f2
+docker	Build and push	2026-05-01T08:51:43.9314922Z ##[endgroup]
+docker	Build and push	2026-05-01T08:51:43.9315430Z ##[group]Metadata
+docker	Build and push	2026-05-01T08:51:43.9315711Z {
+docker	Build and push	2026-05-01T08:51:43.9316346Z   "buildx.build.ref": "builder-3e662c00-10db-4e25-97f8-c9bb220f4a60/linux-amd64/1bdqihrkj38makfkt8d9ugj90",
+docker	Build and push	2026-05-01T08:51:43.9317306Z   "containerimage.descriptor": {
+docker	Build and push	2026-05-01T08:51:43.9317788Z     "mediaType": "application/vnd.oci.image.index.v1+json",
+docker	Build and push	2026-05-01T08:51:43.9318509Z     "digest": "sha256:a4ec755724f569231d8bb752e979f8dc5bbe618e0466efdf4417c879e3dae2f2",
+docker	Build and push	2026-05-01T08:51:43.9319100Z     "size": 856
+docker	Build and push	2026-05-01T08:51:43.9319338Z   },
+docker	Build and push	2026-05-01T08:51:43.9319915Z   "containerimage.digest": "sha256:a4ec755724f569231d8bb752e979f8dc5bbe618e0466efdf4417c879e3dae2f2",
+docker	Build and push	2026-05-01T08:51:43.9320773Z   "image.name": "synapsexlocal/docker-build-cloud-demo:latest"
+docker	Build and push	2026-05-01T08:51:43.9321329Z }
+docker	Build and push	2026-05-01T08:51:43.9322250Z ##[endgroup]
+docker	Build and push	2026-05-01T08:51:43.9323016Z ##[group]Reference
+docker	Build and push	2026-05-01T08:51:43.9323924Z builder-3e662c00-10db-4e25-97f8-c9bb220f4a60/linux-amd64/1bdqihrkj38makfkt8d9ugj90
+docker	Build and push	2026-05-01T08:51:43.9324980Z ##[endgroup]
+docker	Build and push	2026-05-01T08:51:43.9325713Z ##[group]Check build summary support
+docker	Build and push	2026-05-01T08:51:43.9328380Z Build summary supported!
+docker	Build and push	2026-05-01T08:51:43.9329206Z ##[endgroup]
+docker	Post Build and push	﻿2026-05-01T08:51:43.9447928Z Post job cleanup.
+docker	Post Build and push	2026-05-01T08:51:44.1547272Z ##[group]Generating build summary
+docker	Post Build and push	2026-05-01T08:51:44.1551913Z exporting build record to /home/runner/work/_temp/docker-actions-toolkit-HlL2Ye/export
+docker	Post Build and push	2026-05-01T08:51:44.7391319Z ##[warning]ERROR: no record found for ref "1bdqihrkj38makfkt8d9ugj90"
+docker	Post Build and push	2026-05-01T08:51:44.7401971Z ##[endgroup]
+docker	Post Build and push	2026-05-01T08:51:44.7403065Z ##[group]Removing temp folder /home/runner/work/_temp/docker-actions-toolkit-1VLp58
+docker	Post Build and push	2026-05-01T08:51:44.7404254Z ##[endgroup]
+docker	Post Build and push	2026-05-01T08:51:44.7404939Z ##[group]Post cache
+docker	Post Build and push	2026-05-01T08:51:44.7405380Z State not set
+docker	Post Build and push	2026-05-01T08:51:44.7406160Z ##[endgroup]
+docker	Post Set up Docker Buildx	﻿2026-05-01T08:51:44.7506860Z Post job cleanup.
+docker	Post Set up Docker Buildx	2026-05-01T08:51:44.9709746Z ##[group]Removing builder
+docker	Post Set up Docker Buildx	2026-05-01T08:51:45.4763571Z [command]/usr/bin/docker buildx rm builder-3e662c00-10db-4e25-97f8-c9bb220f4a60
+docker	Post Set up Docker Buildx	2026-05-01T08:51:45.5273355Z builder-3e662c00-10db-4e25-97f8-c9bb220f4a60 removed
+docker	Post Set up Docker Buildx	2026-05-01T08:51:45.5290335Z ##[endgroup]
+docker	Post Set up Docker Buildx	2026-05-01T08:51:45.5291742Z ##[group]Cleaning up certificates
+docker	Post Set up Docker Buildx	2026-05-01T08:51:45.5297177Z ##[endgroup]
+docker	Post Set up Docker Buildx	2026-05-01T08:51:45.5298372Z ##[group]Post cache
+docker	Post Set up Docker Buildx	2026-05-01T08:51:45.5300250Z State not set
+docker	Post Set up Docker Buildx	2026-05-01T08:51:45.5301047Z ##[endgroup]
+docker	Post Log in to Docker Hub	﻿2026-05-01T08:51:45.5391968Z Post job cleanup.
+docker	Post Log in to Docker Hub	2026-05-01T08:51:45.8082469Z ##[group]Logout from docker.io
+docker	Post Log in to Docker Hub	2026-05-01T08:51:45.8122544Z [command]/usr/bin/docker logout docker.io
+docker	Post Log in to Docker Hub	2026-05-01T08:51:45.8240630Z Removing login credentials for docker.io
+docker	Post Log in to Docker Hub	2026-05-01T08:51:45.8267273Z ##[endgroup]
+docker	Post Log in to Docker Hub	2026-05-01T08:51:45.8268059Z ##[group]Post cache
+docker	Post Log in to Docker Hub	2026-05-01T08:51:45.8268791Z State not set
+docker	Post Log in to Docker Hub	2026-05-01T08:51:45.8269493Z ##[endgroup]
+docker	Post Checkout	﻿2026-05-01T08:51:45.8395540Z Post job cleanup.
+docker	Post Checkout	2026-05-01T08:51:45.9266201Z [command]/usr/bin/git version
+docker	Post Checkout	2026-05-01T08:51:45.9297353Z git version 2.53.0
+docker	Post Checkout	2026-05-01T08:51:45.9335983Z Temporarily overriding HOME='/home/runner/work/_temp/23ab71d3-02ca-448e-83a4-3f6437ce1a09' before making global git config changes
+docker	Post Checkout	2026-05-01T08:51:45.9337559Z Adding repository directory to the temporary git global config as a safe directory
+docker	Post Checkout	2026-05-01T08:51:45.9343304Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/YT-Studio/YT-Studio
+docker	Post Checkout	2026-05-01T08:51:45.9377480Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+docker	Post Checkout	2026-05-01T08:51:45.9405886Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+docker	Post Checkout	2026-05-01T08:51:45.9579786Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+docker	Post Checkout	2026-05-01T08:51:45.9595495Z http.https://github.com/.extraheader
+docker	Post Checkout	2026-05-01T08:51:45.9605821Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+docker	Post Checkout	2026-05-01T08:51:45.9629297Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+docker	Post Checkout	2026-05-01T08:51:45.9787542Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+docker	Post Checkout	2026-05-01T08:51:45.9811852Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+docker	Complete job	﻿2026-05-01T08:51:46.0066849Z Cleaning up orphan processes
+docker	Complete job	2026-05-01T08:51:46.0289792Z ##[warning]Node.js 20 actions are deprecated. The following actions are running on Node.js 20 and may not work as expected: actions/checkout@v4, docker/build-push-action@v6, docker/login-action@v3, docker/setup-buildx-action@v3. Actions will be forced to run with Node.js 24 by default starting June 2nd, 2026. Node.js 20 will be removed from the runner on September 16th, 2026. Please check if updated versions of these actions are available that support Node.js 24. To opt into Node.js 24 now, set the FORCE_JAVASCRIPT_ACTIONS_TO_NODE24=true environment variable on the runner or in your workflow file. Once Node.js 24 becomes the default, you can temporarily opt out by setting ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
