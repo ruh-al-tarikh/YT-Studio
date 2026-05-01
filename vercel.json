@@ -1,9 +1,9 @@
 {
   "framework": "vite",
-  "buildCommand": "npm run build",
+  "buildCommand": "pnpm build",
   "outputDirectory": "dist",
-  "devCommand": "npm run dev",
-  "installCommand": "npm install",
+  "devCommand": "pnpm dev",
+  "installCommand": "pnpm install",
   "regions": ["iad1"],
   "headers": [
     {

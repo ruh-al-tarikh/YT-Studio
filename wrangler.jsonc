@@ -1,13 +1,13 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "yt-studio",
-  "main": "src/worker.ts",
+  "main": "src/index.js",
   "compatibility_date": "2024-11-01",
   "compatibility_flags": [
     "nodejs_compat"
   ],
   "assets": {
-    "directory": "./public",
+    "directory": "./dist",
     "binding": "ASSETS"
   },
   "env": {
