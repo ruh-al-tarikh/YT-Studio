@@ -1,5 +1,3 @@
-# CircleCI pipeline configuration
-# Docs: https://circleci.com/docs/reference/configuration-reference
 version: 2.1
 
 orbs:
@@ -8,29 +6,22 @@ orbs:
 jobs:
   build-and-test:
     docker:
-      # Track the active LTS release automatically; pin to a specific version (e.g. cimg/node:22.4)
-      # once the project has stricter Node version requirements.
-      - image: cimg/node:lts
-
-    # Use `small` (1 vCPU, 2 GB RAM) — sufficient for a static site with no heavy test suite.
-    # Upgrade to `medium` if build times increase with a real test runner.
+      - image: cimg/node:20.0
     resource_class: small
-
     steps:
       - checkout
-
-      # Install dependencies and restore/save the npm cache automatically.
-      - node/install-packages:
-          pkg-manager: npm
-
-      # Verify the project builds cleanly before running tests.
+      - run:
+          name: Install pnpm
+          command: sudo npm install -g pnpm
+      - run:
+          name: Install dependencies
+          command: pnpm install
       - run:
           name: Build
-          command: npm run build
-
+          command: pnpm build
       - run:
           name: Run tests
-          command: npm test
+          command: pnpm test
 
 workflows:
   ci:

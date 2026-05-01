@@ -1,6 +1,5 @@
 {
-  "outputDirectory": ".",
-  "buildCommand": "echo Static site - no build needed",
-  "installCommand": "echo No dependencies",
-  "framework": null
+  "buildCommand": "pnpm build",
+  "outputDirectory": "dist",
+  "framework": "vite"
 }
