@@ -9,6 +9,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
+    "test": "echo \"No tests specified\"",
+    "lint": "echo \"Linting not configured\""
     "test": "echo \"No tests specified\" && exit 0",
     "lint": "echo \"Linting not configured\"",
     "devframe": "node bin/devframe.js"
