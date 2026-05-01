@@ -4,32 +4,160 @@ on:
   push:
     branches: [ main, master ]
   workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+          - production
+          - staging
 
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
     
     steps:
-    - uses: actions/checkout@v6
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        cache-dependency-path: '**/package-lock.json'
+    
+    - name: Install dependencies
+      run: |
+        # Check if package.json exists
+        if [ ! -f "package.json" ]; then
+          echo "⚠️ No package.json found, skipping npm install"
+          exit 0
+        fi
+        
+        echo "📦 Installing dependencies..."
+        npm ci --prefer-offline --no-audit --fund=false
+        
+        echo "✅ Dependencies installed successfully"
+    
+    - name: Run build (if needed)
+      run: |
+        # Check if build script exists in package.json
+        if grep -q '"build"' package.json 2>/dev/null; then
+          echo "🏗️ Running build script..."
+          npm run build
+          echo "✅ Build completed"
+        else
+          echo "⚠️ No build script found, skipping build step"
+        fi
+    
+    - name: Verify Dockerfile exists
+      run: |
+        if [ ! -f "Dockerfile" ]; then
+          echo "❌ Dockerfile not found in root directory!"
+          echo "📝 Creating a default Dockerfile for Node.js app..."
+          cat > Dockerfile << 'EOF'
+FROM node:20-alpine AS builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --only=production
+
+FROM node:20-alpine
+WORKDIR /app
+RUN apk add --no-cache tini
+COPY --from=builder /app/node_modules ./node_modules
+COPY . .
+EXPOSE 3000
+ENTRYPOINT ["/sbin/tini", "--"]
+CMD ["node", "server.js"]
+EOF
+          echo "✅ Default Dockerfile created"
+        else
+          echo "✅ Dockerfile found"
+          cat Dockerfile | head -20
+        fi
     
     - name: Authenticate to Google Cloud
-      uses: google-github-actions/auth@v3
+      id: auth
+      uses: google-github-actions/auth@v2
       with:
         credentials_json: ${{ secrets.GCP_SA_KEY }}
         project_id: yt-studio-493116
+        export_default_credentials: true
     
     - name: Set up Cloud SDK
-      uses: google-github-actions/setup-gcloud@v3
+      uses: google-github-actions/setup-gcloud@v2
     
     - name: Configure Docker for GCR
-      run: gcloud auth configure-docker gcr.io
+      run: |
+        gcloud auth configure-docker gcr.io
+        gcloud auth configure-docker us.gcr.io
+        gcloud auth configure-docker eu.gcr.io
+        gcloud auth configure-docker asia.gcr.io
+    
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
     
     - name: Build Docker image
+      id: build
       run: |
-        docker build -t gcr.io/yt-studio-493116/yt-studio:latest .
-        docker tag gcr.io/yt-studio-493116/yt-studio:latest gcr.io/yt-studio-493116/yt-studio:${{ github.sha }}
+        # Build with multiple tags and cache optimization
+        docker build \
+          --cache-from gcr.io/yt-studio-493116/yt-studio:latest \
+          --tag gcr.io/yt-studio-493116/yt-studio:latest \
+          --tag gcr.io/yt-studio-493116/yt-studio:${{ github.sha }} \
+          --tag gcr.io/yt-studio-493116/yt-studio:${{ github.run_id }} \
+          --label "github.run_id=${{ github.run_id }}" \
+          --label "github.sha=${{ github.sha }}" \
+          --label "github.ref=${{ github.ref }}" \
+          --label "build.time=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" \
+          .
+        
+        echo "✅ Image built successfully"
+        echo "image_tags=latest,${{ github.sha }},${{ github.run_id }}" >> $GITHUB_OUTPUT
     
-    - name: Push to GCR
+    - name: Push to GCR with retry
       run: |
-        docker push gcr.io/yt-studio-493116/yt-studio:latest
-        docker push gcr.io/yt-studio-493116/yt-studio:${{ github.sha }}
+        # Push with retry logic (3 attempts)
+        for attempt in 1 2 3; do
+          echo "Push attempt $attempt/3..."
+          
+          if docker push gcr.io/yt-studio-493116/yt-studio:latest && \
+             docker push gcr.io/yt-studio-493116/yt-studio:${{ github.sha }} && \
+             docker push gcr.io/yt-studio-493116/yt-studio:${{ github.run_id }}; then
+            echo "✅ All images pushed successfully!"
+            exit 0
+          else
+            echo "⚠️ Push attempt $attempt failed, retrying in 10 seconds..."
+            sleep 10
+          fi
+        done
+        
+        echo "❌ Failed to push after 3 attempts"
+        exit 1
+    
+    - name: Verify push was successful
+      run: |
+        # Verify images exist in GCR
+        gcloud container images describe gcr.io/yt-studio-493116/yt-studio:latest > /dev/null 2>&1 && \
+        echo "✅ Latest tag verified" || exit 1
+        
+        gcloud container images describe gcr.io/yt-studio-493116/yt-studio:${{ github.sha }} > /dev/null 2>&1 && \
+        echo "✅ SHA tag verified" || exit 1
+        
+        echo "🎉 All images successfully pushed to GCR!"
+
+    - name: Deployment summary
+      run: |
+        echo "## 🚀 Deployment Summary" >> $GITHUB_STEP_SUMMARY
+        echo "- **Images pushed:** 3" >> $GITHUB_STEP_SUMMARY
+        echo "- **Repository:** gcr.io/yt-studio-493116/yt-studio" >> $GITHUB_STEP_SUMMARY
+        echo "- **Tags:** latest, ${{ github.sha }}, ${{ github.run_id }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Build time:** $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
+        echo "- **Commit:** [${{ github.sha }}](https://github.com/${{ github.repository }}/commit/${{ github.sha }})" >> $GITHUB_STEP_SUMMARY
+        echo "- **Node.js version:** 20" >> $GITHUB_STEP_SUMMARY
