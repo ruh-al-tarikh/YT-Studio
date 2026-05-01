@@ -11,7 +11,8 @@
     "start": "node server.js",
     "preview": "vite preview",
     "test": "echo \"No tests specified\"",
-    "lint": "echo \"Linting not configured\""
+    "lint": "echo \"Linting not configured\"",
+    "worker": "wrangler dev src/index.ts"
   },
   "dependencies": {
     "@vercel/analytics": "^2.0.1",
