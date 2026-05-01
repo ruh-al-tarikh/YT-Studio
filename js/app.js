@@ -5,7 +5,7 @@
 	 * CONFIG
 	 * ---------------------------- */
 	const CONFIG = {
-		API: 'https://yt-proxy.ruhdevopsytstudio.workers.dev',
+		API: 'https://yt-studio-api.ruhdevopsytstudio.workers.dev',
 		CACHE_KEY: 'yt_studio_videos_cache',
 		CACHE_EXPIRY: 24 * 60 * 60 * 1000,
 		PROGRESS_KEY: 'watch_progress',

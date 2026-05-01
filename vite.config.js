@@ -1,4 +1,6 @@
 import { defineConfig } from 'vite';
+import { resolve } from 'path';
+import fs from 'fs';
 
 export default defineConfig({
   root: '.',
@@ -6,8 +8,23 @@ export default defineConfig({
     outDir: 'dist',
     rollupOptions: {
       input: {
-        main: 'index.html'
+        main: resolve(__dirname, 'index.html')
       }
     }
-  }
+  },
+  plugins: [
+    {
+      name: 'copy-public-assets',
+      closeBundle() {
+        if (fs.existsSync('public')) {
+          const files = fs.readdirSync('public');
+          files.forEach(file => {
+            if (file === '_headers' || file === '_redirects') {
+              fs.copyFileSync(resolve('public', file), resolve('dist', file));
+            }
+          });
+        }
+      }
+    }
+  ]
 });
