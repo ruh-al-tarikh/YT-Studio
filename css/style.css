@@ -704,7 +704,7 @@ body.light-mode .secondary-button {
 .video-sidebar {
   position: absolute;
   right: 16px;
-  top: 16px;
+  top: 80px;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -897,8 +897,8 @@ body.light-mode .secondary-button {
 
 .close-btn {
   position: absolute;
-  top: 14px;
-  right: 14px;
+  top: 20px;
+  right: 20px;
   z-index: 2;
   width: 44px;
   height: 44px;
