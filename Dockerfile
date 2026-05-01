@@ -92,6 +92,11 @@ EOF
 # Copy ONLY production files from source
 COPY --from=static /app /usr/share/nginx/html/
 
+# Create nginx cache directories
+RUN mkdir -p /var/cache/nginx/client_temp /var/cache/nginx/proxy_temp && \
+    chown -R nginx:nginx /var/cache/nginx && \
+    chmod -R 755 /var/cache/nginx
+
 # Clean up unnecessary files (keep only web assets)
 RUN rm -rf /usr/share/nginx/html/node_modules \
     /usr/share/nginx/html/.git \
