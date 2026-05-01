@@ -14,6 +14,15 @@
 		SEARCH_HISTORY_KEY: 'search_history',
 		BOOKMARKS_KEY: 'video_bookmarks',
 		PAGE_SIZE: 12,
+		API: 'https://yt-studio-api.ruhdevopsytstudio.workers.dev',
+		CACHE_KEY: 'yt_studio_videos_cache',
+		CACHE_EXPIRY: 24 * 60 * 60 * 1000,
+		PROGRESS_KEY: 'watch_progress',
+		WATCH_LATER_KEY: 'watch_later',
+		THEME_KEY: 'ui_theme',
+		ITEMS_PER_PAGE: 12,
+		ASSUMED_DURATION: 600,
+
 		API_CONFIG: {
 			retries: 3,
 			backoff: 2
@@ -114,6 +123,83 @@
 		highThemeTitle: $('highlight-theme-title'),
 		highProgressTitle: $('highlight-progress-title'),
 		highProgressCopy: $('highlight-progress-copy')
+
+		// Theme
+		themeToggle: $('darkModeToggle'),
+
+		// Watch Later
+		watchLaterBtn: $('watchLaterBadge'),
+		watchLaterCount: $('watchLaterCount'),
+		watchLaterPage: $('watchLaterPage'),
+		watchLaterContainer: $('watchLaterContainer'),
+		closeWatchLater: $('closeWatchLater'),
+
+		// Dashboard
+		dashboardBtn: $('dashboardBtn'),
+		dashboardModal: $('dashboardModal'),
+		closeDashboard: $('closeDashboard'),
+		dashTotal: $('dashboard-total'),
+		dashSaved: $('dashboard-saved'),
+		dashProgress: $('dashboard-progress'),
+		dashHours: $('dashboard-hours'),
+		dashCategories: $('dashboardCategories'),
+		dashResumeList: $('dashboardResumeList'),
+
+		// Sidebar
+		toggleTranscript: $('toggleTranscript'),
+		transcriptPanel: $('transcriptPanel'),
+		closeTranscript: $('closeTranscript'),
+		transcriptContent: $('transcriptContent'),
+		shareBtn: $('shareEpisode'),
+		sharePanel: $('sharePanel'),
+		closeShare: $('closeShare'),
+		shareLink: $('shareLink'),
+		copyLink: $('copyLinkBtn'),
+
+		// Sections
+		continueBlock: $('continue-block'),
+		continueRow: $('continue-row'),
+		trendingBlock: $('trending-block'),
+		trendingRow: $('trending-row'),
+		recommendedBlock: $('recommended-block'),
+		recommendedRow: $('recommended-row'),
+
+		// Stats
+		statTotal: $('stat-total'),
+		statProgress: $('stat-progress'),
+		statSaved: $('stat-saved'),
+
+		// Highlights
+		highLatestTitle: $('highlight-latest-title'),
+		highLatestCopy: $('highlight-latest-copy'),
+		highThemeTitle: $('highlight-theme-title'),
+		highThemeCopy: $('highlight-theme-copy'),
+		highProgressTitle: $('highlight-progress-title'),
+		highProgressCopy: $('highlight-progress-copy'),
+
+		// Keyboard
+		keyboardHints: $('keyboardHints'),
+		closeHints: $('closeHints'),
+
+		// Filters
+		filters: document.querySelectorAll('.filter-chip'),
+	};
+
+	/* ----------------------------
+	 * STATE
+	 * ---------------------------- */
+	const state = {
+		videos: [],
+		filtered: [],
+		hero: null,
+		current: null,
+		category: 'all',
+		search: '',
+		page: 0,
+		watchLater: JSON.parse(localStorage.getItem(CONFIG.WATCH_LATER_KEY) || '[]'),
+		progress: JSON.parse(localStorage.getItem(CONFIG.PROGRESS_KEY) || '{}'),
+		theme: localStorage.getItem(CONFIG.THEME_KEY) || 'dark',
+		debounceTimer: null,
 	};
 
 	/* ----------------------------
@@ -144,6 +230,149 @@
 
 	/* ----------------------------
 	 * CORE LOGIC
+		sanitize: (s) =>
+			String(s || '')
+				.replace(/&/g, '&amp;')
+				.replace(/</g, '&lt;')
+				.replace(/>/g, '&gt;'),
+
+		truncate: (t, n) => (t.length > n ? t.slice(0, n) + '...' : t),
+
+		formatDate: (d) => new Intl.DateTimeFormat('en', { month: 'short', day: 'numeric', year: 'numeric' }).format(new Date(d)),
+
+		saveLS: (k, v) => localStorage.setItem(k, JSON.stringify(v)),
+		getLS: (k, f = null) => JSON.parse(localStorage.getItem(k) || JSON.stringify(f)),
+
+		showToast: (msg) => {
+			if (!el.toast) return;
+			el.toast.textContent = msg;
+			el.toast.classList.add('show');
+			setTimeout(() => el.toast.classList.remove('show'), 3000);
+		},
+	};
+
+	/* ----------------------------
+	 * THEME
+	 * ---------------------------- */
+	function applyTheme() {
+		if (state.theme === 'light') {
+			el.body.classList.add('light-mode');
+			if (el.themeToggle) el.themeToggle.innerHTML = '<i class="fa-regular fa-sun"></i>';
+		} else {
+			el.body.classList.remove('light-mode');
+			if (el.themeToggle) el.themeToggle.innerHTML = '<i class="fa-regular fa-moon"></i>';
+		}
+		localStorage.setItem(CONFIG.THEME_KEY, state.theme);
+	}
+
+	function toggleTheme() {
+		state.theme = state.theme === 'dark' ? 'light' : 'dark';
+		applyTheme();
+	}
+
+	/* ----------------------------
+	 * DASHBOARD
+	 * ---------------------------- */
+	function renderDashboard() {
+		if (!el.dashboardModal) return;
+
+		const totalVideos = state.videos.length;
+		const savedCount = state.watchLater.length;
+		const activeSessions = Object.keys(state.progress).length;
+		const estimatedHours = (totalVideos * CONFIG.ASSUMED_DURATION) / 3600;
+
+		if (el.dashTotal) el.dashTotal.textContent = totalVideos;
+		if (el.dashSaved) el.dashSaved.textContent = savedCount;
+		if (el.dashProgress) el.dashProgress.textContent = activeSessions;
+		if (el.dashHours) el.dashHours.textContent = estimatedHours.toFixed(1) + 'h';
+
+		// Categories
+		if (el.dashCategories) {
+			const counts = state.videos.reduce((acc, v) => {
+				acc[v.category] = (acc[v.category] || 0) + 1;
+				return acc;
+			}, {});
+
+			el.dashCategories.innerHTML = CATEGORY_RULES.map(r => `
+				<div class="dashboard-list-row">
+					<span>${r.label}</span>
+					<strong>${counts[r.key] || 0}</strong>
+				</div>
+			`).join('');
+		}
+
+		// Resume list
+		if (el.dashResumeList) {
+			const resumeVideos = Object.keys(state.progress)
+				.map(id => state.videos.find(v => v.id === id))
+				.filter(Boolean)
+				.slice(0, 5);
+
+			if (resumeVideos.length) {
+				el.dashResumeList.innerHTML = resumeVideos.map(v => `
+					<div class="dashboard-list-row resume-item" data-id="${v.id}" role="button">
+						<span>${utils.truncate(v.title, 40)}</span>
+						<i class="fa-solid fa-play-circle"></i>
+					</div>
+				`).join('');
+			} else {
+				el.dashResumeList.innerHTML = '<p class="empty-list">No active sessions.</p>';
+			}
+		}
+	}
+
+	/* ----------------------------
+	 * WATCH LATER
+	 * ---------------------------- */
+	function updateWatchLaterUI() {
+		const count = state.watchLater.length;
+		if (el.watchLaterCount) el.watchLaterCount.textContent = count;
+		if (el.statSaved) el.statSaved.textContent = count;
+
+		if (state.hero) {
+			const isHeroSaved = state.watchLater.includes(state.hero.id);
+			if (el.heroSave) {
+				el.heroSave.innerHTML = `<i class="fa-${isHeroSaved ? 'solid' : 'regular'} fa-bookmark"></i> <span>${isHeroSaved ? 'Saved' : 'Save'}</span>`;
+				el.heroSave.classList.toggle('active', isHeroSaved);
+			}
+		}
+
+		// Update grid buttons
+		document.querySelectorAll('.card-save-btn').forEach(btn => {
+			const isSaved = state.watchLater.includes(btn.dataset.id);
+			btn.classList.toggle('active', isSaved);
+			btn.innerHTML = `<i class="fa-${isSaved ? 'solid' : 'regular'} fa-bookmark"></i>`;
+		});
+	}
+
+	function toggleWatchLater(id) {
+		const idx = state.watchLater.indexOf(id);
+		if (idx === -1) {
+			state.watchLater.push(id);
+			utils.showToast('Added to Watch Later');
+		} else {
+			state.watchLater.splice(idx, 1);
+			utils.showToast('Removed from Watch Later');
+		}
+		utils.saveLS(CONFIG.WATCH_LATER_KEY, state.watchLater);
+		updateWatchLaterUI();
+		if (el.watchLaterPage && el.watchLaterPage.style.display === 'block') {
+			renderWatchLater();
+		}
+	}
+
+	function renderWatchLater() {
+		if (!el.watchLaterContainer) return;
+		const videos = state.watchLater.map(id => state.videos.find(v => v.id === id)).filter(Boolean);
+		if (!videos.length) {
+			el.watchLaterContainer.innerHTML = '<p class="empty-state">No saved episodes yet.</p>';
+			return;
+		}
+		el.watchLaterContainer.innerHTML = videos.map(card).join('');
+	}
+
+	/* ----------------------------
+	 * CATEGORY
 	 * ---------------------------- */
 	async function fetchWithRetry(url, options = {}) {
 		let delay = 1000;
@@ -227,6 +456,23 @@
 				</div>
 			</article>
 		`;
+		const title = utils.sanitize(v.title);
+		const isSaved = state.watchLater.includes(v.id);
+		return `
+      <div class="card" data-id="${v.id}" role="button" tabindex="0" aria-label="Watch ${title}">
+        <img src="${v.thumbnail}" alt="" loading="lazy" />
+        <div class="card-copy">
+          <div class="card-title">${utils.truncate(title, 80)}</div>
+          <div class="card-meta">
+            <span>${categoryLabel(v.category)}</span>
+            <span>${utils.formatDate(v.publishedAt)}</span>
+          </div>
+        </div>
+		<button class="card-save-btn ${isSaved ? 'active' : ''}" data-id="${v.id}" aria-label="Save for later">
+			<i class="fa-${isSaved ? 'solid' : 'regular'} fa-bookmark"></i>
+		</button>
+      </div>
+    `;
 	}
 
 	function render() {
@@ -311,6 +557,11 @@
 				`).join('')
 				: '<p>No active sessions</p>';
 		}
+		el.loadMore.style.display = slice.length < state.filtered.length ? 'block' : 'none';
+
+		// Update stats
+		if (el.statTotal) el.statTotal.textContent = state.videos.length;
+		updateWatchLaterUI();
 	}
 
 	/* ----------------------------
@@ -378,10 +629,15 @@
 		const cat = categoryLabel(v.category);
 		if (el.heroCategory) el.heroCategory.textContent = cat;
 		if (el.heroDate) el.heroDate.textContent = utils.formatDate(v.publishedAt);
+		const catEl = el.heroTitle.parentElement.querySelector('#hero-category');
+		if (catEl) catEl.textContent = cat;
 
 		updateWatchLaterUI();
 	}
 
+	/* ----------------------------
+	 * SPECIAL BLOCKS
+	 * ---------------------------- */
 	function renderSpecialBlocks() {
 		// Continue Watching
 		const resumeIds = Object.keys(state.progress).slice(-6).reverse();
@@ -452,6 +708,8 @@
 		});
 
 		el.closeModal?.addEventListener('click', closeModal);
+
+		el.themeToggle?.addEventListener('click', toggleTheme);
 
 		// Watch Later page
 		el.watchLaterBtn?.addEventListener('click', () => {
@@ -562,6 +820,7 @@
 				el.filters.forEach(b => b.classList.remove('active'));
 				btn.classList.add('active');
 				state.category = btn.dataset.category || btn.dataset.cat;
+				state.category = btn.dataset.category;
 				state.page = 0;
 				render();
 			});
@@ -592,6 +851,7 @@
 
 		el.grid?.addEventListener('click', handleCardInteraction);
 		el.watchLaterContainer?.addEventListener('click', handleCardInteraction);
+		el.dashResumeList?.addEventListener('click', handleCardInteraction);
 		el.continueRow?.addEventListener('click', handleCardInteraction);
 		el.trendingRow?.addEventListener('click', handleCardInteraction);
 		el.recommendedRow?.addEventListener('click', handleCardInteraction);
@@ -616,6 +876,7 @@
 			state.progress = utils.getLS(CONFIG.PROGRESS_KEY) || {};
 			state.watchLater = utils.getLS(CONFIG.WATCH_LATER_KEY) || [];
 
+			applyTheme();
 			if (el.loading) el.loading.style.display = 'block';
 
 			state.videos = await loadVideos();

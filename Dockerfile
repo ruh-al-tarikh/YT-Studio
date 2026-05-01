@@ -3,6 +3,7 @@ WORKDIR /app
 RUN npm install -g pnpm
 COPY pnpm-lock.yaml package.json ./
 RUN pnpm install
+RUN pnpm install --frozen-lockfile
 COPY . .
 RUN pnpm build
 
@@ -11,6 +12,7 @@ WORKDIR /app
 RUN npm install -g pnpm
 COPY pnpm-lock.yaml package.json ./
 RUN pnpm install --prod
+RUN pnpm install --prod --frozen-lockfile
 COPY --from=builder /app/dist ./dist
 COPY server.js ./
 EXPOSE 3000
