@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite';
 import { resolve } from 'path';
 import fs from 'fs';
+import Devtools from 'vite-plugin-devtools';
 
 export default defineConfig({
   root: '.',
@@ -13,6 +14,10 @@ export default defineConfig({
     }
   },
   plugins: [
+    Devtools({
+      insertDevtools: true,
+      silent: false,
+    }),
     {
       name: 'copy-public-assets',
       closeBundle() {
