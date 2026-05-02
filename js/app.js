@@ -1,279 +1,59 @@
-(function () {
-  'use strict';
+// YT Studio Main Application
+let ytPlayer;
+let currentVideos = [];
 
-  /* ----------------------------
-   * CONFIG
-   * ---------------------------- */
-  const CONFIG = {
-    API: 'https://yt-proxy.ruhdevopsytstudio.workers.dev',
-    CACHE_KEY: 'yt_studio_videos_cache_v4',
-    CACHE_EXPIRY: 24 * 60 * 60 * 1000,
-    PROGRESS_KEY: 'watch_progress',
-    WATCH_LATER_KEY: 'watch_later_list',
-    THEME_KEY: 'ui_theme',
-    SEARCH_HISTORY_KEY: 'search_history',
-    ITEMS_PER_PAGE: 12,
+// Initialize YouTube API
+function loadYouTubeAPI() {
+  if (document.getElementById('youtube-api-script')) return;
+  const tag = document.createElement('script');
+  tag.id = 'youtube-api-script';
+  tag.src = 'https://www.youtube.com/iframe_api';
+  document.head.appendChild(tag);
+}
 
-    API_CONFIG: {
-      timeout: 10000,
-      retries: 3,
-      backoff: 1.5,
-      delay: 500
+window.onYouTubeIframeAPIReady = function() {
+  ytPlayer = new YT.Player('yt-player-container', {
+    height: '360',
+    width: '100%',
+    videoId: '',
+    playerVars: { 'autoplay': 1, 'rel': 0 },
+    events: { onReady: () => console.log('🎬 Player ready') }
+  });
+};
+
+window.playVideo = function(videoId) {
+  if (ytPlayer && ytPlayer.loadVideoById) {
+    ytPlayer.loadVideoById(videoId);
+    const container = document.getElementById('yt-player-container');
+    if (container) {
+      container.style.display = 'block';
+      container.scrollIntoView({ behavior: 'smooth' });
     }
-  };
-
-  const CATEGORY_RULES = [
-    { key: 'quran', label: 'Quran', terms: ['quran', 'surah', 'ayah', 'allah', 'tafsir', 'islam'] },
-    { key: 'prophecy', label: 'Prophecy', terms: ['prophecy', 'dajjal', 'gog', 'magog', 'end times'] },
-    { key: 'discussion', label: 'Discussion', terms: ['podcast', 'debate', 'interview', 'conversation'] },
-    { key: 'educational', label: 'Educational', terms: ['lesson', 'guide', 'explained', 'documentary'] },
-    { key: 'history', label: 'History', terms: ['history', 'empire', 'caliph', 'war', 'civilization'] }
-  ];
-
-  /* ----------------------------
-   * DOM CACHE
-   * ---------------------------- */
-  const $ = (id) => document.getElementById(id);
-
-  const el = {
-    body: document.body,
-    grid: $('grid'),
-    modal: $('modal'),
-    player: $('player'),
-    closeModal: $('close'),
-    heroTitle: $('hero-title'),
-    heroSubtitle: $('hero-subtitle'),
-    heroBtn: $('hero-btn'),
-    heroSave: $('hero-save-btn'),
-    heroCategory: $('hero-category'),
-    search: $('searchInput'),
-    clearSearch: $('clearSearch'),
-    suggestions: $('searchSuggestions'),
-    loadMore: $('loadMoreBtn'),
-    loadMoreContainer: $('loadMoreContainer'),
-    loading: $('loading-state'),
-    error: $('error-container'),
-    errorMsg: $('error-message'),
-    retryBtn: $('retry-btn'),
-    toast: $('toast'),
-    bg: $('bg'),
-    themeToggle: $('darkModeToggle'),
-    watchLaterBadge: $('watchLaterBadge'),
-    watchLaterCount: $('watchLaterCount'),
-    chips: document.querySelectorAll('.chip'),
-    resultsMeta: $('results-meta'),
-    // Stats
-    statTotal: $('stat-total'),
-    statSaved: $('stat-saved'),
-    statProgress: $('stat-progress')
-  };
-
-  /* ----------------------------
-   * STATE
-   * ---------------------------- */
-  const state = {
-    videos: [],
-    filtered: [],
-    hero: null,
-    category: 'all',
-    search: '',
-    page: 0,
-    watchLater: JSON.parse(localStorage.getItem(CONFIG.WATCH_LATER_KEY) || '[]'),
-    theme: localStorage.getItem(CONFIG.THEME_KEY) || 'dark',
-    debounceTimer: null,
-    searchHistory: JSON.parse(localStorage.getItem(CONFIG.SEARCH_HISTORY_KEY) || '[]')
-  };
-
-  /* ----------------------------
-   * UTILITIES
-   * ---------------------------- */
-  const utils = {
-    sanitize: (s) =>
-      String(s || '')
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;'),
-
-    truncate: (t, n) => (t.length > n ? t.slice(0, n) + '...' : t),
-
-    formatDate: (d) =>
-      new Intl.DateTimeFormat('en', { month: 'short', day: 'numeric', year: 'numeric' })
-        .format(new Date(d)),
-
-    saveLS: (k, v) => localStorage.setItem(k, JSON.stringify(v)),
-    getLS: (k, f = null) => {
-      try {
-        const val = localStorage.getItem(k);
-        return val ? JSON.parse(val) : f;
-      } catch (e) { return f; }
-    },
-
-    showToast: (msg) => {
-      if (!el.toast) return;
-      el.toast.textContent = msg;
-      el.toast.classList.add('show');
-      setTimeout(() => el.toast.classList.remove('show'), 3000);
-    }
-  };
-
-  /* ----------------------------
-   * CATEGORY
-   * ---------------------------- */
-  function detectCategory(title) {
-    const t = title.toLowerCase();
-    const match = CATEGORY_RULES.find(r => r.terms.some(x => t.includes(x)));
-    return match?.key || 'history';
+  } else {
+    console.warn('Player not ready, retrying...');
+    setTimeout(() => window.playVideo(videoId), 500);
   }
+};
 
-  function categoryLabel(key) {
-    return CATEGORY_RULES.find(r => r.key === key)?.label || 'History';
+// Load videos from API
+async function loadVideos() {
+  try {
+    const response = await fetch('https://yt-proxy.ruhdevopsytstudio.workers.dev');
+    const data = await response.json();
+    currentVideos = data.videos || data || [];
+    renderVideos();
+  } catch (error) {
+    console.error('Failed to load videos:', error);
   }
+}
 
-  /* ----------------------------
-   * API
-   * ---------------------------- */
-  async function fetchWithRetry(url) {
-    let delay = CONFIG.API_CONFIG.delay;
-
-    for (let i = 0; i < CONFIG.API_CONFIG.retries; i++) {
-      try {
-        const ctrl = new AbortController();
-        const t = setTimeout(() => ctrl.abort(), CONFIG.API_CONFIG.timeout);
-
-        const res = await fetch(url, { signal: ctrl.signal });
-        clearTimeout(t);
-
-        if (!res.ok) throw new Error(`API Error: ${res.status} ${res.statusText}`);
-        return res;
-      } catch (e) {
-        if (i === CONFIG.API_CONFIG.retries - 1) throw e;
-        await new Promise(r => setTimeout(r, delay));
-        delay *= CONFIG.API_CONFIG.backoff;
-      }
-    }
-  }
-
-  async function loadVideos() {
-    const cached = utils.getLS(CONFIG.CACHE_KEY);
-
-    if (cached?.data?.length && Date.now() - cached.time < CONFIG.CACHE_EXPIRY) {
-      return cached.data;
-    }
-
-    try {
-      const res = await fetchWithRetry(CONFIG.API);
-      const json = await res.json();
-
-      const videos = (json.videos || []).map(v => ({
-        id: v.id || v.videoId,
-        title: v.title || 'Untitled',
-        thumbnail: v.thumbnail,
-        publishedAt: v.publishedAt || new Date().toISOString(),
-        category: detectCategory(v.title || ''),
-        description: v.description || 'Deep dive into Islamic history and theology.'
-      }));
-
-      if (videos.length > 0) {
-        utils.saveLS(CONFIG.CACHE_KEY, { data: videos, time: Date.now() });
-      }
-      return videos;
-    } catch (err) {
-      console.error('Failed to load videos:', err);
-      // If we have any cache at all, even expired, return it as fallback
-      if (cached?.data) return cached.data;
-      throw err;
-    }
-  }
-
-  /* ----------------------------
-   * MODAL / PLAYER
-   * ---------------------------- */
-  function openModal(video) {
-    if (!video || !el.modal || !el.player) return;
-
-    el.player.src = `https://www.youtube.com/embed/${video.id}?autoplay=1&rel=0&modestbranding=1`;
-    el.modal.style.display = 'flex';
-    el.modal.setAttribute('aria-hidden', 'false');
-    el.body.style.overflow = 'hidden';
-
-    const titleEl = $('video-title');
-    if (titleEl) titleEl.textContent = video.title;
-
-    // Save to search history if it came from search
-    if (state.search) {
-      if (!state.searchHistory.includes(state.search)) {
-        state.searchHistory.unshift(state.search);
-        state.searchHistory = state.searchHistory.slice(0, 5);
-        utils.saveLS(CONFIG.SEARCH_HISTORY_KEY, state.searchHistory);
-      }
-    }
-  }
-
-  function closeModal() {
-    if (!el.modal || !el.player) return;
-    el.player.src = '';
-    el.modal.style.display = 'none';
-    el.modal.setAttribute('aria-hidden', 'true');
-    el.body.style.overflow = '';
-  }
-
-  /* ----------------------------
-   * WATCH LATER
-   * ---------------------------- */
-  function toggleWatchLater(video) {
-    const idx = state.watchLater.findIndex(v => v.id === video.id);
-    if (idx === -1) {
-      state.watchLater.push(video);
-      utils.showToast('Added to Watch Later');
-    } else {
-      state.watchLater.splice(idx, 1);
-      utils.showToast('Removed from Watch Later');
-    }
-    utils.saveLS(CONFIG.WATCH_LATER_KEY, state.watchLater);
-    updateStats();
-  }
-
-  /* ----------------------------
-   * THEME
-   * ---------------------------- */
-  function applyTheme() {
-    if (state.theme === 'light') {
-      el.body.classList.add('light-mode');
-    } else {
-      el.body.classList.remove('light-mode');
-    }
-    const icon = el.themeToggle?.querySelector('i');
-    if (icon) {
-      icon.className = state.theme === 'dark' ? 'fa-regular fa-moon' : 'fa-regular fa-sun';
-    }
-  }
-
-  function toggleTheme() {
-    state.theme = state.theme === 'dark' ? 'light' : 'dark';
-    utils.saveLS(CONFIG.THEME_KEY, state.theme);
-    applyTheme();
-  }
-
-  /* ----------------------------
-   * RENDER
-   * ---------------------------- */
-  function card(v) {
-    const isSaved = state.watchLater.some(s => s.id === v.id);
-    return `
-      <div class="card" data-id="${v.id}" role="button" tabindex="0">
-        <div class="card-thumb-wrapper">
-          <img src="${v.thumbnail}" alt="${utils.sanitize(v.title)}" loading="lazy">
-          <button class="watch-later-btn ${isSaved ? 'active' : ''}" data-id="${v.id}" aria-label="Save for later">
-            <i class="fa-${isSaved ? 'solid' : 'regular'} fa-bookmark"></i>
-          </button>
-        </div>
-        <div class="card-copy">
-          <div class="card-title">${utils.sanitize(utils.truncate(v.title, 60))}</div>
-          <div class="card-meta">
-            <span class="card-tag">${categoryLabel(v.category)}</span>
-            <span>${utils.formatDate(v.publishedAt)}</span>
-          </div>
-        </div>
+function renderVideos() {
+  const container = document.querySelector('.episodes-grid, #episodes-container');
+  if (container && currentVideos.length) {
+    container.innerHTML = currentVideos.map(video => `
+      <div class="video-card" data-video-id="${video.videoId}" onclick="playVideo('${video.videoId}')">
+        <img src="${video.thumbnail}" alt="${video.title}" loading="lazy">
+        <h3>${escapeHtml(video.title)}</h3>
       </div>
     `;
   }
@@ -506,3 +286,31 @@
 
   document.addEventListener('DOMContentLoaded', init);
 })();
+    `).join('');
+  }
+}
+
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+// Dark mode toggle
+function initDarkMode() {
+  const toggle = document.getElementById('darkModeToggle');
+  if (toggle) {
+    toggle.addEventListener('click', () => {
+      document.body.classList.toggle('dark-mode');
+      localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
+    });
+  }
+}
+
+// Initialize everything
+document.addEventListener('DOMContentLoaded', () => {
+  loadYouTubeAPI();
+  loadVideos();
+  initDarkMode();
+  console.log('🚀 YT Studio initialized');
+});

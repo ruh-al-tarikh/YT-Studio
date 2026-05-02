@@ -718,3 +718,4 @@ snapshots:
       tinyglobby: 0.2.16
     optionalDependencies:
       fsevents: 2.3.3
+      lightningcss: 1.32.0
