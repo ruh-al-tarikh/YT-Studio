@@ -304,32 +304,7 @@
   /* ----------------------------
    * MODAL / PLAYER
    * ---------------------------- */
-  function openPlayer(v) {
-    if (!v) return;
-    state.current = v;
-
-    const videoId = v.id || v.videoId;
-    el.player.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`;
-    el.modal.style.display = 'flex';
-    el.modal.setAttribute('aria-hidden', 'false');
-    el.body.style.overflow = 'hidden';
-
-    const titleEl = $('video-title');
-    if (titleEl) titleEl.textContent = v.title;
-  }
-
-  function closePlayer() {
-    el.player.src = '';
-    el.modal.style.display = 'none';
-    el.modal.setAttribute('aria-hidden', 'true');
-    el.body.style.overflow = '';
-    state.current = null;
-    if (el.loadMoreContainer) {
-      el.loadMoreContainer.style.display = slice.length < state.filtered.length ? 'block' : 'none';
-    }
-  }
-
-  function updateStats() {
+      function updateStats() {
     if (el.statTotal) el.statTotal.textContent = state.videos.length;
     if (el.statSaved) el.statSaved.textContent = state.watchLater.length;
     if (el.watchLaterCount) el.watchLaterCount.textContent = state.watchLater.length;
@@ -358,13 +333,12 @@
   /* ----------------------------
    * EVENTS
    * ---------------------------- */
-  function bind() {
+    function bind() {
     // Search input
-    // Search
-    el.search?.addEventListener('input', (e) => {
+    el.search?.addEventListener("input", (e) => {
       state.search = e.target.value;
       state.page = 0;
-      if (el.clearSearch) el.clearSearch.style.display = state.search ? 'block' : 'none';
+      if (el.clearSearch) el.clearSearch.style.display = state.search ? "block" : "none";
       clearTimeout(state.debounceTimer);
       state.debounceTimer = setTimeout(() => {
         state.page = 0;
@@ -373,122 +347,49 @@
     });
 
     // Clear search
-    $('clearSearch')?.addEventListener('click', () => {
+    el.clearSearch?.addEventListener("click", () => {
       if (el.search) {
-        el.search.value = '';
-        state.search = '';
+        el.search.value = "";
+        state.search = "";
         state.page = 0;
+        el.clearSearch.style.display = "none";
         render();
       }
     });
 
     // Filter chips
-    document.querySelector('.filter-chips')?.addEventListener('click', (e) => {
-      const chip = e.target.closest('.chip');
-      if (!chip) return;
-
-      document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-      chip.classList.add('active');
-
-      state.category = chip.dataset.cat;
-      state.page = 0;
-      render();
-    });
-
-    // Load more
-      state.debounceTimer = setTimeout(render, 300);
-    });
-
-    el.clearSearch?.addEventListener('click', () => {
-      if (el.search) el.search.value = '';
-      state.search = '';
-      state.page = 0;
-      el.clearSearch.style.display = 'none';
-      render();
-    });
-
-    // Load More
-    el.loadMore?.addEventListener('click', () => {
-      state.page++;
-      render();
-    });
-
-    // Hero Play
-    el.heroBtn?.addEventListener('click', () => {
-      if (state.hero) openPlayer(state.hero);
-    });
-
-    // Modal Close
-    el.closeModal?.addEventListener('click', closePlayer);
-
-    window.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') closePlayer();
-    });
-
-    // Video Grid - Event delegation
-    el.grid?.addEventListener('click', (e) => {
-      const card = e.target.closest('.card');
-      if (!card) return;
-
-      const id = card.dataset.id;
-      const video = state.videos.find(v => (v.id === id || v.videoId === id));
-      if (video) openPlayer(video);
-    });
-
-    // Handle clicks outside modal content to close
-    el.modal?.addEventListener('click', (e) => {
-      if (e.target === el.modal) closePlayer();
-    });
-
-    // Theme toggle
-    $('darkModeToggle')?.addEventListener('click', () => {
-      const isDark = el.body.classList.toggle('light-theme');
-      const icon = $('darkModeToggle').querySelector('i');
-      if (icon) {
-        icon.className = isDark ? 'fa-regular fa-sun' : 'fa-regular fa-moon';
-      }
-    });
-
-    // Retry button
-    $('retry-btn')?.addEventListener('click', () => {
-      el.error.style.display = 'none';
-      init();
-    // Chips
     el.chips.forEach(chip => {
-      chip.addEventListener('click', () => {
-        el.chips.forEach(c => c.classList.remove('active'));
-        chip.classList.add('active');
+      chip.addEventListener("click", () => {
+        el.chips.forEach(c => c.classList.remove("active"));
+        chip.classList.add("active");
         state.category = chip.dataset.cat;
         state.page = 0;
         render();
       });
     });
 
-    // Theme
-    el.themeToggle?.addEventListener('click', toggleTheme);
+    // Theme Toggle
+    el.themeToggle?.addEventListener("click", toggleTheme);
 
     // Hero Buttons
-    el.heroBtn?.addEventListener('click', () => {
+    el.heroBtn?.addEventListener("click", () => {
       if (state.hero) openModal(state.hero);
     });
 
-    el.heroSave?.addEventListener('click', () => {
+    el.heroSave?.addEventListener("click", () => {
       if (state.hero) {
         toggleWatchLater(state.hero);
-        setHero(state.hero); // refresh hero save button state
+        setHero(state.hero);
       }
     });
 
     // Modal Close
-    el.closeModal?.addEventListener('click', closeModal);
-    window.addEventListener('click', (e) => {
-      if (e.target === el.modal) closeModal();
-    });
+    el.closeModal?.addEventListener("click", closeModal);
 
-    // Card Clicks
-    el.grid?.addEventListener('click', (e) => {
-      const cardEl = e.target.closest('.card');
-      const saveBtn = e.target.closest('.watch-later-btn');
+    // Video Grid - Event delegation
+    el.grid?.addEventListener("click", (e) => {
+      const cardEl = e.target.closest(".card");
+      const saveBtn = e.target.closest(".watch-later-btn");
 
       if (saveBtn) {
         e.stopPropagation();
@@ -496,7 +397,7 @@
         const video = state.videos.find(v => v.id === id);
         if (video) {
           toggleWatchLater(video);
-          render(); // Refresh grid to show new save state
+          render();
         }
         return;
       }
@@ -508,28 +409,70 @@
       }
     });
 
-    // Retry Button
-    el.retryBtn?.addEventListener('click', init);
+    // Load More
+    el.loadMore?.addEventListener("click", () => {
+      state.page++;
+      render();
+    });
 
     // Keyboard Shortcuts
-    document.addEventListener('keydown', (e) => {
-      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
-        if (e.key === 'Escape') e.target.blur();
+        document.addEventListener("keydown", (e) => {
+      if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") {
+        if (e.key === "Escape") e.target.blur();
         return;
       }
 
-      switch(e.key.toLowerCase()) {
-        case '/':
+      const key = e.key.toLowerCase();
+
+      switch(key) {
+        case "/":
           e.preventDefault();
           el.search?.focus();
           break;
-        case 'escape':
+        case "escape":
           closeModal();
+          const hints = $("keyboardHints");
+          if (hints) {
+             hints.setAttribute("aria-hidden", "true");
+             el.body.style.overflow = "";
+          }
           break;
-        // Navigation could be added here
+        case "?":
+          const hintsModal = $("keyboardHints");
+          if (hintsModal) {
+            const isHidden = hintsModal.getAttribute("aria-hidden") === "true";
+            hintsModal.setAttribute("aria-hidden", isHidden ? "false" : "true");
+            el.body.style.overflow = isHidden ? "hidden" : "";
+          }
+          break;
+        case "t":
+          toggleTheme();
+          break;
+      }
+    });
+
+    // Close hints
+    $("closeHints")?.addEventListener("click", () => {
+      $("keyboardHints")?.setAttribute("aria-hidden", "true");
+      el.body.style.overflow = "";
+    });
+
+    // Retry Button
+    el.retryBtn?.addEventListener("click", init);
+
+    // Handle clicks outside modal content to close
+    el.modal?.addEventListener("click", (e) => {
+      if (e.target === el.modal) closeModal();
+    });
+
+    $("keyboardHints")?.addEventListener("click", (e) => {
+      if (e.target === $("keyboardHints")) {
+        $("keyboardHints").setAttribute("aria-hidden", "true");
+        el.body.style.overflow = "";
       }
     });
   }
+
 
   /* ----------------------------
    * INIT
