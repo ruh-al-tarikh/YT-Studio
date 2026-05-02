@@ -17,7 +17,9 @@
     "@vercel/speed-insights": "^2.0.0"
   },
   "devDependencies": {
-    "vite": "^6.0.0"
+    "@cloudflare/workers-types": "^4.20260502.1",
+    "vite": "^6.0.0",
+    "wrangler": "^4.87.0"
   },
   "engines": {
     "node": ">=20.0.0",
