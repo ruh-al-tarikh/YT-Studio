@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -9,10 +9,22 @@
     content="A cinematic archive for Ruh Al Tarikh episodes exploring Islamic history, scripture, prophecy, and deep discussion."
   >
   <link rel="stylesheet" href="css/style.css">
+  <title>Ruh Al Tarikh | Cinematic Islamic Archive</title>
+  <meta name="description" content="A cinematic archive for Ruh Al Tarikh episodes exploring Islamic history, scripture, prophecy, and deep discussion.">
+  <meta name="author" content="Ruh Al Tarikh">
+  <meta property="og:title" content="Ruh Al Tarikh">
+  <meta property="og:description" content="Uncovering truth through Islamic history, scripture, and contested ideas.">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  
+  <!-- Preconnects for performance -->
   <link rel="preconnect" href="https://i.ytimg.com">
   <link rel="preconnect" href="https://www.youtube.com">
   <link rel="preconnect" href="https://yt-proxy.ruhdevopsytstudio.workers.dev">
   <link rel="dns-prefetch" href="https://yt-proxy.ruhdevopsytstudio.workers.dev">
+  
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -33,6 +45,15 @@
 <body>
   <div id="bg" aria-hidden="true"></div>
 
+  
+  <!-- YouTube API -->
+  <script src="https://www.youtube.com/iframe_api"></script>
+</head>
+<body>
+
+  <div id="bg" aria-hidden="true"></div>
+
+  <!-- Header -->
   <header class="header">
     <div class="header-content">
       <div class="brand-block">
@@ -58,6 +79,8 @@
   </header>
 
   <main id="app-root">
+    
+    <!-- Search & Filter Section -->
     <section class="search-filter-section" aria-label="Browse controls">
       <div class="search-panel">
         <label class="search-label" for="searchInput">Search the archive</label>
@@ -75,11 +98,16 @@
             <i class="fa-solid fa-xmark" aria-hidden="true"></i>
           </button>
           <div id="searchSuggestions" class="search-suggestions" role="listbox" aria-hidden="true"></div>
+          <input type="text" id="searchInput" placeholder="Search episodes, topics, people, or places (/) to focus" autocomplete="off">
+          <button id="clearSearch" class="clear-search" type="button" aria-label="Clear search">
+            <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+          </button>
         </div>
       </div>
       <div class="filter-panel">
         <p class="filter-heading">Themes</p>
         <div class="filter-chips" role="tablist" aria-label="Episode categories">
+        <div class="filter-chips" role="tablist">
           <button class="chip active" type="button" data-cat="all">All</button>
           <button class="chip" type="button" data-cat="history">History</button>
           <button class="chip" type="button" data-cat="quran">Quran</button>
@@ -90,16 +118,19 @@
       </div>
     </section>
 
+    <!-- Loading State -->
     <div id="loading-state" class="loading-state" style="display: none;">
       <div class="spinner"></div>
       <p>Loading premium content...</p>
     </div>
 
+    <!-- Error State -->
     <div id="error-container" class="error-container" style="display: none;">
       <p id="error-message"></p>
       <button id="retry-btn" type="button">Retry</button>
     </div>
 
+    <!-- Hero Section -->
     <section class="hero" aria-labelledby="hero-title">
       <div class="hero-overlay">
         <div class="hero-copy">
@@ -138,6 +169,7 @@
       </div>
     </section>
 
+    <!-- Highlights Section -->
     <section class="highlights" aria-label="Quick highlights">
       <article class="highlight-card">
         <span class="highlight-label">Latest focus</span>
@@ -156,6 +188,7 @@
       </article>
     </section>
 
+    <!-- Continue Watching Section -->
     <section id="continue-block" class="content-section" style="display: none;">
       <div class="section-heading">
         <h2 class="section-title">Continue Watching</h2>
@@ -164,6 +197,7 @@
       <div id="continue-row" class="row"></div>
     </section>
 
+    <!-- Trending Section -->
     <section id="trending-block" class="content-section" style="display: none;">
       <div class="section-heading">
         <h2 class="section-title">Trending in the Archive</h2>
@@ -172,6 +206,7 @@
       <div id="trending-row" class="row"></div>
     </section>
 
+    <!-- Recommended Section -->
     <section id="recommended-block" class="content-section" style="display: none;">
       <div class="section-heading">
         <h2 class="section-title">Recommended For You</h2>
@@ -180,6 +215,7 @@
       <div id="recommended-row" class="row"></div>
     </section>
 
+    <!-- Episodes Grid -->
     <section class="content-section">
       <div class="section-heading">
         <h2 class="section-title">Episodes</h2>
@@ -188,11 +224,13 @@
       <div id="results-meta" class="results-meta"></div>
       <div id="grid" class="grid"></div>
       <div id="loadMoreContainer" style="display: none; text-align: center; padding: 30px 0;">
+      <div id="loadMoreContainer" class="load-more-container" style="display: none;">
         <button id="loadMoreBtn" class="primary-button" type="button">Load More Episodes</button>
       </div>
     </section>
   </main>
 
+  <!-- Video Modal -->
   <div id="modal" class="modal" aria-hidden="true">
     <div class="modal-content">
       <button id="close" class="close-btn" type="button" aria-label="Close player">
@@ -200,18 +238,13 @@
       </button>
       <div class="modal-body">
         <div class="video-container">
-          <iframe
-            id="player"
-            title="YouTube player"
-            allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
-            allowfullscreen
-          ></iframe>
+          <iframe id="player" title="YouTube player" allow="autoplay; encrypted-media; fullscreen; picture-in-picture" allowfullscreen></iframe>
         </div>
         <div class="video-sidebar">
-          <button id="toggleTranscript" class="sidebar-btn" type="button" aria-label="Toggle transcript panel" title="View episode notes">
+          <button id="toggleTranscript" class="sidebar-btn" type="button" title="View episode notes">
             <i class="fa-solid fa-note-sticky" aria-hidden="true"></i>
           </button>
-          <button id="shareEpisode" class="sidebar-btn" type="button" aria-label="Share episode" title="Share this episode">
+          <button id="shareEpisode" class="sidebar-btn" type="button" title="Share this episode">
             <i class="fa-solid fa-share-nodes" aria-hidden="true"></i>
           </button>
         </div>
@@ -219,17 +252,20 @@
           <div class="transcript-header">
             <h3>Episode Notes</h3>
             <button id="closeTranscript" class="close-transcript" type="button" aria-label="Close transcript">
+            <button id="closeTranscript" class="close-transcript" type="button">
               <i class="fa-solid fa-xmark" aria-hidden="true"></i>
             </button>
           </div>
           <div id="transcriptContent" class="transcript-content">
             <p class="transcript-placeholder">Transcript &amp; notes coming soon for this episode.</p>
+            <p class="transcript-placeholder">Transcript & notes coming soon for this episode.</p>
           </div>
         </div>
         <div id="sharePanel" class="share-panel" aria-hidden="true">
           <div class="share-header">
             <h3>Share Episode</h3>
             <button id="closeShare" class="close-share" type="button" aria-label="Close share">
+            <button id="closeShare" class="close-share" type="button">
               <i class="fa-solid fa-xmark" aria-hidden="true"></i>
             </button>
           </div>
@@ -239,6 +275,7 @@
               <div class="copy-input-group">
                 <input type="text" id="shareLink" readonly>
                 <button id="copyLinkBtn" class="copy-btn" type="button" aria-label="Copy link">Copy</button>
+                <button id="copyLinkBtn" class="copy-btn" type="button">Copy</button>
               </div>
             </div>
             <div class="share-social">
@@ -253,6 +290,9 @@
                 <button id="shareWhatsApp" class="social-btn whatsapp" type="button" aria-label="Share on WhatsApp" title="WhatsApp">
                   <i class="fa-brands fa-whatsapp" aria-hidden="true"></i>
                 </button>
+                <button id="shareTwitter" class="social-btn twitter" type="button"><i class="fa-brands fa-twitter"></i></button>
+                <button id="shareFacebook" class="social-btn facebook" type="button"><i class="fa-brands fa-facebook"></i></button>
+                <button id="shareWhatsApp" class="social-btn whatsapp" type="button"><i class="fa-brands fa-whatsapp"></i></button>
               </div>
             </div>
           </div>
@@ -262,6 +302,7 @@
     </div>
   </div>
 
+  <!-- Watch Later Overlay -->
   <section id="watchLaterPage" class="watch-later-page" style="display: none;" aria-hidden="true">
     <div class="watch-later-shell">
       <div class="watch-later-header">
@@ -270,6 +311,7 @@
           <h2>Watch Later</h2>
         </div>
         <button id="closeWatchLater" class="icon-button" type="button" aria-label="Close watch later">
+        <button id="closeWatchLater" class="icon-button" type="button">
           <i class="fa-solid fa-xmark" aria-hidden="true"></i>
         </button>
       </div>
@@ -277,6 +319,7 @@
     </div>
   </section>
 
+  <!-- Dashboard Overlay -->
   <section id="dashboardModal" class="dashboard-modal" style="display: none;" aria-hidden="true">
     <div class="dashboard-content">
       <div class="dashboard-header">
@@ -285,6 +328,7 @@
           <h2>Archive Dashboard</h2>
         </div>
         <button id="closeDashboard" class="icon-button" type="button" aria-label="Close dashboard">
+        <button id="closeDashboard" class="icon-button" type="button">
           <i class="fa-solid fa-xmark" aria-hidden="true"></i>
         </button>
       </div>
@@ -338,6 +382,13 @@
   <footer class="footer">
     <div class="footer-content">
       <p>&copy; 2026 Ruh Al Tarikh. All rights reserved.</p>
+  <!-- Toast Notification -->
+  <div id="toast" class="toast" aria-live="polite"></div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-content">
+      <p>© 2026 Ruh Al Tarikh. All rights reserved.</p>
       <p class="footer-tagline">Built for deep viewing, quick discovery, and cleaner continuity.</p>
     </div>
   </footer>
@@ -350,5 +401,7 @@
     data-cf-beacon='{"token": "ba884823c06049fc9efb06ab4e1b533c"}'
   ></script>
   <!-- End Cloudflare Web Analytics -->
+  <!-- Scripts -->
+  <script src="js/app.js" defer></script>
 </body>
 </html>
