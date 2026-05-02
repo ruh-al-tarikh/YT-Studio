@@ -12,6 +12,8 @@
   "assets": {
     "directory": "./dist",
     "binding": "ASSETS"
+    "binding": "ASSETS",
+    "html_handling": "drop-extension"
   },
   "d1_databases": [
     {
