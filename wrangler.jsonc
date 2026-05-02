@@ -6,6 +6,13 @@
   "compatibility_flags": [
     "nodejs_compat"
   ],
+  "build": {
+    "command": "pnpm run build"
+  },
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS"
+  },
   "d1_databases": [
     {
       "binding": "MY_DB",
@@ -17,7 +24,12 @@
     "production": {
       "vars": {
         "ENVIRONMENT": "production",
+        "NODE_ENV": "production",
         "API_URL": "https://yt-studio-api.ruhdevopsytstudio.workers.dev"
+      },
+      "assets": {
+        "directory": "./dist",
+        "binding": "ASSETS"
       },
       "d1_databases": [
         {
