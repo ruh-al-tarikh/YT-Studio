@@ -5,9 +5,16 @@
   "compatibility_date": "2024-11-01",
   "compatibility_flags": ["nodejs_compat"],
   "assets": {
-    "directory": "./public",
+    "directory": "./dist",
     "binding": "ASSETS"
   },
+  "d1_databases": [
+    {
+      "binding": "MY_DB",
+      "database_name": "yt-studio-db",
+      "database_id": "e36d3eba-7401-4945-b8e8-26cdbd13e3a9"
+    }
+  ],
   "env": {
     "development": {
       "vars": {
