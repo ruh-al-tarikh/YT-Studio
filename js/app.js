@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /**
  * YT Studio - Cinematic Archive
  * Core Application Logic
@@ -893,4 +894,81 @@
 
   document.addEventListener('DOMContentLoaded', init);
 })();
+=======
+﻿// YT Studio - Working Video Player
+(function() {
+  const API_URL = 'https://yt-proxy.ruhdevopsytstudio.workers.dev';
+  
+  // Load videos when page loads
+  async function loadVideos() {
+    const container = document.querySelector('.videos-grid, .grid, #grid, .episodes-grid');
+    if (!container) {
+      console.error('Video container not found');
+      return;
+    }
+    
+    container.innerHTML = '<div class="loading">Loading videos...</div>';
+    
+    try {
+      const response = await fetch(API_URL);
+      const data = await response.json();
+      const videos = data.videos || [];
+      
+      if (videos.length === 0) {
+        container.innerHTML = '<div>No videos found</div>';
+        return;
+      }
+      
+      // Render thumbnails
+      container.innerHTML = videos.map(video => `
+        <div class="video-card" onclick="playVideo('\''${video.videoId}'\'')">
+          <img src="${video.thumbnail}" alt="${video.title}" loading="lazy">
+          <h3>${video.title}</h3>
+        </div>
+      `).join('');
+      
+      console.log(`✅ Loaded ${videos.length} videos`);
+      
+    } catch (error) {
+      console.error('Error loading videos:', error);
+      container.innerHTML = '<div>Failed to load videos. Please refresh.</div>';
+    }
+  }
+  
+  // YouTube player
+  let player;
+  function loadYouTubeAPI() {
+    const tag = document.createElement('script');
+    tag.src = 'https://www.youtube.com/iframe_api';
+    document.head.appendChild(tag);
+  }
+  
+  window.onYouTubeIframeAPIReady = function() {
+    const container = document.createElement('div');
+    container.id = 'yt-player-container';
+    container.style.cssText = 'display:none;position:fixed;bottom:20px;right:20px;width:400px;z-index:1000';
+    document.body.appendChild(container);
+    
+    player = new YT.Player('yt-player-container', {
+      height: '225',
+      width: '400',
+      videoId: '',
+      events: { onReady: () => console.log('Player ready') }
+    });
+  };
+  
+  window.playVideo = function(videoId) {
+    if (player) {
+      player.loadVideoById(videoId);
+      const container = document.getElementById('yt-player-container');
+      if (container) container.style.display = 'block';
+    } else {
+      setTimeout(() => playVideo(videoId), 500);
+    }
+  };
+  
+  // Initialize
+  loadYouTubeAPI();
+  document.addEventListener('DOMContentLoaded', loadVideos);
+>>>>>>> 5194a1b (fix: Working video thumbnails and player)
 })();
