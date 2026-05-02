@@ -12,10 +12,10 @@
     WATCH_LATER_KEY: 'watch_later_list',
     THEME_KEY: 'ui_theme',
     SEARCH_HISTORY_KEY: 'search_history',
-    ITEMS_PER_PAGE: 24,
+    ITEMS_PER_PAGE: 12,
 
     API_CONFIG: {
-      timeout: 20000,
+      timeout: 10000,
       retries: 3,
       backoff: 1.5,
       delay: 500
@@ -157,27 +157,21 @@
     const cached = utils.getLS(CONFIG.CACHE_KEY);
 
     if (cached?.data?.length && Date.now() - cached.time < CONFIG.CACHE_EXPIRY) {
-      console.log('Loading videos from cache...');
       return cached.data;
     }
 
     try {
-      console.log('Fetching videos from API...');
       const res = await fetchWithRetry(CONFIG.API);
       const json = await res.json();
-      console.log('API Response:', json);
 
-      const videos = (json.videos || []).map(v => {
-        const id = v.videoId || v.id;
-        return {
-          id: id || '',
-          title: v.title || 'Untitled',
-          thumbnail: v.thumbnail || '',
-          publishedAt: v.publishedAt || new Date().toISOString(),
-          category: detectCategory(v.title || ''),
-          description: v.description || 'Deep dive into Islamic history and theology.'
-        };
-      }).filter(v => v.id);
+      const videos = (json.videos || []).map(v => ({
+        id: v.id || v.videoId,
+        title: v.title || 'Untitled',
+        thumbnail: v.thumbnail,
+        publishedAt: v.publishedAt || new Date().toISOString(),
+        category: detectCategory(v.title || ''),
+        description: v.description || 'Deep dive into Islamic history and theology.'
+      }));
 
       if (videos.length > 0) {
         utils.saveLS(CONFIG.CACHE_KEY, { data: videos, time: Date.now() });
@@ -185,6 +179,7 @@
       return videos;
     } catch (err) {
       console.error('Failed to load videos:', err);
+      // If we have any cache at all, even expired, return it as fallback
       if (cached?.data) return cached.data;
       throw err;
     }
@@ -194,16 +189,8 @@
    * MODAL / PLAYER
    * ---------------------------- */
   function openModal(video) {
-    if (!video || !video.id) {
-      console.error('Invalid video for modal:', video);
-      return;
-    }
-    if (!el.modal || !el.player) {
-      console.error('Modal elements missing');
-      return;
-    }
+    if (!video || !el.modal || !el.player) return;
 
-    console.log('Opening video:', video.id);
     el.player.src = `https://www.youtube.com/embed/${video.id}?autoplay=1&rel=0&modestbranding=1`;
     el.modal.style.display = 'flex';
     el.modal.setAttribute('aria-hidden', 'false');
@@ -212,6 +199,7 @@
     const titleEl = $('video-title');
     if (titleEl) titleEl.textContent = video.title;
 
+    // Save to search history if it came from search
     if (state.search) {
       if (!state.searchHistory.includes(state.search)) {
         state.searchHistory.unshift(state.search);
@@ -313,7 +301,10 @@
     }
   }
 
-  function updateStats() {
+  /* ----------------------------
+   * MODAL / PLAYER
+   * ---------------------------- */
+      function updateStats() {
     if (el.statTotal) el.statTotal.textContent = state.videos.length;
     if (el.statSaved) el.statSaved.textContent = state.watchLater.length;
     if (el.watchLaterCount) el.watchLaterCount.textContent = state.watchLater.length;
@@ -328,6 +319,8 @@
 
     el.heroTitle.textContent = v.title;
     el.heroSubtitle.textContent = v.description || '';
+    el.bg.style.backgroundImage = `url(${v.thumbnail})`;
+    if (el.heroSubtitle) el.heroSubtitle.textContent = v.description;
     if (el.heroCategory) el.heroCategory.textContent = categoryLabel(v.category);
     if (el.bg) el.bg.style.backgroundImage = `url(${v.thumbnail})`;
 
@@ -340,7 +333,7 @@
   /* ----------------------------
    * EVENTS
    * ---------------------------- */
-  function bind() {
+    function bind() {
     // Search input
     el.search?.addEventListener("input", (e) => {
       state.search = e.target.value;
@@ -411,13 +404,8 @@
 
       if (cardEl) {
         const id = cardEl.dataset.id;
-        console.log('Card clicked, ID:', id);
         const video = state.videos.find(v => v.id === id);
-        if (video) {
-          openModal(video);
-        } else {
-          console.error('Video not found for ID:', id);
-        }
+        if (video) openModal(video);
       }
     });
 
@@ -428,7 +416,7 @@
     });
 
     // Keyboard Shortcuts
-    document.addEventListener("keydown", (e) => {
+        document.addEventListener("keydown", (e) => {
       if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") {
         if (e.key === "Escape") e.target.blur();
         return;
@@ -485,12 +473,12 @@
     });
   }
 
+
   /* ----------------------------
    * INIT
    * ---------------------------- */
   async function init() {
     try {
-      console.log('Archive initializing...');
       if (el.error) el.error.style.display = 'none';
       if (el.loading) el.loading.style.display = 'block';
 
@@ -499,7 +487,6 @@
       state.videos.sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt));
 
       if (state.videos.length > 0) {
-        console.log(`Loaded ${state.videos.length} videos.`);
         setHero(state.videos[0]);
         render();
         updateStats();
