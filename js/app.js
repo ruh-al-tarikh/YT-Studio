@@ -41,20 +41,22 @@
     player:            $('player'),
     closeModal:        $('close'),
     heroTitle:         $('hero-title'),
+    heroDesc:          $('hero-desc'),
     heroSubtitle:      $('hero-subtitle'),
     heroBtn:           $('hero-btn'),
-    heroSave:          $('hero-save-btn'),
+    heroSave:          $('hero-save'),
     heroCategory:      $('hero-category'),
     heroDate:          $('hero-date'),
     search:            $('searchInput'),
+    bg:                $('bg'),
     clearSearch:       $('clearSearch'),
     suggestions:       $('searchSuggestions'),
     loadMore:          $('loadMoreBtn'),
     loadMoreContainer: $('loadMoreContainer'),
-    loading:           $('loading-state'),
-    error:             $('error-container'),
-    errorMsg:          $('error-message'),
-    retryBtn:          $('retry-btn'),
+    loading:           $('loading'),
+    error:             $('error'),
+    errorMsg:          $('error-msg'),
+    retryBtn:          $('retryBtn'),
     toast:             $('toast'),
     bg:                $('bg'),
     themeToggle:       $('darkModeToggle'),
@@ -444,7 +446,7 @@
     if (!v || !el.heroTitle) return;
 
     el.heroTitle.textContent = v.title;
-    if (el.heroSubtitle) el.heroSubtitle.textContent = v.description || '';
+    if (el.heroDesc) el.heroDesc.textContent = v.description || '';
     if (el.heroCategory) el.heroCategory.textContent = categoryLabel(v.category);
     if (el.heroDate) el.heroDate.textContent = utils.formatDate(v.publishedAt);
     if (el.bg) el.bg.style.backgroundImage = 'url(' + v.thumbnail + ')';
