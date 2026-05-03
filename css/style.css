@@ -825,6 +825,63 @@ img {
   border-bottom: 1px solid var(--line-soft);
 }
 
+.dashboard-empty-state {
+  grid-column: 1 / -1;
+  padding: 60px 40px;
+  text-align: center;
+  background: var(--bg-soft);
+  border-radius: var(--radius-lg);
+  border: 2px dashed var(--line-soft);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  margin-top: 20px;
+}
+
+.dashboard-empty-state i {
+  font-size: 3rem;
+  color: var(--text-soft);
+  opacity: 0.5;
+}
+
+.dashboard-empty-state h4 {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  color: var(--text-main);
+}
+
+.dashboard-empty-state p {
+  color: var(--text-muted);
+  max-width: 400px;
+}
+
+.connect-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 32px;
+  background: var(--accent);
+  color: oklch(0.1 0.05 85);
+  border-radius: 999px;
+  font-weight: 800;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 10px 20px oklch(from var(--accent) l c h / 0.2);
+}
+
+.connect-btn:hover {
+  background: var(--accent-strong);
+  transform: translateY(-2px);
+  box-shadow: 0 15px 30px oklch(from var(--accent) l c h / 0.3);
+}
+
+.connect-btn:active {
+  transform: translateY(0);
+}
+
+
 /* Toast */
 .toast {
   position: fixed;
