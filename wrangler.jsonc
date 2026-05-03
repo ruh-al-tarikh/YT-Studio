@@ -11,9 +11,8 @@
   },
   "assets": {
     "directory": "./dist",
-    "binding": "ASSETS"
     "binding": "ASSETS",
-    "html_handling": "drop-extension"
+    "html_handling": "none"
   },
   "d1_databases": [
     {
@@ -30,8 +29,7 @@
         "API_URL": "https://yt-studio-api.ruhdevopsytstudio.workers.dev"
       },
       "assets": {
-        "directory": "./dist",
-        "binding": "ASSETS"
+        "directory": "./dist"
       },
       "d1_databases": [
         {
