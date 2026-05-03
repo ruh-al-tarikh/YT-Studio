@@ -118,13 +118,13 @@ img {
 
 .brand-block h1 {
   font-family: var(--font-display);
-  font-size: 1.75rem;
+  font-size: 2.25rem;
   font-weight: 700;
   letter-spacing: -0.02em;
 }
 
 .eyebrow {
-  font-size: 0.7rem;
+  font-size: 0.9rem;
   text-transform: uppercase;
   letter-spacing: 0.15em;
   color: var(--accent);
@@ -133,7 +133,7 @@ img {
 }
 
 .header-tagline {
-  font-size: 0.85rem;
+  font-size: 1.05rem;
   color: var(--text-soft);
 }
 
@@ -202,7 +202,7 @@ img {
 }
 
 .search-label {
-  font-size: 0.85rem;
+  font-size: 1.05rem;
   font-weight: 700;
   color: var(--text-muted);
 }
@@ -246,7 +246,7 @@ img {
   border-radius: 999px;
   background: var(--bg-soft);
   border: 1px solid var(--line-soft);
-  font-size: 0.85rem;
+  font-size: 1.05rem;
   font-weight: 600;
   white-space: nowrap;
   transition: all 0.2s ease;
@@ -296,7 +296,7 @@ img {
 .overlay-kicker {
   color: var(--accent);
   font-weight: 800;
-  font-size: 0.8rem;
+  font-size: 0.9rem;
   text-transform: uppercase;
   margin-bottom: 12px;
 }
@@ -378,7 +378,7 @@ img {
 }
 
 .highlight-card p {
-  font-size: 0.8rem;
+  font-size: 0.9rem;
   color: var(--text-soft);
 }
 
@@ -400,13 +400,13 @@ img {
 
 .section-copy {
   color: var(--text-soft);
-  font-size: 0.95rem;
+  font-size: 1.05rem;
 }
 
 /* Grid & Cards */
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 24px;
 }
 
@@ -485,7 +485,7 @@ img {
 }
 
 .card-meta {
-  font-size: 0.8rem;
+  font-size: 0.9rem;
   color: var(--text-soft);
   display: flex;
   justify-content: space-between;
@@ -790,14 +790,14 @@ img {
 }
 
 .stat-card h3 {
-  font-size: 0.8rem;
+  font-size: 0.9rem;
   text-transform: uppercase;
   color: var(--text-soft);
   margin-bottom: 8px;
 }
 
 .stat-card p {
-  font-size: 2rem;
+  font-size: 2.25rem;
   font-weight: 800;
   color: var(--accent);
 }
@@ -992,7 +992,7 @@ img {
 }
 
 .footer-group h3 {
-  font-size: 0.8rem;
+  font-size: 0.9rem;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   color: var(--text-soft);
@@ -1038,7 +1038,7 @@ img {
   padding-top: 40px;
   border-top: 1px solid var(--line-soft);
   color: var(--text-soft);
-  font-size: 0.85rem;
+  font-size: 1.05rem;
   text-align: center;
 }
 

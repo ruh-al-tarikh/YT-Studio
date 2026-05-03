@@ -5,3 +5,7 @@
 ## 2025-05-01 - Video Playback and Loading Stability
 **Learning:** API timeouts and inconsistent video ID normalization (videoId vs id) can cause broken playback experiences.
 **Action:** Use a unified normalization step in data fetching and provide robust logging for debugging.
+
+## 2025-05-03 - Header Enhancements & Grid Layout
+**Learning:** For a "Cinematic Archive", larger typography and a consistent grid layout (3 columns) improve the premium feel and readability.
+**Action:** Ensure typography scales are consistent with the design system (OKLCH) and grid layouts are responsive but structured.
