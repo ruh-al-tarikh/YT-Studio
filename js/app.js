@@ -338,6 +338,38 @@
     if (el.dashProgress) el.dashProgress.textContent = 0;
     if (el.dashHours) el.dashHours.textContent = (state.videos.length * 0.5).toFixed(1) + 'h';
 
+    const panels = document.querySelector('.dashboard-panels');
+    if (state.videos.length === 0) {
+      if (panels) panels.style.display = 'none';
+
+      let emptyState = document.getElementById('dashboard-empty');
+      if (!emptyState) {
+        emptyState = document.createElement('div');
+        emptyState.id = 'dashboard-empty';
+        emptyState.className = 'dashboard-empty-state';
+        emptyState.innerHTML = `
+          <i class="fa-solid fa-cloud-arrow-up" aria-hidden="true"></i>
+          <h4>No Channel Connected</h4>
+          <p>Connect your YouTube channel to sync your archive, track progress, and unlock personalized insights.</p>
+          <button type="button" class="connect-btn" aria-label="Connect YouTube Channel">
+            <i class="fa-brands fa-youtube" aria-hidden="true"></i>
+            Connect Channel
+          </button>
+        `;
+        const content = document.querySelector('.dashboard-content');
+        if (content) content.appendChild(emptyState);
+
+        const btn = emptyState.querySelector('.connect-btn');
+        if (btn) btn.addEventListener('click', () => utils.showToast('Channel connection coming soon!'));
+      }
+      emptyState.style.display = 'flex';
+      return;
+    } else {
+      if (panels) panels.style.display = 'grid';
+      const emptyState = document.getElementById('dashboard-empty');
+      if (emptyState) emptyState.style.display = 'none';
+    }
+
     if (el.dashCategories) {
       const counts = {};
       state.videos.forEach(v => {

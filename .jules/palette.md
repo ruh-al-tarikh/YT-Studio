@@ -9,3 +9,7 @@
 ## 2025-05-03 - Header Enhancements & Grid Layout
 **Learning:** For a "Cinematic Archive", larger typography and a consistent grid layout (3 columns) improve the premium feel and readability.
 **Action:** Ensure typography scales are consistent with the design system (OKLCH) and grid layouts are responsive but structured.
+
+## 2025-05-03 - Empty State Implementation with CTA
+**Learning:** Empty states should guide users with clear next steps. Using dynamic injection for modal-based empty states avoids static HTML clutter while maintaining consistent state management.
+**Action:** Implement dashed borders and clear iconography for empty states. Always include an accessible call-to-action (CTA) even if the feature is still in development.
