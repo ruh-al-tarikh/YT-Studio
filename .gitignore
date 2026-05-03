@@ -42,3 +42,5 @@ logs/
 
 # Local DB
 *.sqlite*
+.vercel
+.env*.local

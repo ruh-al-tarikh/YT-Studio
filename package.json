@@ -13,8 +13,13 @@
     "lint": "echo \"Linting not configured\""
   },
   "dependencies": {
+    "@flags-sdk/hypertune": "^0.3.2",
     "@vercel/analytics": "^2.0.1",
-    "@vercel/speed-insights": "^2.0.0"
+    "@vercel/edge-config": "^1.4.3",
+    "@vercel/speed-insights": "^2.0.0",
+    "flags": "^4.0.6",
+    "hypertune": "^2.10.1",
+    "server-only": "^0.0.1"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20260502.1",
