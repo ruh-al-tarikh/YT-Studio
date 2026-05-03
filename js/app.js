@@ -91,7 +91,8 @@
     copyLinkBtn:       $('copyLinkBtn'),
     shareTwitter:      $('shareTwitter'),
     shareFacebook:     $('shareFacebook'),
-    shareWhatsApp:     $('shareWhatsApp')
+    shareWhatsApp:     $('shareWhatsApp'),
+    scrollToTop:       $('scrollToTop')
   };
 
   /* ----------------------------
@@ -427,6 +428,8 @@
     return '<div class="card" data-id="' + v.id + '" role="button" tabindex="0">' +
       '<div class="card-thumb-wrapper">' +
       '<img src="' + thumb + '" alt="' + utils.sanitize(v.title) + '" loading="lazy">' +
+      '<div class="card-thumb-overlay"><i class="fa-solid fa-play play-icon"></i></div>' +
+      '<div class="duration-badge">HD</div>' +
       '<button class="watch-later-btn ' + (isSaved ? 'active' : '') + '" data-id="' + v.id + '" aria-label="Save for later">' +
       '<i class="fa-' + (isSaved ? 'solid' : 'regular') + ' fa-bookmark"></i>' +
       '</button>' +
@@ -453,7 +456,23 @@
     }
 
     const slice = state.filtered.slice(0, CONFIG.ITEMS_PER_PAGE * (state.page + 1));
-    if (el.grid) el.grid.innerHTML = slice.map(card).join('');
+
+    if (el.grid) {
+      if (state.filtered.length === 0) {
+        el.grid.innerHTML = `
+          <div class="empty-state-card" style="grid-column: 1 / -1; margin-top: 40px;">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <h3>No results found</h3>
+            <p>Try different keywords or browse by category to find what you're looking for.</p>
+            <button type="button" class="secondary-button" style="margin-top: 20px;" onclick="document.getElementById('searchInput').value=''; document.getElementById('searchInput').dispatchEvent(new Event('input'));">
+              Clear Search
+            </button>
+          </div>
+        `;
+      } else {
+        el.grid.innerHTML = slice.map(card).join('');
+      }
+    }
 
     if (el.loadMoreContainer) {
       el.loadMoreContainer.style.display = slice.length < state.filtered.length ? 'block' : 'none';
@@ -747,6 +766,17 @@
     // Retry button
     if (el.retryBtn) el.retryBtn.addEventListener('click', init);
 
+    // Scroll to Top
+    if (el.scrollToTop) {
+      window.addEventListener('scroll', () => {
+        if (window.scrollY > 500) el.scrollToTop.classList.add('show');
+        else el.scrollToTop.classList.remove('show');
+      });
+      el.scrollToTop.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    }
+
     // Keyboard shortcuts
     document.addEventListener('keydown', (e) => {
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
@@ -814,10 +844,22 @@
   /* ----------------------------
    * INIT
    * ---------------------------- */
+  function renderSkeletons() {
+    if (!el.grid) return;
+    const skeletons = Array(6).fill(0).map(() => `
+      <div class="skeleton-card animate-pulse">
+        <div class="skeleton skeleton-thumb"></div>
+        <div class="skeleton skeleton-text"></div>
+        <div class="skeleton skeleton-text short"></div>
+      </div>
+    `).join('');
+    el.grid.innerHTML = skeletons;
+  }
+
   async function init() {
     try {
       if (el.error) el.error.style.display = 'none';
-      if (el.loading) el.loading.style.display = 'block';
+      renderSkeletons();
 
       applyTheme();
       state.videos = await loadVideos();
