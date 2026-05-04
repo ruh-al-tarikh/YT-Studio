@@ -35,18 +35,19 @@ jobs:
         run: |
           curl -fsSL https://opencode.ai/install | bash
           echo "$HOME/.opencode/bin" >> $GITHUB_PATH
-          
+
       - name: Extract clean prompt
         id: extract-prompt
         env:
           RAW_PROMPT: ${{ github.event_name == 'workflow_dispatch' && inputs.prompt || github.event.comment.body }}
         run: |
-          CLEAN_PROMPT=$(echo "$RAW_PROMPT" | sed -n 's/.*\/oc\s*//p' | sed -n 's/.*\/opencode\s*//p')
+          # Remove everything before /oc or /opencode, and strip HTML/markdown
+          CLEAN_PROMPT=$(echo "$RAW_PROMPT" | sed -E 's/.*\/(oc|opencode)[[:space:]]*//i' | sed -E 's/<[^>]*>//g' | head -1)
           if [ -z "$CLEAN_PROMPT" ]; then
-            CLEAN_PROMPT="Analyze this"
+            CLEAN_PROMPT="Please analyze this issue or pull request"
           fi
           echo "clean_prompt=$CLEAN_PROMPT" >> $GITHUB_OUTPUT
-          
+
       - name: Run OpenCode
         env:
           OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
