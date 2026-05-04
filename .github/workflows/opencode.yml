@@ -38,4 +38,4 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           PROMPT="${{ github.event_name == 'workflow_dispatch' && inputs.prompt || github.event.comment.body }}"
-          opencode run "$PROMPT" --provider opencode --model gpt-4o-mini
+          opencode run "$PROMPT" --model opencode/gpt-4o-mini
