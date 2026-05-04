@@ -83,12 +83,12 @@ export function initVoice() {
 
 	document.getElementById('fontIncBtn').addEventListener('click', () => {
 		fontSize += 4;
-		contentEl.style.fontSize = \`\${fontSize}px\`;
+		contentEl.style.fontSize = `${fontSize}px`;
 	});
 
 	document.getElementById('fontDecBtn').addEventListener('click', () => {
 		fontSize = Math.max(16, fontSize - 4);
-		contentEl.style.fontSize = \`\${fontSize}px\`;
+		contentEl.style.fontSize = `${fontSize}px`;
 	});
 
 	let scrollInterval;

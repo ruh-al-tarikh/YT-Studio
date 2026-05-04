@@ -81,7 +81,7 @@ export function initSEO() {
 	titleInput.addEventListener('input', (e) => {
 		const val = e.target.value;
 		previewTitle.textContent = val || 'Your Title Will Appear Here';
-		titleCount.textContent = \`\${val.length}/100\`;
+		titleCount.textContent = `${val.length}/100`;
 
 		if (val.length < 20) {
 			scoreTitle.textContent = 'Too Short';
@@ -96,11 +96,11 @@ export function initSEO() {
 	});
 
 	descInput.addEventListener('input', (e) => {
-		document.getElementById('descCount').textContent = \`\${e.target.value.length}/5000\`;
+		document.getElementById('descCount').textContent = `${e.target.value.length}/5000`;
 	});
 
 	tagsInput.addEventListener('input', (e) => {
-		document.getElementById('tagCount').textContent = \`\${e.target.value.length}/500\`;
+		document.getElementById('tagCount').textContent = `${e.target.value.length}/500`;
 	});
 
 	document.getElementById('aiTitleBtn')?.addEventListener('click', () => {

@@ -93,7 +93,7 @@ function updateMetrics() {
 	const minutes = Math.floor(words / 130);
 	const seconds = Math.floor((words % 130) / (130 / 60));
 	
-	document.getElementById('scriptDuration').textContent = \`\${minutes}:\${seconds.toString().padStart(2, '0')}\`;
+	document.getElementById('scriptDuration').textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
 }
 
 function insertAtCursor(text) {
