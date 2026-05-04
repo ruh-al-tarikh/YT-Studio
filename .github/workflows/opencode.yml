@@ -27,10 +27,15 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Install OpenCode CLI
+        run: |
+          curl -fsSL https://opencode.ai/install | bash
+          echo "$HOME/.opencode/bin" >> $GITHUB_PATH
+          
       - name: Run OpenCode
-        uses: anomalyco/opencode/github@latest
         env:
           OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          prompt: ${{ github.event_name == 'workflow_dispatch' && inputs.prompt || '' }}
+        run: |
+          PROMPT="${{ github.event_name == 'workflow_dispatch' && inputs.prompt || github.event.comment.body }}"
+          opencode run "$PROMPT" --provider opencode --model gpt-4o-mini
