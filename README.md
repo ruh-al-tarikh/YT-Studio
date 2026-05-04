@@ -1,4 +1,5 @@
-# 🚀 Ruh-Al-Tarikh — YT Studio Archive
+#  🚀 Ruh-Al-Tarikh 
+## YT Studio Archive
 
 A **cinematic, performance-focused video archive** for *Ruh Al Tarikh*, designed to explore Islamic history, scripture, prophecy, and deep discussions through a modern, app-like web experience.
 
@@ -146,7 +147,6 @@ Automated pipeline:
 Build Docker image
 Push to Google Container Registry
 Deploy to Cloud Run (main branch)
-
 Config:
 .github/workflows/deploy-gcr.yml
 
@@ -210,7 +210,7 @@ Sample Response
 | `J`       | Previous episode |
 | `K`       | Next episode     |
 | `Esc`     | Close modals     |
-| `↑ ↓ ← →` | Navigate grid    |
+| `↑ ↓ ← →`| Navigate grid    |
 
 
 🌐 Browser Support
