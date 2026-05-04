@@ -2,8 +2,8 @@ name: 🤖 Auto-Enhance Website
 
 on:
   schedule:
-    - cron: '0 */6 * * *'   # Every 6 hours
-    - cron: '0 0 * * *'     # Daily at midnight
+    - cron: '0 */6 * * *'
+    - cron: '0 0 * * *'
   workflow_dispatch:
     inputs:
       enhancement_type:
@@ -17,17 +17,22 @@ on:
           - 'seo'
           - 'accessibility'
 
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+  id-token: write
+
 jobs:
   enhance:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      pull-requests: write
+    timeout-minutes: 15
     
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
           
       - name: Run Performance Checks
         run: |
@@ -55,33 +60,25 @@ jobs:
             sed -i 's/<head>/<head>\n  <meta name="description" content="YT Studio - Islamic history and Quranic mysteries">/' index.html
           fi
           
-          # Check viewport
-          if grep -q 'name="viewport"' index.html 2>/dev/null; then
-            echo "- ✅ Viewport configured" >> report.md
-          else
-            echo "- ❌ Missing viewport" >> report.md
-            sed -i 's/<head>/<head>\n  <meta name="viewport" content="width=device-width, initial-scale=1.0">/' index.html
-          fi
-          
-          # Check H1 tag
-          if grep -q '<h1' index.html 2>/dev/null; then
-            echo "- ✅ H1 tag present" >> report.md
-          else
-            echo "- ❌ Missing H1 tag" >> report.md
-          fi
-          
       - name: Apply Auto-Fixes
         run: |
           # Add lazy loading to images
           sed -i 's/<img /<img loading="lazy" /g' index.html 2>/dev/null || true
-          
-          # Run Prettier if available
-          npx prettier --write "**/*.{js,css,html}" 2>/dev/null || true
-          
           echo "✅ Auto-fixes applied" >> report.md
           
+      - name: Check for Changes
+        id: git-check
+        run: |
+          git add -A
+          if ! git diff --cached --quiet; then
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          fi
+          
       - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v6
+        if: steps.git-check.outputs.has_changes == 'true'
+        uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: "🤖 Auto-enhancement: Website optimizations"
@@ -103,6 +100,7 @@ jobs:
           base: main
           labels: automated, enhancement
           delete-branch: true
+          signoff: false
           
       - name: Summary
         run: |
