@@ -3,6 +3,8 @@
 			API: 'https://yt-studio.ruhdevopsytstudio.workers.dev/api/videos',
 			CACHE_KEY: 'yt_studio_videos_cache_v4',
 			CACHE_EXPIRY: 864e5,
+			PROJECTS_KEY: "yt_studio_projects",
+			RESEARCH_KEY: "yt_studio_research",
 			WATCH_LATER_KEY: 'watch_later_list',
 			THEME_KEY: 'ui_theme',
 			SEARCH_HISTORY_KEY: 'search_history',
@@ -150,6 +152,44 @@
 	}
 	function d(e) {
 		return n.progress[e] || null;
+	}
+	function renderProjects() {
+		const grid = document.getElementById("studioProjectsList");
+		if (!grid) return;
+		const saved = localStorage.getItem(i.PROJECTS_KEY);
+		const projects = saved ? JSON.parse(saved) : [
+			{ id: "p1", title: "The Fall of the Abbasids", status: "Writing", progress: 65, date: "2024-05-10" },
+			{ id: "p2", title: "Prophecy & Modernity", status: "Research", progress: 30, date: "2024-05-12" },
+			{ id: "p3", title: "The Silent Silk Road", status: "Editing", progress: 90, date: "2024-05-08" }
+		];
+		grid.innerHTML = projects.map(p => `
+			<div class="project-card">
+				<div class="project-card-header">
+					<span class="status-badge ${p.status.toLowerCase()}">${p.status}</span>
+					<span class="project-date">${p.date}</span>
+				</div>
+				<h3 class="project-title">${p.title}</h3>
+				<div class="project-progress-container">
+					<div class="project-progress-bar" style="width: ${p.progress}%"></div>
+				</div>
+				<div class="project-card-footer">
+					<span>${p.progress}% Complete</span>
+					<button class="secondary-button small resume-project-btn" data-id="${p.id}">Resume</button>
+				</div>
+			</div>
+		`).join("");
+		grid.querySelectorAll(".resume-project-btn").forEach(btn => {
+			btn.addEventListener("click", (e) => {
+				const id = e.currentTarget.dataset.id;
+				const project = projects.find(p => p.id === id);
+				if (project) {
+					s.studioViews.forEach(v => v.style.display = "none");
+					if (s.activeProjectView) s.activeProjectView.style.display = "block";
+					if (r("current-project-title")) r("current-project-title").textContent = project.title;
+					if (s.projectTabBtns[0]) s.projectTabBtns[0].click();
+				}
+			});
+		});
 	}
 	function t() {
 		var e;
@@ -713,6 +753,21 @@
 			}
 		});
 
+		const startScriptBtn = document.getElementById("startScriptBtn");
+		const openDemoBtn = document.getElementById("openDemoBtn");
+		if (startScriptBtn) {
+			startScriptBtn.addEventListener("click", () => {
+				if (s.studioToggleBtn) s.studioToggleBtn.click();
+				if (s.newProjectBtn) s.newProjectBtn.click();
+			});
+		}
+		if (openDemoBtn) {
+			openDemoBtn.addEventListener("click", () => {
+				if (s.studioToggleBtn) s.studioToggleBtn.click();
+				const resumeBtns = document.querySelectorAll(".resume-project-btn");
+				if (resumeBtns.length > 0) resumeBtns[0].click();
+			});
+		}
 		s.studioNavBtns && s.studioNavBtns.forEach(btn => {
 			btn.addEventListener('click', () => {
 				s.studioNavBtns.forEach(b => b.classList.remove('active'));
@@ -821,7 +876,7 @@
 				!(0 < n.videos.length))
 			)
 				throw new Error('No videos available in the archive.');
-			(T(n.videos[0]), k(), t(), E(), S());
+			(T(n.videos[0]), k(), t(), E(), S(), renderProjects());
 		} catch (e) {
 			(s.error && (s.error.style.display = 'block'),
 				s.errorMsg && (s.errorMsg.textContent = e.message || 'Connection failed. Please try again.'),

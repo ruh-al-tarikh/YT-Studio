@@ -48,8 +48,10 @@ const VOICE_HTML = `
 			</div>
 		</div>
 	</div>
-	<div class="read-mode-content" id="readModeContent">
-		<!-- Injected script text -->
+	<div class="read-mode-content-wrapper">
+		<div class="read-mode-content" id="readModeContent">
+			<!-- Injected script text -->
+		</div>
 	</div>
 </div>
 `;
@@ -101,8 +103,10 @@ export function initVoice() {
 		} else {
 			scrolling = true;
 			autoScrollBtn.classList.add('active');
+			autoScrollBtn.innerHTML = '<i class="fa-solid fa-pause"></i> Stop Scroll';
 			scrollInterval = setInterval(() => {
-				contentEl.scrollTop += 1;
+				const wrapper = document.querySelector('.read-mode-content-wrapper');
+				wrapper.scrollTop += 1;
 			}, 30);
 		}
 	});
@@ -110,6 +114,7 @@ export function initVoice() {
 	function stopAutoScroll() {
 		scrolling = false;
 		autoScrollBtn.classList.remove('active');
+		autoScrollBtn.innerHTML = '<i class="fa-solid fa-angles-down"></i> Auto-Scroll';
 		clearInterval(scrollInterval);
 	}
 
@@ -118,28 +123,27 @@ export function initVoice() {
 		let fullScript = '';
 		textareas.forEach(ta => {
 			if (ta.value.trim()) {
-				fullScript += '<p>' + processMarkers(ta.value.trim()) + '</p><br>';
+				fullScript += '<div>' + processMarkers(ta.value.trim()) + '</div><br>';
 			}
 		});
 
 		if (!fullScript) {
-			fullScript = '<p class="text-center text-soft" style="margin-top:20vh;">No script written yet.</p>';
+			fullScript = '<p class="text-center text-soft" style="margin-top:20vh;">No script written yet. Go to Script Studio.</p>';
 		}
 
 		contentEl.innerHTML = fullScript;
 		previewEl.innerHTML = '<div class="voice-script-preview">' + fullScript + '</div>';
 	}
 	
-	// Expose for tab switching update
 	window.updateVoicePreview = syncScriptToReadMode;
 }
 
 function processMarkers(text) {
-	let processed = text.replace(/\\n/g, '<br>');
-	// Replace [PAUSE]
-	processed = processed.replace(/\\[PAUSE\\]/gi, '<span class="read-pause">⏱ [PAUSE]</span>');
-	// Replace **Text** with emphasis class
-	processed = processed.replace(/\\*\\*(.*?)\\*\\*/g, '<span class="read-emphasis">$1</span>');
+	let processed = text.replace(/\n/g, '<br>');
+	// Replace [PAUSE] with a stylized badge
+	processed = processed.replace(/\[PAUSE\]/gi, '<span class="read-pause-badge">⏱ PAUSE</span>');
+	// Replace **Text** with emphasis
+	processed = processed.replace(/\*\*(.*?)\*\*/g, '<span class="read-emphasis-text">$1</span>');
 	return processed;
 }
 

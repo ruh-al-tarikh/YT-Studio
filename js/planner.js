@@ -4,7 +4,7 @@ const PLANNER_HTML = `
 <div class="planner-container">
 	<div class="section-heading flex-between">
 		<div>
-			<h2 class="section-title">Content Planner</h2>
+			<h2 class="section-title">Content Calendar</h2>
 			<p class="section-copy">Schedule videos and track your weekly goals.</p>
 		</div>
 		<div class="planner-actions">
@@ -14,35 +14,8 @@ const PLANNER_HTML = `
 
 	<div class="planner-layout">
 		<div class="planner-main">
-			<div class="kanban-board">
-				<div class="kanban-column" id="col-idea">
-					<h3 class="kanban-title">Ideas</h3>
-					<div class="kanban-cards">
-						<div class="kanban-card" draggable="true">The Last Caliphate</div>
-						<div class="kanban-card" draggable="true">Tariq bin Ziyad</div>
-					</div>
-				</div>
-
-				<div class="kanban-column" id="col-scripting">
-					<h3 class="kanban-title">Scripting <span class="status-dot warning"></span></h3>
-					<div class="kanban-cards">
-						<div class="kanban-card" draggable="true">Umayyad Architecture</div>
-					</div>
-				</div>
-
-				<div class="kanban-column" id="col-production">
-					<h3 class="kanban-title">Production <span class="status-dot active"></span></h3>
-					<div class="kanban-cards">
-						<div class="kanban-card" draggable="true">Rise of the Ottomans</div>
-					</div>
-				</div>
-
-				<div class="kanban-column" id="col-done">
-					<h3 class="kanban-title">Ready to Publish</h3>
-					<div class="kanban-cards">
-						<!-- Empty -->
-					</div>
-				</div>
+			<div class="calendar-grid" id="calendarGrid">
+				<!-- Mock Calendar injected here -->
 			</div>
 		</div>
 
@@ -66,14 +39,6 @@ const PLANNER_HTML = `
 					<span class="text-sm">1/3 Completed</span>
 				</div>
 			</div>
-
-			<div class="planner-card mt-4">
-				<h3>Upcoming Reminders</h3>
-				<ul class="reminder-list">
-					<li><i class="fa-solid fa-bell" style="color: var(--accent)"></i> Publish Ottomans <span>(Tomorrow)</span></li>
-					<li><i class="fa-solid fa-bell"></i> Community Post <span>(Friday)</span></li>
-				</ul>
-			</div>
 		</aside>
 	</div>
 </div>
@@ -84,39 +49,23 @@ export function initPlanner() {
 	if (!container) return;
 	container.innerHTML = PLANNER_HTML;
 
-	// Simple Drag and Drop mock
-	const cards = container.querySelectorAll('.kanban-card');
-	const columns = container.querySelectorAll('.kanban-cards');
+	const calendarGrid = document.getElementById('calendarGrid');
+	const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
-	let dragged = null;
+	let calendarHTML = days.map(day => `<div class="calendar-day-header">${day}</div>`).join('');
 
-	cards.forEach(card => {
-		card.addEventListener('dragstart', (e) => {
-			dragged = card;
-			setTimeout(() => card.style.opacity = '0.5', 0);
-		});
-		card.addEventListener('dragend', () => {
-			dragged.style.opacity = '1';
-			dragged = null;
-		});
-	});
+	for(let i=1; i<=28; i++) {
+		const isToday = i === 12;
+		const hasVideo = i === 15 || i === 22;
+		calendarHTML += `
+			<div class="calendar-day ${isToday ? 'today' : ''}">
+				<span class="day-number">${i}</span>
+				${hasVideo ? `<div class="calendar-event ${i === 15 ? 'writing' : 'editing'}">Video Project</div>` : ''}
+			</div>
+		`;
+	}
 
-	columns.forEach(col => {
-		col.addEventListener('dragover', (e) => {
-			e.preventDefault();
-			col.classList.add('drag-over');
-		});
-		col.addEventListener('dragleave', () => {
-			col.classList.remove('drag-over');
-		});
-		col.addEventListener('drop', (e) => {
-			e.preventDefault();
-			col.classList.remove('drag-over');
-			if (dragged) {
-				col.appendChild(dragged);
-			}
-		});
-	});
+	calendarGrid.innerHTML = calendarHTML;
 }
 
 document.addEventListener('DOMContentLoaded', initPlanner);

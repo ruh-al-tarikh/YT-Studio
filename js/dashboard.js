@@ -12,7 +12,7 @@ const DASHBOARD_HTML = `
 		<div class="insight-card highlight">
 			<h3><i class="fa-solid fa-lightbulb"></i> What to Create Next</h3>
 			<p class="insight-text">Your audience heavily engages with <strong>Prophetic History</strong>. We recommend your next video be about "The early days of the Umayyads" based on search trends.</p>
-			<button class="primary-button mt-3"><i class="fa-solid fa-plus"></i> Start Project</button>
+			<button class="primary-button mt-3" id="startSuggestedProject"><i class="fa-solid fa-plus"></i> Start Project</button>
 		</div>
 
 		<div class="insight-card">
@@ -29,7 +29,7 @@ const DASHBOARD_HTML = `
 		<div class="insight-card warning">
 			<h3><i class="fa-solid fa-triangle-exclamation"></i> Underperforming Area</h3>
 			<p class="insight-text">Videos over 30 minutes long have a 60% drop-off in the first 5 minutes. Try tightening your <strong>Hooks</strong>.</p>
-			<button class="secondary-button mt-3" onclick="document.querySelector('[data-tab=\\'projects\\']').click()">Review Scripts</button>
+			<button class="secondary-button mt-3" id="reviewHooksBtn">Review Scripts</button>
 		</div>
 
 		<div class="insight-card">
@@ -45,6 +45,19 @@ export function initDashboard() {
 	const container = document.getElementById('studio-view-dashboard');
 	if (!container) return;
 	container.innerHTML = DASHBOARD_HTML;
+
+	document.getElementById('startSuggestedProject')?.addEventListener('click', () => {
+		const newBtn = document.getElementById('newProjectBtn');
+		if(newBtn) {
+			newBtn.click();
+			const title = document.getElementById('current-project-title');
+			if(title) title.textContent = 'The early days of the Umayyads';
+		}
+	});
+
+	document.getElementById('reviewHooksBtn')?.addEventListener('click', () => {
+		document.querySelector('[data-tab="projects"]')?.click();
+	});
 }
 
 document.addEventListener('DOMContentLoaded', initDashboard);

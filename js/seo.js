@@ -33,7 +33,10 @@ const SEO_HTML = `
 		<div class="seo-card">
 			<h3>YouTube Preview</h3>
 			<div class="yt-preview-card">
-				<div class="yt-thumb-mock"></div>
+				<div class="yt-thumb-mock" id="thumbMock">
+					<div class="thumb-overlay">12:45</div>
+					<div class="thumb-title-layer" id="thumbTitle">Your Title</div>
+				</div>
 				<div class="yt-details-mock">
 					<div class="yt-avatar"></div>
 					<div class="yt-text-mock">
@@ -45,19 +48,19 @@ const SEO_HTML = `
 		</div>
 
 		<div class="seo-card mt-4">
-			<h3>SEO Scorecard</h3>
+			<h3>Readability & Strength</h3>
 			<div class="seo-metrics">
 				<div class="seo-metric">
 					<span>Title Length</span>
 					<span id="scoreTitle" class="score-badge warning">Too Short</span>
 				</div>
 				<div class="seo-metric">
-					<span>Description Keyword Density</span>
-					<span class="score-badge good">Good</span>
+					<span>Readability Score</span>
+					<span id="scoreReadability" class="score-badge good">A-</span>
 				</div>
 				<div class="seo-metric">
-					<span>Engagement Prediction</span>
-					<span class="score-badge excellent">High</span>
+					<span>Keyword Strength</span>
+					<span id="scoreKeywords" class="score-badge warning">Low</span>
 				</div>
 			</div>
 		</div>
@@ -71,49 +74,55 @@ export function initSEO() {
 	container.innerHTML = SEO_HTML;
 
 	const titleInput = document.getElementById('seoTitle');
-	const descInput = document.getElementById('seoDesc');
-	const tagsInput = document.getElementById('seoTags');
-	
+	const thumbTitle = document.getElementById('thumbTitle');
 	const previewTitle = document.getElementById('previewTitle');
 	const titleCount = document.getElementById('titleCount');
 	const scoreTitle = document.getElementById('scoreTitle');
+	const scoreKeywords = document.getElementById('scoreKeywords');
 
 	titleInput.addEventListener('input', (e) => {
 		const val = e.target.value;
 		previewTitle.textContent = val || 'Your Title Will Appear Here';
+		thumbTitle.textContent = val || 'Your Title';
 		titleCount.textContent = `${val.length}/100`;
 
 		if (val.length < 20) {
 			scoreTitle.textContent = 'Too Short';
 			scoreTitle.className = 'score-badge warning';
-		} else if (val.length > 60) {
+		} else if (val.length > 70) {
 			scoreTitle.textContent = 'Too Long';
 			scoreTitle.className = 'score-badge warning';
 		} else {
 			scoreTitle.textContent = 'Optimal';
 			scoreTitle.className = 'score-badge good';
 		}
+
+		// Mock keyword strength
+		const keywords = ['quran', 'history', 'truth', 'secret', 'mystery', 'islam'];
+		const hasKeyword = keywords.some(k => val.toLowerCase().includes(k));
+		if (hasKeyword) {
+			scoreKeywords.textContent = 'Strong';
+			scoreKeywords.className = 'score-badge excellent';
+		} else {
+			scoreKeywords.textContent = 'Low';
+			scoreKeywords.className = 'score-badge warning';
+		}
 	});
 
-	descInput.addEventListener('input', (e) => {
+	document.getElementById('seoDesc')?.addEventListener('input', (e) => {
 		document.getElementById('descCount').textContent = `${e.target.value.length}/5000`;
 	});
 
-	tagsInput.addEventListener('input', (e) => {
+	document.getElementById('seoTags')?.addEventListener('input', (e) => {
 		document.getElementById('tagCount').textContent = `${e.target.value.length}/500`;
 	});
 
 	document.getElementById('aiTitleBtn')?.addEventListener('click', () => {
-		// Mock opening AI modal with hook context
-		if (window.initAI) {
-			const btn = document.getElementById('aiActionSelect');
-			if(btn) {
-				btn.value = 'hook';
-				document.getElementById('aiModal').classList.add('show');
-				document.getElementById('aiModal').setAttribute('aria-hidden', 'false');
-			}
-		} else {
-			alert('AI Assistant triggered!');
+		const modal = document.getElementById('aiModal');
+		if(modal) {
+			document.getElementById('aiActionSelect').value = 'title';
+			modal.classList.add('show');
+			modal.setAttribute('aria-hidden', 'false');
 		}
 	});
 }

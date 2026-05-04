@@ -37,11 +37,16 @@ const RESEARCH_HTML = `
 				<span class="topic-pill">Battle of Badr</span>
 			</div>
 		</div>
+		<div class="quick-tools-card mt-4">
+			<h3>Quick Tools</h3>
+			<button class="secondary-button full-width mb-2" onclick="window.open('https://quran.com', '_blank')"><i class="fa-solid fa-book-quran"></i> Open Quran.com</button>
+			<button class="secondary-button full-width" onclick="window.open('https://sunnah.com', '_blank')"><i class="fa-solid fa-scroll"></i> Open Sunnah.com</button>
+		</div>
 	</aside>
 </div>
 `;
 
-let researchNotes = [];
+let researchNotes = JSON.parse(localStorage.getItem('yt_studio_research') || '[]');
 
 export function initResearch() {
 	const container = document.getElementById('ptab-research');
@@ -65,17 +70,9 @@ export function initResearch() {
 		};
 
 		researchNotes.unshift(note);
+		localStorage.setItem('yt_studio_research', JSON.stringify(researchNotes));
 		inputEl.value = '';
 		renderNotes();
-	});
-
-	// Highlight to save (mock implementation for pasted text area)
-	inputEl.addEventListener('mouseup', () => {
-		const selectedText = window.getSelection().toString().trim();
-		if (selectedText.length > 5) {
-			// In a real scenario we'd show a tooltip "Save Excerpt?".
-			// For simplicity we just use the input directly.
-		}
 	});
 
 	renderNotes();
@@ -117,7 +114,7 @@ function renderNotes() {
 		btn.addEventListener('click', (e) => {
 			const text = decodeURIComponent(e.currentTarget.dataset.text);
 			navigator.clipboard.writeText(text);
-			alert('Copied to clipboard!');
+			showToast('Copied research note!');
 		});
 	});
 
@@ -125,9 +122,19 @@ function renderNotes() {
 		btn.addEventListener('click', (e) => {
 			const id = parseInt(e.currentTarget.dataset.id);
 			researchNotes = researchNotes.filter(n => n.id !== id);
+			localStorage.setItem('yt_studio_research', JSON.stringify(researchNotes));
 			renderNotes();
 		});
 	});
+}
+
+function showToast(msg) {
+	const toast = document.getElementById('toast');
+	if(toast) {
+		toast.textContent = msg;
+		toast.classList.add('show');
+		setTimeout(() => toast.classList.remove('show'), 3000);
+	}
 }
 
 // Auto-init on load
