@@ -28,7 +28,16 @@
 			rel="stylesheet"
 		/>
 		<link rel="stylesheet" href="css/style.css" />
-
+		<!-- Creator Studio Modules CSS -->
+		<link rel="stylesheet" href="css/editor.css" />
+		<link rel="stylesheet" href="css/research.css" />
+		<link rel="stylesheet" href="css/ai.css" />
+		<link rel="stylesheet" href="css/seo.css" />
+		<link rel="stylesheet" href="css/voice.css" />
+		<link rel="stylesheet" href="css/repurpose.css" />
+		<link rel="stylesheet" href="css/dashboard.css" />
+		<link rel="stylesheet" href="css/islamic.css" />
+		<link rel="stylesheet" href="css/planner.css" />
 		<!-- Vercel Speed Insights & Analytics -->
 		<script>
 			window.si =
@@ -66,6 +75,10 @@
 					<button id="dashboardBtn" class="pill-button" type="button" aria-label="Open viewing dashboard">
 						<i class="fa-solid fa-chart-simple" aria-hidden="true"></i>
 						<span>Dashboard</span>
+					</button>
+					<button id="studioToggleBtn" class="pill-button accent" type="button" aria-label="Toggle Creator Studio">
+						<i class="fa-solid fa-video" aria-hidden="true"></i>
+						<span>Studio</span>
 					</button>
 					<a
 						href="https://www.youtube.com/@Ruh-Al-Tarikh"
@@ -251,6 +264,84 @@
 				</div>
 			</section>
 		</main>
+
+		<!-- Creator Studio Shell -->
+		<main id="studio-root" class="fade-in" style="display: none;">
+			<div class="studio-layout">
+				<aside class="studio-sidebar">
+					<div class="studio-sidebar-header">
+						<h2>Creator Workspace</h2>
+					</div>
+					<nav class="studio-nav">
+						<button class="studio-nav-btn active" data-tab="projects"><i class="fa-solid fa-folder-open"></i> Projects</button>
+						<button class="studio-nav-btn" data-tab="planner"><i class="fa-regular fa-calendar-days"></i> Planner</button>
+						<button class="studio-nav-btn" data-tab="dashboard"><i class="fa-solid fa-chart-line"></i> Insights</button>
+						<button class="studio-nav-btn" data-tab="islamic"><i class="fa-solid fa-book-quran"></i> References</button>
+					</nav>
+					<div class="studio-sidebar-footer">
+						<button id="newProjectBtn" class="primary-button full-width"><i class="fa-solid fa-plus"></i> New Video</button>
+					</div>
+				</aside>
+
+				<div class="studio-main">
+					<!-- Project View (Active when inside a project) -->
+					<div id="active-project-view" style="display: none;">
+						<header class="project-header">
+							<div class="project-title-area">
+								<button id="backToProjectsBtn" class="icon-button"><i class="fa-solid fa-arrow-left"></i></button>
+								<h2 id="current-project-title">Untitled Video</h2>
+							</div>
+							<div class="project-progress">
+								<span class="progress-step active">Researching</span>
+								<i class="fa-solid fa-chevron-right"></i>
+								<span class="progress-step">Writing</span>
+								<i class="fa-solid fa-chevron-right"></i>
+								<span class="progress-step">Recording</span>
+								<i class="fa-solid fa-chevron-right"></i>
+								<span class="progress-step">Editing</span>
+								<i class="fa-solid fa-chevron-right"></i>
+								<span class="progress-step">Published</span>
+							</div>
+							<div class="project-actions">
+								<button id="exportProjectBtn" class="secondary-button"><i class="fa-solid fa-file-export"></i> Export</button>
+							</div>
+						</header>
+
+						<nav class="project-tabs">
+							<button class="project-tab-btn active" data-ptab="research">Research</button>
+							<button class="project-tab-btn" data-ptab="script">Script</button>
+							<button class="project-tab-btn" data-ptab="voice">Voiceover</button>
+							<button class="project-tab-btn" data-ptab="seo">SEO & Publish</button>
+							<button class="project-tab-btn" data-ptab="repurpose">Repurpose</button>
+						</nav>
+
+						<div class="project-content-area">
+							<!-- Project Tab Contents injected by JS -->
+							<div id="ptab-research" class="ptab-content active"></div>
+							<div id="ptab-script" class="ptab-content"></div>
+							<div id="ptab-voice" class="ptab-content"></div>
+							<div id="ptab-seo" class="ptab-content"></div>
+							<div id="ptab-repurpose" class="ptab-content"></div>
+						</div>
+					</div>
+
+					<!-- Main Views (Projects, Planner, Dashboard, Islamic References) -->
+					<div id="studio-view-projects" class="studio-view active">
+						<div class="section-heading">
+							<h2 class="section-title">Your Projects</h2>
+							<p class="section-copy">Manage your upcoming and past videos.</p>
+						</div>
+						<div class="studio-projects-grid" id="studioProjectsList">
+							<!-- Populated by JS -->
+						</div>
+					</div>
+					<div id="studio-view-planner" class="studio-view" style="display: none;"></div>
+					<div id="studio-view-dashboard" class="studio-view" style="display: none;"></div>
+					<div id="studio-view-islamic" class="studio-view" style="display: none;"></div>
+				</div>
+			</div>
+		</main>
+
 
 		<!-- Modal Player -->
 		<div id="modal" class="modal" aria-hidden="true">
@@ -483,11 +574,18 @@
 					<div class="footer-group">
 						<h3>Connect</h3>
 						<div class="footer-social">
-							<a href="#" aria-label="Twitter"><i class="fa-brands fa-twitter"></i></a>
-							<a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook"></i></a>
-							<a href="https://www.youtube.com/@Ruh-Al-Tarikh" target="_blank" rel="noopener noreferrer" aria-label="YouTube"
-								><i class="fa-brands fa-youtube"></i
-							></a>
+							<a href="https://x.com/mrizwan_az" target="_blank" aria-label="X (Twitter)" title="@mrizwan_az">
+								<i class="fa-brands fa-x-twitter"></i>
+								<span class="social-handle">@mrizwan_az</span>
+							</a>
+							<a href="https://www.facebook.com/azeezmohammedrizwan" target="_blank" aria-label="Facebook" title="@azeezmohammedrizwan">
+								<i class="fa-brands fa-facebook"></i>
+								<span class="social-handle">@azeezmohammedrizwan</span>
+							</a>
+							<a href="https://www.youtube.com/@Ruh-Al-Tarikh" target="_blank" rel="noopener noreferrer" aria-label="YouTube" title="Ruh Al Tarikh">
+								<i class="fa-brands fa-youtube"></i>
+								<span class="social-handle">Ruh Al Tarikh</span>
+							</a>
 						</div>
 					</div>
 				</nav>
@@ -504,6 +602,17 @@
 
 		<!-- Scripts -->
 		<script src="js/app.js" type="module"></script>
+		<script src="js/research.js" type="module"></script>
+		<script src="js/script.js" type="module"></script>
+		<script src="js/ai.js" type="module"></script>
+		<script src="js/seo.js" type="module"></script>
+		<script src="js/voice.js" type="module"></script>
+		<script src="js/repurpose.js" type="module"></script>
+		<script src="js/dashboard.js" type="module"></script>
+		<script src="js/islamic.js" type="module"></script>
+		<script src="js/planner.js" type="module"></script>
+		<script src="js/automation.js" type="module"></script>
+		<script src="js/versioning.js" type="module"></script>
 		<script
 			defer
 			src="https://static.cloudflareinsights.com/beacon.min.js"
