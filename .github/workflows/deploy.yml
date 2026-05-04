@@ -13,33 +13,29 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      # ✅ STEP 1: Install pnpm FIRST
       - name: Install pnpm
         uses: pnpm/action-setup@v4
         with:
           version: 8
 
-      # ✅ STEP 2: Then setup Node with pnpm cache
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: '22'
           cache: pnpm
 
-      # ✅ STEP 3: Install dependencies
       - name: Install dependencies
         run: pnpm install
 
-      # ✅ STEP 4: Build the TypeScript Worker
       - name: Build Worker
         run: pnpm run build
 
-      # ✅ STEP 5: Deploy to Cloudflare Workers
       - name: Deploy to Cloudflare Workers
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: deploy --config wrangler.jsonc
+          command: deploy --config wrangler.jsonc --env production
