@@ -5,7 +5,7 @@
    * CONFIG
    * ---------------------------- */
   const CONFIG = {
-    API: 'https://yt-studio-production-production-production-production.ruhdevopsytstudio.workers.dev/api/videos',
+    API: 'https://yt-studio.ruhdevopsytstudio.workers.dev/api/videos',
     CACHE_KEY: 'yt_studio_videos_cache_v4',
     CACHE_EXPIRY: 24 * 60 * 60 * 1000,
     WATCH_LATER_KEY: 'watch_later_list',
@@ -116,8 +116,7 @@
     debounceTimer: null,
     searchHistory: JSON.parse(localStorage.getItem(CONFIG.SEARCH_HISTORY_KEY) || '[]'),
     progress: JSON.parse(localStorage.getItem(CONFIG.PROGRESS_KEY) || '{}'),
-    ytPlayer: null,
-    suggestionIndex: -1
+    ytPlayer: null
   };
 
   /* ----------------------------
@@ -342,6 +341,7 @@ function openModal(video) {
           }
         }
       });
+    }
 
     el.modal.style.display = 'flex';
     el.modal.setAttribute('aria-hidden', 'false');
@@ -677,7 +677,6 @@ if (el.resultsMeta) {
         state.search = e.target.value;
         state.page = 0;
         if (el.clearSearch) el.clearSearch.style.display = state.search ? 'block' : 'none';
-        state.suggestionIndex = -1;
         renderSuggestions(state.search);
         clearTimeout(state.debounceTimer);
         state.debounceTimer = setTimeout(() => {
@@ -685,38 +684,6 @@ if (el.resultsMeta) {
           render();
         }, 250);
       });
-      el.search.addEventListener("keydown", (e) => {
-        const items = el.suggestions ? el.suggestions.querySelectorAll(".suggestion-item") : [];
-        if (!items.length) return;
-
-        if (e.key === "ArrowDown") {
-          e.preventDefault();
-          state.suggestionIndex = (state.suggestionIndex + 1) % items.length;
-          renderSuggestions(state.search);
-        } else if (e.key === "ArrowUp") {
-          e.preventDefault();
-          state.suggestionIndex = (state.suggestionIndex - 1 + items.length) % items.length;
-          renderSuggestions(state.search);
-        } else if (e.key === "Enter" && state.suggestionIndex >= 0) {
-          e.preventDefault();
-          const selected = items[state.suggestionIndex];
-          if (selected) {
-            const id = selected.dataset.id;
-            const video = state.videos.find(v => v.id === id);
-            if (video) {
-              el.search.value = video.title;
-              state.search = video.title;
-              el.suggestions.style.display = "none";
-              state.suggestionIndex = -1;
-              openModal(video);
-            }
-          }
-        } else if (e.key === "Escape") {
-          el.suggestions.style.display = "none";
-          state.suggestionIndex = -1;
-        }
-      });
-
 
       // Close suggestions on blur
       document.addEventListener('click', (e) => {
@@ -753,6 +720,7 @@ if (el.resultsMeta) {
         el.clearSearch.style.display = 'none';
         render();
       });
+    }
 
     // Filter chips (event delegation on container for reliability)
         if (el.clearFilters) {
@@ -765,6 +733,7 @@ if (el.resultsMeta) {
         state.page = 0;
         render();
       });
+    }
 const filterChips = document.querySelector('.filter-chips');
     if (filterChips) {
       filterChips.addEventListener('click', (e) => {
@@ -798,6 +767,7 @@ const filterChips = document.querySelector('.filter-chips');
         state.page = 0;
         render();
       });
+    }
 
     // Theme toggle
     if (el.themeToggle) el.themeToggle.addEventListener('click', toggleTheme);
@@ -807,6 +777,7 @@ const filterChips = document.querySelector('.filter-chips');
       el.heroBtn.addEventListener('click', () => {
         if (state.hero) openModal(state.hero);
       });
+    }
 
     if (el.heroSave) {
       el.heroSave.addEventListener('click', () => {
@@ -815,6 +786,7 @@ const filterChips = document.querySelector('.filter-chips');
           setHero(state.hero);
         }
       });
+    }
 
     // Modal close
     if (el.closeModal) el.closeModal.addEventListener('click', closeModal);
@@ -823,6 +795,7 @@ const filterChips = document.querySelector('.filter-chips');
       el.modal.addEventListener('click', (e) => {
         if (e.target === el.modal) closeModal();
       });
+    }
 
     // Video grid - event delegation
     if (el.grid) {
@@ -859,6 +832,7 @@ const filterChips = document.querySelector('.filter-chips');
           }
         }
       });
+    }
 
     // Load more
     if (el.loadMore) {
@@ -866,6 +840,7 @@ const filterChips = document.querySelector('.filter-chips');
         state.page++;
         render();
       });
+    }
 
     // Watch Later badge opens overlay
     if (el.watchLaterBadge) el.watchLaterBadge.addEventListener('click', openWatchLater);
@@ -898,6 +873,7 @@ const filterChips = document.querySelector('.filter-chips');
           }
         }
       });
+    }
 
     // Dashboard
     if (el.dashboardBtn) el.dashboardBtn.addEventListener('click', openDashboard);
@@ -906,6 +882,7 @@ const filterChips = document.querySelector('.filter-chips');
       el.dashboardModal.addEventListener('click', (e) => {
         if (e.target === el.dashboardModal) closeDashboard();
       });
+    }
 
     // Transcript panel
     if (el.toggleTranscript) {
@@ -914,6 +891,7 @@ const filterChips = document.querySelector('.filter-chips');
         if (isHidden) openTranscriptPanel();
         else closeTranscriptPanel();
       });
+    }
     if (el.closeTranscript) el.closeTranscript.addEventListener('click', closeTranscriptPanel);
 
     // Share panel
@@ -923,36 +901,23 @@ const filterChips = document.querySelector('.filter-chips');
         if (isHidden) openSharePanel(state.current);
         else closeSharePanel();
       });
+    }
     if (el.closeShare) el.closeShare.addEventListener('click', closeSharePanel);
 
     // Copy link
     if (el.copyLinkBtn && el.shareLink) {
-      el.copyLinkBtn.addEventListener("click", () => {
+      el.copyLinkBtn.addEventListener('click', () => {
         el.shareLink.select();
-        const originalText = el.copyLinkBtn.textContent;
-        const feedback = () => {
-          el.copyLinkBtn.textContent = "Copied!";
-          el.copyLinkBtn.classList.add("success");
-          utils.showToast("Link copied to clipboard!");
-          setTimeout(() => {
-            el.copyLinkBtn.textContent = originalText;
-            el.copyLinkBtn.classList.remove("success");
-          }, 2000);
-        };
-
         try {
-          if (navigator.clipboard) {
-            navigator.clipboard.writeText(el.shareLink.value).then(feedback).catch(() => {
-              document.execCommand("copy");
-              feedback();
-            });
-          } else {
-            document.execCommand("copy");
-            feedback();
-          }
+          navigator.clipboard.writeText(el.shareLink.value).then(() => {
+            utils.showToast('Link copied!');
+          }).catch(() => {
+            document.execCommand('copy');
+            utils.showToast('Link copied!');
+          });
         } catch (e) {
-          document.execCommand("copy");
-          feedback();
+          document.execCommand('copy');
+          utils.showToast('Link copied!');
         }
       });
     }
@@ -964,14 +929,16 @@ const filterChips = document.querySelector('.filter-chips');
         const url = encodeURIComponent('https://www.youtube.com/watch?v=' + state.current.id);
         const text = encodeURIComponent(state.current.title);
         window.open('https://twitter.com/intent/tweet?url=' + url + '&text=' + text, '_blank', 'noopener');
-      });    }
+      });
+    }
 
     if (el.shareFacebook) {
       el.shareFacebook.addEventListener('click', () => {
         if (!state.current) return;
         const url = encodeURIComponent('https://www.youtube.com/watch?v=' + state.current.id);
         window.open('https://www.facebook.com/sharer/sharer.php?u=' + url, '_blank', 'noopener');
-      });    }
+      });
+    }
 
     if (el.shareWhatsApp) {
       el.shareWhatsApp.addEventListener('click', () => {
@@ -979,7 +946,8 @@ const filterChips = document.querySelector('.filter-chips');
         const url = encodeURIComponent('https://www.youtube.com/watch?v=' + state.current.id);
         const text = encodeURIComponent(state.current.title + ' ');
         window.open('https://wa.me/?text=' + text + url, '_blank', 'noopener');
-      });    }
+      });
+    }
 
     // Retry button
     if (el.retryBtn) el.retryBtn.addEventListener('click', init);
@@ -993,6 +961,7 @@ const filterChips = document.querySelector('.filter-chips');
       el.scrollToTop.addEventListener('click', () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
       });
+    }
 
     // Keyboard shortcuts
     document.addEventListener('keydown', (e) => {
@@ -1047,6 +1016,7 @@ const filterChips = document.querySelector('.filter-chips');
         el.body.style.overflow = '';
     el.body.classList.remove('modal-open');
       });
+    }
 
     const keyboardHints = $('keyboardHints');
     if (keyboardHints) {
@@ -1057,6 +1027,7 @@ const filterChips = document.querySelector('.filter-chips');
     el.body.classList.remove('modal-open');
         }
       });
+    }
   }
 
   /* ----------------------------

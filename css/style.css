@@ -1316,7 +1316,6 @@ button:active {
   gap: 12px;
   transition: background 0.2s ease;
 }
-.suggestion-item.active,
 
 .suggestion-item:hover {
   background: var(--bg-soft);
