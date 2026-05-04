@@ -1,0 +1,97 @@
+/* AI Assistant CSS */
+.ai-modal {
+	position: fixed;
+	inset: 0;
+	z-index: 300;
+	background: oklch(0 0 0 / 0.6);
+	backdrop-filter: blur(8px);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	opacity: 0;
+	pointer-events: none;
+	transition: all 0.3s ease;
+}
+
+.ai-modal.show {
+	opacity: 1;
+	pointer-events: auto;
+}
+
+.ai-modal-content {
+	background: var(--bg-canvas);
+	border: 1px solid var(--line-soft);
+	border-radius: var(--radius-lg);
+	width: min(500px, 90vw);
+	max-height: 90vh;
+	display: flex;
+	flex-direction: column;
+	box-shadow: var(--shadow-lg);
+}
+
+.ai-modal-header {
+	padding: 20px 24px;
+	border-bottom: 1px solid var(--line-soft);
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.ai-modal-header h3 {
+	font-family: var(--font-display);
+	color: var(--accent);
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+
+.ai-modal-body {
+	padding: 24px;
+	overflow-y: auto;
+}
+
+.ai-controls label {
+	display: block;
+	font-size: 0.9rem;
+	font-weight: 600;
+	margin-bottom: 8px;
+	color: var(--text-soft);
+}
+
+.mt-3 { margin-top: 16px; }
+
+.ai-results {
+	margin-top: 24px;
+	padding-top: 24px;
+	border-top: 1px solid var(--line-soft);
+}
+
+.ai-results h4 {
+	font-size: 1rem;
+	margin-bottom: 16px;
+}
+
+.ai-variations-list {
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+}
+
+.ai-variation-card {
+	background: var(--bg-soft);
+	border: 1px solid var(--line-soft);
+	border-radius: var(--radius-md);
+	padding: 16px;
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.ai-variation-card p {
+	font-size: 0.95rem;
+	line-height: 1.5;
+}
+
+.ai-variation-card button {
+	align-self: flex-end;
+}
