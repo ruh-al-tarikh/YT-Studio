@@ -55,6 +55,9 @@
 					<p class="header-tagline">Uncovering truth through Islamic history, scripture, and contested ideas.</p>
 				</div>
 				<div class="header-actions">
+					<button id="mobileMenuToggle" class="icon-button mobile-toggle" type="button" aria-label="Toggle mobile menu">
+						<i class="fa-solid fa-bars"></i>
+					</button>
 					<button id="watchLaterBadge" class="pill-button accent" type="button" aria-label="Open watch later list">
 						<i class="fa-regular fa-bookmark" aria-hidden="true"></i>
 						<span>Watch Later</span>
@@ -79,6 +82,19 @@
 					</button>
 				</div>
 			</div>
+			<nav id="mobileNav" class="mobile-nav" aria-hidden="true">
+				<div class="mobile-nav-content">
+					<button class="mobile-nav-link" onclick="document.querySelector('[data-cat=all]').click(); document.getElementById('mobileMenuToggle').click();">
+						<i class="fa-solid fa-film"></i> All Episodes
+					</button>
+					<button class="mobile-nav-link" onclick="document.getElementById('watchLaterBadge').click(); document.getElementById('mobileMenuToggle').click();">
+						<i class="fa-solid fa-bookmark"></i> Watch Later
+					</button>
+					<button class="mobile-nav-link" onclick="document.getElementById('dashboardBtn').click(); document.getElementById('mobileMenuToggle').click();">
+						<i class="fa-solid fa-chart-simple"></i> Dashboard
+					</button>
+				</div>
+			</nav>
 		</header>
 
 		<main id="app-root" class="fade-in">
@@ -133,6 +149,9 @@
 			</div>
 
 			<section id="hero" class="hero" style="display: none">
+				<div class="ornament ornament-1"></div>
+				<div class="ornament ornament-2"></div>
+				<div class="ornament ornament-3"></div>
 				<div id="hero-bg" class="hero-bg"></div>
 				<div class="hero-overlay">
 					<div class="hero-main">
