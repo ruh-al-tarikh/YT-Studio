@@ -5,7 +5,7 @@
    * CONFIG
    * ---------------------------- */
   const CONFIG = {
-    API: 'https://yt-proxy.ruhdevopsytstudio.workers.dev',
+    API: 'https://yt-studio.ruhdevopsytstudio.workers.dev/api/videos',
     CACHE_KEY: 'yt_studio_videos_cache_v4',
     CACHE_EXPIRY: 24 * 60 * 60 * 1000,
     WATCH_LATER_KEY: 'watch_later_list',
@@ -124,19 +124,19 @@
    * ---------------------------- */
   const utils = {
     sanitize: (s) =>
-      String(s || '')
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;'),
+      String(s || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;"),
 
-    truncate: (t, n) => (t.length > n ? t.slice(0, n) + '...' : t),
+    truncate: (t, n) => (t.length > n ? t.slice(0, n) + "..." : t),
 
     formatDate: (d) => {
       try {
-        return new Intl.DateTimeFormat('en', { month: 'short', day: 'numeric', year: 'numeric' })
+        return new Intl.DateTimeFormat("en", { month: "short", day: "numeric", year: "numeric" })
           .format(new Date(d));
       } catch (e) {
-        return '';
+        return "";
       }
     },
 
@@ -151,11 +151,17 @@
       } catch (e) { return fallback; }
     },
 
+    highlight: (text, query) => {
+      if (!query) return text;
+      const re = new RegExp(`(${query})`, "gi");
+      return text.replace(re, "<mark>$1</mark>");
+    },
+
     showToast: (msg) => {
       if (!el.toast) return;
       el.toast.textContent = msg;
-      el.toast.classList.add('show');
-      setTimeout(() => el.toast.classList.remove('show'), 3000);
+      el.toast.classList.add("show");
+      setTimeout(() => el.toast.classList.remove("show"), 3000);
     }
   };
 
@@ -208,14 +214,17 @@
       const res = await fetchWithRetry(CONFIG.API);
       const json = await res.json();
 
-      const videos = (json.videos || []).map(v => ({
-        id:          v.id || v.videoId,
-        title:       v.title || 'Untitled',
-        thumbnail:   v.thumbnail || ('https://i.ytimg.com/vi/' + (v.id || v.videoId) + '/hqdefault.jpg'),
-        publishedAt: v.publishedAt || new Date().toISOString(),
-        category:    detectCategory(v.title || ''),
-        description: v.description || 'Deep dive into Islamic history and theology.'
-      }));
+      const videos = (json.videos || []).map(v => {
+        const id = v.id || v.videoId;
+        return {
+          id:          id,
+          title:       v.title || "Untitled",
+          thumbnail:   v.thumbnail || ("https://i.ytimg.com/vi/" + id + "/hqdefault.jpg"),
+          publishedAt: v.publishedAt || new Date().toISOString(),
+          category:    detectCategory(v.title || ""),
+          description: v.description || "Deep dive into Islamic history and theology."
+        };
+      });
 
       if (videos.length > 0) {
         utils.saveLS(CONFIG.CACHE_KEY, { data: videos, time: Date.now() });
@@ -240,12 +249,6 @@
     const percent = (time / duration) * 100;
     state.progress[videoId] = { time, duration, percent, updated: Date.now() };
     utils.saveLS(CONFIG.PROGRESS_KEY, state.progress);
-
-    highlight: (text, query) => {
-      if (!query) return text;
-      const re = new RegExp(`(${query})`, 'gi');
-      return text.replace(re, '<mark>$1</mark>');
-    },
 
     updateStats();
   }
