@@ -13,3 +13,7 @@
 ## 2025-05-03 - Empty State Implementation with CTA
 **Learning:** Empty states should guide users with clear next steps. Using dynamic injection for modal-based empty states avoids static HTML clutter while maintaining consistent state management.
 **Action:** Implement dashed borders and clear iconography for empty states. Always include an accessible call-to-action (CTA) even if the feature is still in development.
+
+## 2025-05-04 - Advanced Personalization & Smart UX
+**Learning:** Transitioning from "Good UI" to "Intelligent Experience" involves behavior-based state management (Watch Progress, Multi-select Filtering, Live Suggestions).
+**Action:** Use YouTube Iframe API for granular progress tracking. Implement regex-based highlighting for search discoverability. Use 'modal-open' body classes to trigger global immersive styles (dimming/blurring).
