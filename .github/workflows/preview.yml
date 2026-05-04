@@ -1,0 +1,30 @@
+name: Deploy Preview
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Deploy to Firebase Preview Channel
+        run: |
+          firebase hosting:channel:deploy pr-${{ github.event.number }} \
+            --expires 7d \
+            --project ytstudio-pr
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
