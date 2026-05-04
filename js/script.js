@@ -78,6 +78,12 @@ function updateMetrics() {
 	if(durEl) durEl.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
 }
 function updateFocusMetrics() {
+	const ta = document.getElementById("focusTextArea");
+	if (ta) {
+		const words = ta.value.trim().split(/\s+/).filter(w => w.length > 0).length;
+		const el = document.getElementById("focusMetrics");
+		if (el) el.textContent = `${words} words`;
+	}
 	const words = document.getElementById("focusTextArea").value.trim().split(/\s+/).filter(w => w.length > 0).length;
 	document.getElementById('focusMetrics').textContent = `${words} words`;
 }
