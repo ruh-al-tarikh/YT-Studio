@@ -7,15 +7,6 @@ on:
         description: 'Prompt for OpenCode'
         required: true
         type: string
-      model:
-        description: 'Model to use'
-        required: false
-        default: 'qwen/qwen3-6b-plus-free'
-        type: choice
-        options:
-          - 'qwen/qwen3-6b-plus-free'
-          - 'openai/gpt-4o-mini'
-          - 'anthropic/claude-3-haiku'
   issue_comment:
     types: [created]
   pull_request_review_comment:
@@ -42,16 +33,5 @@ jobs:
           OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          model: ${{ github.event_name == 'workflow_dispatch' && inputs.model || 'qwen/qwen3-6b-plus-free' }}
-          prompt: ${{ github.event_name == 'workflow_dispatch' && inputs.prompt || '' }}
-          
-      - name: Post comment on issue
-        if: github.event_name == 'issue_comment'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          echo "OpenCode has completed processing your request." >> comment.md
-          echo "" >> comment.md
-          echo "Check the Actions tab for more details: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" >> comment.md
-          
-          gh issue comment ${{ github.event.issue.number }} --body-file comment.md
+          # Use a simpler model format or let OpenCode choose default
+          model: opencode/claude-3-haiku
