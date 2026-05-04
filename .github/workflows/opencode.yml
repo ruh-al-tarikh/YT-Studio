@@ -8,27 +8,16 @@ on:
 
 jobs:
   opencode:
-    if: |
-      github.event.comment.body &&
-      (contains(github.event.comment.body, '/oc') ||
-       contains(github.event.comment.body, '/opencode'))
+    if: contains(github.event.comment.body, '/oc') || contains(github.event.comment.body, '/opencode')
     runs-on: ubuntu-latest
     permissions:
-      id-token: write
-      contents: write  # Changed from 'read' to allow PR creation
-      pull-requests: write  # Changed from 'read' to allow commenting
-      issues: write  # Changed from 'read' to allow commenting
+      contents: write
+      pull-requests: write
+      issues: write
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4  # Changed from v6 (v6 doesn't exist)
-        with:
-          persist-credentials: false
-          fetch-depth: 0  # Fetch all history for better context
-
-      - name: Run opencode
-        uses: anomalyco/opencode/github@latest
+      - uses: actions/checkout@v4
+      - uses: anomalyco/opencode/github@latest
         env:
           OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          model: qwen/qwen3-6b-plus-free  # Correct provider/model format
+          model: qwen/qwen3-6b-plus-free
