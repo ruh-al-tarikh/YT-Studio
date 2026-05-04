@@ -14,6 +14,10 @@ on:
 
 jobs:
   opencode:
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      contains(github.event.comment.body, '/oc') ||
+      contains(github.event.comment.body, '/opencode')
     runs-on: ubuntu-latest
     permissions:
       id-token: write
@@ -32,10 +36,20 @@ jobs:
           curl -fsSL https://opencode.ai/install | bash
           echo "$HOME/.opencode/bin" >> $GITHUB_PATH
           
+      - name: Extract clean prompt
+        id: extract-prompt
+        env:
+          RAW_PROMPT: ${{ github.event_name == 'workflow_dispatch' && inputs.prompt || github.event.comment.body }}
+        run: |
+          CLEAN_PROMPT=$(echo "$RAW_PROMPT" | sed -n 's/.*\/oc\s*//p' | sed -n 's/.*\/opencode\s*//p')
+          if [ -z "$CLEAN_PROMPT" ]; then
+            CLEAN_PROMPT="Analyze this"
+          fi
+          echo "clean_prompt=$CLEAN_PROMPT" >> $GITHUB_OUTPUT
+          
       - name: Run OpenCode
         env:
           OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          PROMPT="${{ github.event_name == 'workflow_dispatch' && inputs.prompt || github.event.comment.body }}"
-          opencode run "$PROMPT" --model opencode/gpt-4o-mini
+          opencode run "${{ steps.extract-prompt.outputs.clean_prompt }}" --model opencode/gpt-4o-mini
