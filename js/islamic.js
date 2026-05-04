@@ -102,7 +102,10 @@ export function initIslamic() {
 				<p class="ref-translation">${r.translation}</p>
 				<div class="ref-footer">
 					<div class="ref-tags">${r.tags.map(t => `<span class="ref-tag">#${t}</span>`).join('')}</div>
-					<button class="secondary-button small copy-ref-btn" data-id="${r.id}"><i class="fa-regular fa-copy"></i> Copy</button>
+					<div class="ref-actions">
+						<button class="secondary-button small copy-ref-btn" data-id="${r.id}"><i class="fa-regular fa-copy"></i> Copy</button>
+						<button class="secondary-button small attach-ref-btn" data-id="${r.id}"><i class="fa-solid fa-paperclip"></i> Attach to Script</button>
+					</div>
 				</div>
 			</div>
 		`).join('');
@@ -113,9 +116,35 @@ export function initIslamic() {
 				const ref = mockReferences.find(r => r.id === id);
 				const text = `${ref.source}\n${ref.arabic ? ref.arabic + '\n' : ''}${ref.translation}`;
 				navigator.clipboard.writeText(text);
-				alert('Reference copied!');
+				showToast('Reference copied!');
 			});
 		});
+
+		listEl.querySelectorAll('.attach-ref-btn').forEach(btn => {
+			btn.addEventListener('click', (e) => {
+				const id = parseInt(e.currentTarget.dataset.id);
+				const ref = mockReferences.find(r => r.id === id);
+				const text = `[REF: ${ref.source}]`;
+
+				// Find active script textarea or fallback to first
+				const tas = document.querySelectorAll('.script-textarea');
+				if (tas.length > 0) {
+					const ta = tas[2] || tas[0]; // Prefer lesson section
+					ta.value += '\n' + text;
+					ta.dispatchEvent(new Event('input'));
+					showToast('Attached to Script!');
+				}
+			});
+		});
+	}
+
+	function showToast(msg) {
+		const toast = document.getElementById('toast');
+		if(toast) {
+			toast.textContent = msg;
+			toast.classList.add('show');
+			setTimeout(() => toast.classList.remove('show'), 3000);
+		}
 	}
 
 	searchEl.addEventListener('input', (e) => {

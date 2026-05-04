@@ -12,6 +12,7 @@ const AI_MODAL_HTML = `
 				<label>Action</label>
 				<select id="aiActionSelect" class="research-select full-width mb-3">
 					<option value="hook">Generate Hook</option>
+					<option value="title">Improve Title</option>
 					<option value="expand">Expand Story</option>
 					<option value="simplify">Simplify Concept</option>
 					<option value="translate">Translate to Tamil</option>
@@ -39,14 +40,19 @@ const AI_MODAL_HTML = `
 		</div>
 	</div>
 </div>
+
+<div id="floatingAiToolbar" class="floating-ai-toolbar" style="display: none;">
+	<button class="ai-tool-btn" data-action="improve" title="Improve Phrasing"><i class="fa-solid fa-wand-magic-sparkles"></i></button>
+	<button class="ai-tool-btn" data-action="translate" title="Translate"><i class="fa-solid fa-language"></i></button>
+	<button class="ai-tool-btn" data-action="simplify" title="Simplify"><i class="fa-solid fa-feather"></i></button>
+</div>
 `;
 
 export function initAI() {
-	// Inject AI Modal into body
 	if (!document.getElementById('aiModal')) {
 		const div = document.createElement('div');
 		div.innerHTML = AI_MODAL_HTML;
-		document.body.appendChild(div.firstElementChild);
+		document.body.appendChild(div);
 	}
 
 	const aiModal = document.getElementById('aiModal');
@@ -54,6 +60,7 @@ export function initAI() {
 	const generateBtn = document.getElementById('generateAiBtn');
 	const resultsArea = document.getElementById('aiResultsArea');
 	const variationsList = document.getElementById('aiVariationsList');
+	const floatingToolbar = document.getElementById('floatingAiToolbar');
 	
 	closeBtn.addEventListener('click', () => {
 		aiModal.setAttribute('aria-hidden', 'true');
@@ -64,7 +71,6 @@ export function initAI() {
 		generateBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Generating...';
 		generateBtn.disabled = true;
 		
-		// Mock API call
 		setTimeout(() => {
 			generateBtn.innerHTML = '<i class="fa-solid fa-bolt"></i> Generate';
 			generateBtn.disabled = false;
@@ -82,6 +88,11 @@ export function initAI() {
 				mockResults = [
 					"Have you ever wondered what really happened during the fall of the empire?",
 					"The truth they didn't teach you in history class.",
+				];
+			} else if (action === 'title') {
+				mockResults = [
+					"The Lost Dynasty: Secrets of the Silk Road",
+					"Beyond the Empire: A Story of Survival",
 				];
 			} else {
 				mockResults = [
@@ -106,19 +117,45 @@ export function initAI() {
 				});
 			});
 
-		}, 1500);
+		}, 1200);
+	});
+
+	// Floating Toolbar Logic
+	document.addEventListener('mouseup', () => {
+		const selection = window.getSelection();
+		const text = selection.toString().trim();
+		if (text.length > 3) {
+			const range = selection.getRangeAt(0);
+			const rect = range.getBoundingClientRect();
+			floatingToolbar.style.top = `${rect.top + window.scrollY - 50}px`;
+			floatingToolbar.style.left = `${rect.left + window.scrollX + rect.width/2}px`;
+			floatingToolbar.style.display = 'flex';
+		} else {
+			floatingToolbar.style.display = 'none';
+		}
+	});
+
+	document.querySelectorAll('.ai-tool-btn').forEach(btn => {
+		btn.addEventListener('click', (e) => {
+			const action = e.currentTarget.dataset.action;
+			const selection = window.getSelection().toString();
+
+			document.getElementById('aiActionSelect').value = action === 'improve' ? 'expand' : action;
+			document.getElementById('aiInputText').value = selection;
+
+			aiModal.setAttribute('aria-hidden', 'false');
+			aiModal.classList.add('show');
+			floatingToolbar.style.display = 'none';
+		});
 	});
 
 	// Hook up sidebar buttons from Script Studio
 	document.addEventListener('click', (e) => {
-		if (e.target.closest('#aiTranslateBtn') || e.target.closest('#aiImproveBtn')) {
-			const action = e.target.closest('#aiTranslateBtn') ? 'translate' : 'simplify';
+		const target = e.target.closest('#aiTranslateBtn') || e.target.closest('#aiImproveBtn');
+		if (target) {
+			const action = target.id === 'aiTranslateBtn' ? 'translate' : 'simplify';
 			document.getElementById('aiActionSelect').value = action;
 			
-			// Grab selected text if any
-			const selected = window.getSelection().toString();
-			if(selected) document.getElementById('aiInputText').value = selected;
-
 			aiModal.setAttribute('aria-hidden', 'false');
 			aiModal.classList.add('show');
 		}
@@ -126,12 +163,18 @@ export function initAI() {
 }
 
 function insertIntoActiveEditor(text) {
-	// Find the most recently focused script textarea
-	const textareas = document.querySelectorAll('.script-textarea');
-	if (textareas.length > 0) {
-		const ta = textareas[0]; // Naive fallback
-		ta.value += '\\n' + text;
-		ta.dispatchEvent(new Event('input')); // trigger word count
+	const textareas = document.querySelectorAll('.script-textarea, .focus-textarea');
+	let activeTA = null;
+	textareas.forEach(ta => { if(document.activeElement === ta) activeTA = ta; });
+
+	if (!activeTA && textareas.length > 0) activeTA = textareas[0];
+
+	if (activeTA) {
+		const start = activeTA.selectionStart;
+		const end = activeTA.selectionEnd;
+		const val = activeTA.value;
+		activeTA.value = val.substring(0, start) + text + val.substring(end);
+		activeTA.dispatchEvent(new Event('input'));
 	}
 }
 

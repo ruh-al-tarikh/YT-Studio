@@ -155,3 +155,40 @@
 		grid-template-columns: 1fr;
 	}
 }
+
+.yt-thumb-mock {
+	aspect-ratio: 16/9;
+	background: linear-gradient(135deg, #1a1a1a 0%, #333 100%);
+	border-radius: var(--radius-sm);
+	position: relative;
+	overflow: hidden;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	text-align: center;
+	padding: 20px;
+}
+.thumb-overlay {
+	position: absolute;
+	bottom: 8px;
+	right: 8px;
+	background: rgba(0,0,0,0.8);
+	color: #fff;
+	padding: 2px 4px;
+	font-size: 0.75rem;
+	border-radius: 2px;
+	font-weight: 700;
+}
+.thumb-title-layer {
+	font-family: var(--font-display);
+	font-size: 1.25rem;
+	font-weight: 700;
+	color: #fff;
+	text-transform: uppercase;
+	text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+	line-height: 1.2;
+}
+.score-badge.excellent {
+	background: oklch(0.6 0.15 150 / 0.2);
+	color: oklch(0.6 0.15 150);
+}
