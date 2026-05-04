@@ -1,0 +1,22 @@
+{
+  "name": "mastering-gemini-cli-agentic-skill",
+  "owner": {
+    "name": "Richard Hightower",
+    "email": "rhightower@spillwave.com"
+  },
+  "metadata": {
+    "description": "Build headless automation and agentic workflows with Google's Gemini CLI",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "mastering-gemini-cli",
+      "description": "Build headless automation and agentic workflows with Google's Gemini CLI. Covers approval modes (default, auto_edit, yolo), file permission model, Edit vs WriteFile tool selection, smartEdit configuration, GEMINI.md context files, settings.json hierarchy, and MCP server integration.",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./mastering-gemini-cli"
+      ]
+    }
+  ]
+}

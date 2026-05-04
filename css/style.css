@@ -34,90 +34,135 @@ body {
 	overflow-x: hidden;
 }
 :root {
-	--bg-canvas: oklch(0.14 0.02 250);
-	--bg-elevated: oklch(0.18 0.03 250 / 0.8);
-	--bg-panel: oklch(0.22 0.04 250 / 0.85);
-	--bg-soft: oklch(1 0 0 / 0.05);
-	--line-soft: oklch(0.9 0.03 85 / 0.12);
-	--line-strong: oklch(0.85 0.1 85 / 0.3);
-	--text-main: oklch(0.95 0.01 85);
-	--text-muted: oklch(0.8 0.02 250);
-	--text-soft: oklch(0.65 0.03 250);
-	--accent: oklch(0.78 0.14 85);
-	--accent-strong: oklch(0.85 0.12 85);
-	--accent-deep: oklch(0.65 0.15 85);
-	--shadow-lg: 0 30px 70px oklch(0 0 0 / 0.5);
-	--shadow-md: 0 16px 32px oklch(0 0 0 / 0.3);
+	--bg-canvas: oklch(0.12 0.01 250);
+	--bg-elevated: oklch(0.18 0.02 250 / 0.7);
+	--bg-panel: oklch(0.22 0.03 250 / 0.8);
+	--bg-soft: oklch(1 0 0 / 0.03);
+	--line-soft: oklch(1 0 0 / 0.08);
+	--line-strong: oklch(1 0 0 / 0.15);
+	--text-main: oklch(0.98 0.01 85);
+	--text-muted: oklch(0.85 0.02 250);
+	--text-soft: oklch(0.7 0.02 250);
+	--accent: oklch(0.82 0.12 85);
+	--accent-strong: oklch(0.88 0.15 85);
+	--accent-deep: oklch(0.65 0.18 85);
+	--accent-glow: oklch(0.82 0.12 85 / 0.2);
+	--shadow-lg: 0 20px 50px -12px oklch(0 0 0 / 0.5);
+	--shadow-md: 0 12px 24px -8px oklch(0 0 0 / 0.3);
+	--glass: blur(16px) saturate(180%);
 	--radius-lg: 24px;
 	--radius-md: 18px;
 	--radius-sm: 12px;
 	--font-display: 'Cinzel', serif;
 	--font-body: 'Manrope', sans-serif;
 	--container: min(1200px, calc(100vw - 40px));
-	--fs-h1: clamp(2.5rem, 5vw, 4rem);
-	--fs-h2: clamp(1.75rem, 3.5vw, 2.5rem);
-	--fs-h3: clamp(1.25rem, 2.5vw, 1.75rem);
-	--fs-body: 1rem;
 }
+
 body.light-mode {
-	--bg-canvas: oklch(0.96 0.01 85);
-	--bg-elevated: oklch(1 0.005 85 / 0.85);
-	--bg-panel: oklch(0.98 0.01 85 / 0.95);
-	--bg-soft: oklch(0 0 0 / 0.04);
-	--line-soft: oklch(0.3 0.05 85 / 0.1);
-	--line-strong: oklch(0.3 0.1 85 / 0.2);
-	--text-main: oklch(0.2 0.03 250);
-	--text-muted: oklch(0.4 0.05 250);
-	--text-soft: oklch(0.55 0.04 250);
-	--accent: oklch(0.55 0.15 85);
-	--accent-strong: oklch(0.6 0.18 85);
-	--accent-deep: oklch(0.45 0.12 85);
-	--shadow-lg: 0 30px 70px oklch(0.2 0.1 85 / 0.1);
-	--shadow-md: 0 16px 32px oklch(0.2 0.1 85 / 0.08);
+	--bg-canvas: oklch(0.98 0.01 85);
+	--bg-elevated: oklch(1 0 0 / 0.6);
+	--bg-panel: oklch(1 0 0 / 0.8);
+	--bg-soft: oklch(0 0 0 / 0.03);
+	--line-soft: oklch(0 0 0 / 0.06);
+	--line-strong: oklch(0 0 0 / 0.12);
+	--text-main: oklch(0.15 0.02 250);
+	--text-muted: oklch(0.35 0.03 250);
+	--text-soft: oklch(0.5 0.03 250);
+	--accent: oklch(0.6 0.15 85);
+	--accent-strong: oklch(0.5 0.18 85);
+	--accent-deep: oklch(0.4 0.12 85);
+	--accent-glow: oklch(0.6 0.15 85 / 0.15);
 }
-* {
-	box-sizing: border-box;
-	margin: 0;
-	padding: 0;
-}
-html {
-	scroll-behavior: smooth;
-}
-body::before {
-	content: '';
-	position: fixed;
-	inset: 0;
-	background:
-		radial-gradient(circle at 0% 0%, oklch(0.78 0.14 85/0.08), transparent 40%),
-		radial-gradient(circle at 100% 0%, oklch(0.6 0.1 250/0.1), transparent 40%);
-	pointer-events: none;
-	z-index: -1;
-}
-button,
-input {
-	font: inherit;
-}
-input {
-	border: 0;
-	background: 0 0;
-	color: inherit;
-}
-img {
-	display: block;
-	width: 100%;
-}
-:focus-visible {
-	outline: 2px solid var(--accent-strong);
-	outline-offset: 4px;
-}
+
 .header {
 	position: sticky;
 	top: 0;
-	z-index: 100;
-	background: oklch(from var(--bg-canvas) l c h/.75);
-	backdrop-filter: blur(12px);
+	z-index: 1000;
+	background: var(--bg-elevated);
+	backdrop-filter: var(--glass);
 	border-bottom: 1px solid var(--line-soft);
-	transition: all 0.3s ease, background-color 0.5s ease;
+	padding: 12px 0;
+	transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.header.scrolled {
+	padding: 8px 0;
+	background: var(--bg-panel);
+	box-shadow: var(--shadow-md);
+}
+
+.card {
+	background: var(--bg-elevated);
+	backdrop-filter: var(--glass);
+	border: 1px solid var(--line-soft);
+	border-radius: var(--radius-md);
+	overflow: hidden;
+	transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+	position: relative;
+	will-change: transform, box-shadow;
+}
+
+.card::before {
+	content: '';
+	position: absolute;
+	inset: 0;
+	background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), var(--accent-glow), transparent 60%);
+	opacity: 0;
+	transition: opacity 0.5s;
+	pointer-events: none;
+}
+
+.card:hover::before {
+	opacity: 1;
+}
+
+.card:hover {
+	transform: translateY(-12px) scale(1.02);
+	border-color: var(--accent);
+	box-shadow: 0 30px 60px -12px oklch(0 0 0 / 0.4), 0 0 20px var(--accent-glow);
+}
+
+.card-thumb-wrapper img {
+	transition: transform 0.8s cubic-bezier(0.23, 1, 0.32, 1), filter 0.5s ease, opacity 0.5s ease;
+	opacity: 0;
+	filter: blur(10px);
+}
+
+.card-thumb-wrapper img.loaded {
+	opacity: 1;
+	filter: blur(0);
+}
+
+.card:hover .card-thumb-wrapper img {
+	transform: scale(1.1);
+}
+
+.primary-button {
+	background: linear-gradient(135deg, var(--accent), var(--accent-deep));
+	color: oklch(0.1 0.05 85);
+	border: none;
+	position: relative;
+	z-index: 1;
+}
+
+.primary-button::before {
+	content: '';
+	position: absolute;
+	inset: 0;
+	background: linear-gradient(135deg, var(--accent-strong), var(--accent));
+	opacity: 0;
+	transition: opacity 0.3s ease;
+	z-index: -1;
+	border-radius: inherit;
+}
+
+.primary-button:hover::before {
+	opacity: 1;
+}
+
+.primary-button:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 12px 24px -6px var(--accent-glow);
 }
 .header-content {
 	width: var(--container);
@@ -920,16 +965,29 @@ button:active {
 .skeleton {
 	background: var(--bg-soft);
 	border-radius: var(--radius-sm);
+	position: relative;
+	overflow: hidden;
 }
+
+.skeleton::after {
+	content: '';
+	position: absolute;
+	inset: 0;
+	background: linear-gradient(90deg, transparent, var(--bg-elevated), transparent);
+	transform: translateX(-100%);
+	animation: skeleton-shine 1.5s infinite;
+}
+
 .skeleton-card {
+	background: var(--bg-elevated);
+	backdrop-filter: var(--glass);
+	border: 1px solid var(--line-soft);
+	border-radius: var(--radius-md);
+	padding: 20px;
 	height: 320px;
 	display: flex;
 	flex-direction: column;
 	gap: 16px;
-	padding: 20px;
-	background: var(--bg-elevated);
-	border-radius: var(--radius-md);
-	border: 1px solid var(--line-soft);
 }
 .skeleton-thumb {
 	aspect-ratio: 16/9;
@@ -1529,4 +1587,109 @@ body.menu-open .mobile-nav {
         padding-top: 80px; /* Space for the sticky header */
         z-index: 999;
     }
+}
+/* Custom Player Controls */
+.custom-player-controls {
+	padding: 16px 0;
+	border-top: 1px solid var(--line-soft);
+	margin-top: 16px;
+	display: flex;
+	justify-content: center;
+}
+
+.control-group {
+	display: flex;
+	gap: 12px;
+	align-items: center;
+}
+
+.control-btn {
+	padding: 8px 16px;
+	background: var(--bg-soft);
+	border: 1px solid var(--line-soft);
+	border-radius: var(--radius-sm);
+	font-weight: 700;
+	font-size: 0.9rem;
+	transition: all 0.2s ease;
+	min-width: 44px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.control-btn:hover {
+	background: var(--bg-panel);
+	border-color: var(--accent);
+}
+
+.dropdown-wrapper {
+	position: relative;
+}
+
+.dropdown-menu {
+	position: absolute;
+	bottom: 100%;
+	left: 50%;
+	transform: translateX(-50%) translateY(-10px);
+	background: var(--bg-panel);
+	backdrop-filter: var(--glass);
+	border: 1px solid var(--line-soft);
+	border-radius: var(--radius-sm);
+	padding: 8px;
+	display: none;
+	flex-direction: column;
+	gap: 4px;
+	min-width: 100px;
+	z-index: 100;
+	box-shadow: var(--shadow-lg);
+}
+
+.dropdown-wrapper:hover .dropdown-menu {
+	display: flex;
+}
+
+.dropdown-menu button {
+	padding: 8px 12px;
+	border-radius: 4px;
+	text-align: left;
+	font-size: 0.85rem;
+	transition: background 0.2s ease;
+}
+
+.dropdown-menu button:hover {
+	background: var(--bg-soft);
+	color: var(--accent);
+}
+
+.dropdown-menu button.active {
+	background: var(--accent-glow);
+	color: var(--accent);
+}
+/* Accessibility & Focus States */
+:focus-visible {
+	outline: 3px solid var(--accent);
+	outline-offset: 4px;
+	box-shadow: 0 0 0 6px oklch(from var(--accent) l c h / 0.15);
+}
+
+.sr-only {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	white-space: nowrap;
+	border-width: 0;
+}
+
+.card:focus-within {
+	border-color: var(--accent);
+	box-shadow: var(--shadow-lg), 0 0 0 4px var(--accent-glow);
+}
+
+button:focus:not(:focus-visible),
+input:focus:not(:focus-visible) {
+	outline: none;
 }

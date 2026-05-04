@@ -29,6 +29,9 @@ importers:
       server-only:
         specifier: ^0.0.1
         version: 0.0.1
+      skilz:
+        specifier: ^0.0.0
+        version: 0.0.0
     devDependencies:
       '@cloudflare/workers-types':
         specifier: ^4.20260502.1
@@ -1154,6 +1157,9 @@ packages:
   siginfo@2.0.0:
     resolution: {integrity: sha512-ybx0WO1/8bSBLEWXZvEd7gMW3Sn3JFlW3TvX1nREbDLRNQNaeNN8WK0meBwPdAaOI7TtRRRJn/Es1zhrrCHu7g==}
 
+  skilz@0.0.0:
+    resolution: {integrity: sha512-5T91vGRd7x58siusVT5DRF6bkGunUTipnM/bWjSAkJM+8YQ8EyQqdn31qCo2TJVuJvGUfygbkXaEORKarlbUBg==}
+
   source-map-js@1.2.1:
     resolution: {integrity: sha512-UXWMKhLOwVKb728IUtQPXxfYU+usdybtUrK/8uGE8CQMvrhOpwvzDBwj0QhSL7MQc7vIsISBG8VQ8+IDQxpfQA==}
     engines: {node: '>=0.10.0'}
@@ -2163,6 +2169,8 @@ snapshots:
       '@img/sharp-win32-x64': 0.34.5
 
   siginfo@2.0.0: {}
+
+  skilz@0.0.0: {}
 
   source-map-js@1.2.1: {}
 

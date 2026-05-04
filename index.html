@@ -1,28 +1,46 @@
 <!doctype html>
 <html lang="en">
 	<head>
-    <meta name="google-site-verification" content="qrI4J97dOgkwX308NGJkNHYEV0-J4M08t_7weyFrY1w" />
-		<meta name="description" content="YT Studio - Islamic history and Quranic mysteries" />
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Ruh Al Tarikh | Cinematic Islamic Archive</title>
-		<meta
-			name="description"
-			content="A cinematic archive for Ruh Al Tarikh episodes exploring Islamic history, scripture, prophecy, and deep discussion."
-		/>
-		<meta name="author" content="Ruh Al Tarikh" />
-		<meta property="og:title" content="Ruh Al Tarikh" />
-		<meta property="og:description" content="Uncovering truth through Islamic history, scripture, and contested ideas." />
+		<meta name="google-site-verification" content="qrI4J97dOgkwX308NGJkNHYEV0-J4M08t_7weyFrY1w" />
+		
+		<title>YT Studio - Islamic History, Prophecy & Discussion Archive</title>
+		<meta name="description" content="Explore an curated cinematic archive of Islamic history, scripture, prophecy, and deep discussions. Featuring high-quality video content on Quranic mysteries, ancient empires, and modern theology." />
+		<meta name="keywords" content="Islamic history, Quran, prophecy, theology, Islamic podcast, Muslim history, end times, Islamic education" />
+		<meta name="author" content="Azeez Mohammed Rizwan" />
+		<link rel="canonical" href="https://yt-studio.vercel.app/" />
+
+		<!-- Open Graph / Facebook -->
 		<meta property="og:type" content="website" />
-		<meta name="twitter:card" content="summary_large_image" />
+		<meta property="og:url" content="https://yt-studio.vercel.app/" />
+		<meta property="og:title" content="YT Studio - Islamic History & Prophecy Archive" />
+		<meta property="og:description" content="Explore an curated cinematic archive of Islamic history, scripture, prophecy, and deep discussions." />
+		<meta property="og:image" content="https://yt-studio.vercel.app/assets/og-image.jpg" />
+
+		<!-- Twitter -->
+		<meta property="twitter:card" content="summary_large_image" />
+		<meta property="twitter:url" content="https://yt-studio.vercel.app/" />
+		<meta property="twitter:title" content="YT Studio - Islamic History & Prophecy Archive" />
+		<meta property="twitter:description" content="Explore an curated cinematic archive of Islamic history, scripture, prophecy, and deep discussions." />
+		<meta property="twitter:image" content="https://yt-studio.vercel.app/assets/og-image.jpg" />
 
 		<!-- Preconnects for performance -->
 		<link rel="preconnect" href="https://i.ytimg.com" />
 		<link rel="preconnect" href="https://www.youtube.com" />
 		<link rel="preconnect" href="https://yt-studio.ruhdevopsytstudio.workers.dev" />
-		<link rel="dns-prefetch" href="https://yt-studio.ruhdevopsytstudio.workers.dev" />
-		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		
+		<!-- Fonts -->
+		<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400..900&family=Manrope:wght@200..800&display=swap" rel="stylesheet" />
+		
+		<!-- Icons -->
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
+		
+		<!-- Styles -->
+		<link rel="stylesheet" href="css/style.css" />
+	</head>
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 		<link
 			href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Manrope:wght@400;500;600;700;800&display=swap"
@@ -399,6 +417,35 @@
 							allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
 							allowfullscreen
 						></iframe>
+					</div>
+					<div class="custom-player-controls">
+						<div class="control-group">
+							<button id="pipBtn" class="control-btn" title="Picture in Picture">
+								<i class="fa-solid fa-window-restore"></i>
+							</button>
+							<div class="dropdown-wrapper">
+								<button id="speedBtn" class="control-btn" title="Playback Speed">
+									<span id="currentSpeed">1x</span>
+								</button>
+								<div id="speedOptions" class="dropdown-menu">
+									<button data-speed="0.5">0.5x</button>
+									<button data-speed="1" class="active">1x</button>
+									<button data-speed="1.5">1.5x</button>
+									<button data-speed="2">2x</button>
+								</div>
+							</div>
+							<div class="dropdown-wrapper">
+								<button id="qualityBtn" class="control-btn" title="Quality Select">
+									<i class="fa-solid fa-gear"></i>
+								</button>
+								<div id="qualityOptions" class="dropdown-menu">
+									<button data-quality="auto" class="active">Auto</button>
+									<button data-quality="hd1080">1080p</button>
+									<button data-quality="hd720">720p</button>
+									<button data-quality="large">480p</button>
+								</div>
+							</div>
+						</div>
 					</div>
 					<div class="video-sidebar">
 						<button id="toggleTranscript" class="sidebar-btn" type="button" aria-label="Toggle transcript panel" title="View episode notes">
