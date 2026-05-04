@@ -142,9 +142,12 @@ function updateMetrics() {
 }
 
 function updateFocusMetrics() {
-	const focusTextArea = document.getElementById("focusTextArea");
-	const words = (window.activeFocusTextArea || document.getElementById("focusTextArea")).value.trim().split(/\s+/).filter(w => w.length > 0).length;
-	document.getElementById('focusMetrics').textContent = `${words} words`;
+	const ta = document.getElementById("focusTextArea");
+	if (ta) {
+		const words = ta.value.trim().split(/\s+/).filter(w => w.length > 0).length;
+		const el = document.getElementById("focusMetrics");
+		if (el) el.textContent = `${words} words`;
+	}
 }
 
 function insertAtCursor(text) {

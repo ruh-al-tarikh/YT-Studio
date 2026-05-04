@@ -19,10 +19,14 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: '20'
-        # cache: 'npm'  # REMOVED - causes lock file error
+
+    - name: Install pnpm
+      uses: pnpm/action-setup@v4
+      with:
+        version: 10
     
     - name: Install dependencies
-      run: npm install --no-audit --fund=false
+      run: pnpm install
     
     - name: Login to GitHub Container Registry
       uses: docker/login-action@v3
