@@ -1,3 +1,4 @@
+body { transition: background 0.3s ease, color 0.3s ease; }
 :root {
   /* OKLCH Color Tokens - Dark Mode */
   --bg-canvas: oklch(0.14 0.02 250);
@@ -250,8 +251,10 @@ button:active {
   display: flex;
   gap: 10px;
   overflow-x: auto;
-  padding-bottom: 4px;
+  padding: 4px 0 12px;
   scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  mask-image: linear-gradient(to right, black 85%, transparent 100%);
 }
 
 .chip {
@@ -1254,4 +1257,88 @@ button:active {
 .scroll-top-btn:hover {
   background: var(--accent-strong);
   transform: translateY(-5px);
+}
+
+.chip-clear {
+  background: transparent;
+  border: 1px dashed var(--line-soft);
+  color: var(--text-soft);
+  gap: 8px;
+}
+
+.chip-clear:hover {
+  background: oklch(0.63 0.17 41 / 0.1);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.progress-bar-container {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.2);
+  z-index: 5;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: var(--accent);
+  transition: width 0.3s ease;
+}
+
+.search-container {
+  position: relative;
+}
+
+.search-suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--bg-canvas);
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius-md);
+  margin-top: 8px;
+  z-index: 100;
+  box-shadow: var(--shadow-lg);
+  display: none;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.suggestion-item {
+  padding: 12px 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: background 0.2s ease;
+}
+
+.suggestion-item:hover {
+  background: var(--bg-soft);
+}
+
+.suggestion-item i {
+  color: var(--text-soft);
+  font-size: 0.9rem;
+}
+
+mark {
+  background: rgba(240, 180, 77, 0.3);
+  color: inherit;
+  border-radius: 2px;
+  padding: 0 2px;
+}
+
+/* Immersive Player Dimming */
+body.modal-open #app-root {
+  filter: brightness(0.3) blur(4px);
+  transition: filter 0.4s ease;
+}
+
+.modal {
+  background: oklch(0 0 0 / 0.85); /* Slightly darker */
 }
