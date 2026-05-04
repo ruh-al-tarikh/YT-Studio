@@ -44,3 +44,4 @@ logs/
 *.sqlite*
 .vercel
 .env*.local
+deployment-url.txt
