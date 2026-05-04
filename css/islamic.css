@@ -1,0 +1,148 @@
+/* Islamic Reference CSS */
+.islamic-container {
+	display: grid;
+	grid-template-columns: 1fr 300px;
+	gap: 32px;
+	max-width: 1200px;
+}
+
+.islamic-search {
+	display: flex;
+	align-items: center;
+	background: var(--bg-elevated);
+	border: 1px solid var(--line-soft);
+	border-radius: var(--radius-md);
+	padding: 16px 20px;
+	margin: 24px 0;
+}
+
+.islamic-search i {
+	color: var(--text-soft);
+	margin-right: 12px;
+	font-size: 1.2rem;
+}
+
+.islamic-search input {
+	flex: 1;
+	font-size: 1.1rem;
+}
+
+.islamic-filters {
+	display: flex;
+	gap: 12px;
+	margin-bottom: 24px;
+}
+
+.reference-list {
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+}
+
+.reference-item {
+	background: var(--bg-elevated);
+	border: 1px solid var(--line-soft);
+	border-radius: var(--radius-md);
+	padding: 24px;
+}
+
+.ref-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 16px;
+}
+
+.ref-source {
+	font-family: var(--font-display);
+	font-size: 1.1rem;
+	font-weight: 700;
+}
+
+.ref-badge {
+	font-size: 0.75rem;
+	text-transform: uppercase;
+	font-weight: 700;
+	padding: 4px 8px;
+	border-radius: 4px;
+}
+.ref-badge.quran { background: oklch(0.5 0.15 150 / 0.2); color: oklch(0.8 0.1 150); }
+.ref-badge.hadith { background: oklch(0.5 0.15 200 / 0.2); color: oklch(0.8 0.1 200); }
+.ref-badge.history { background: oklch(0.5 0.15 50 / 0.2); color: oklch(0.8 0.1 50); }
+
+.ref-arabic {
+	font-size: 1.5rem;
+	text-align: right;
+	direction: rtl;
+	margin-bottom: 12px;
+	color: var(--text-main);
+	line-height: 1.8;
+}
+
+.ref-translation {
+	font-size: 1.05rem;
+	color: var(--text-muted);
+	line-height: 1.6;
+	margin-bottom: 16px;
+}
+
+.ref-footer {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	border-top: 1px solid var(--line-soft);
+	padding-top: 16px;
+}
+
+.ref-tags {
+	display: flex;
+	gap: 8px;
+}
+
+.ref-tag {
+	font-size: 0.85rem;
+	color: var(--text-soft);
+}
+
+.islamic-card {
+	background: var(--bg-elevated);
+	border: 1px solid var(--line-soft);
+	border-radius: var(--radius-md);
+	padding: 24px;
+}
+
+.collection-list {
+	list-style: none;
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	margin-top: 16px;
+}
+
+.collection-list li {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	padding: 12px;
+	background: var(--bg-soft);
+	border-radius: var(--radius-sm);
+	cursor: pointer;
+	transition: background 0.2s;
+}
+
+.collection-list li:hover {
+	background: oklch(from var(--accent) l c h / 0.1);
+}
+
+.collection-list span {
+	margin-left: auto;
+	color: var(--text-soft);
+	font-size: 0.85rem;
+}
+
+@media (max-width: 900px) {
+	.islamic-container {
+		grid-template-columns: 1fr;
+	}
+}
