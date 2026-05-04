@@ -13,10 +13,9 @@
     "whoami": "wrangler whoami"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20250504.0",
+    "@cloudflare/workers-types": "4.20260503.1",
     "typescript": "^5.4.5",
     "wrangler": "^4.87.0"
   },
-  "dependencies": {},
   "private": true
 }
