@@ -59,7 +59,6 @@
     errorMsg:          $('error-msg'),
     retryBtn:          $('retryBtn'),
     toast:             $('toast'),
-    bg:                $('bg'),
     themeToggle:       $('darkModeToggle'),
     watchLaterBadge:   $('watchLaterBadge'),
     watchLaterCount:   $('watchLaterCount'),
@@ -138,6 +137,12 @@
       } catch (e) {
         return '';
       }
+    },
+
+    highlight: (text, query) => {
+      if (!query) return text;
+      const re = new RegExp(`(${query})`, 'gi');
+      return text.replace(re, '<mark>$1</mark>');
     },
 
     saveLS: (k, v) => {
@@ -240,12 +245,6 @@
     const percent = (time / duration) * 100;
     state.progress[videoId] = { time, duration, percent, updated: Date.now() };
     utils.saveLS(CONFIG.PROGRESS_KEY, state.progress);
-
-    highlight: (text, query) => {
-      if (!query) return text;
-      const re = new RegExp(`(${query})`, 'gi');
-      return text.replace(re, '<mark>$1</mark>');
-    },
 
     updateStats();
   }
@@ -374,6 +373,18 @@ function openModal(video) {
     render();
     if (el.transcriptPanel) el.transcriptPanel.setAttribute('aria-hidden', 'true');
     if (el.sharePanel) el.sharePanel.setAttribute('aria-hidden', 'true');
+  }
+
+  function navigateEpisode(direction) {
+    if (!state.current || !state.filtered.length) return;
+    const currentIndex = state.filtered.findIndex((v) => v.id === state.current.id);
+    if (currentIndex === -1) return;
+
+    let nextIndex = currentIndex + direction;
+    if (nextIndex < 0) nextIndex = state.filtered.length - 1;
+    if (nextIndex >= state.filtered.length) nextIndex = 0;
+
+    openModal(state.filtered[nextIndex]);
   }
 
   /* ----------------------------
@@ -1001,6 +1012,17 @@ const filterChips = document.querySelector('.filter-chips');
       if (key === 't') {
         toggleTheme();
         return;
+      }
+
+      if (state.current) {
+        if (key === 'j') {
+          navigateEpisode(-1);
+          return;
+        }
+        if (key === 'k') {
+          navigateEpisode(1);
+          return;
+        }
       }
     });
 
