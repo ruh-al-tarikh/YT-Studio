@@ -92,26 +92,26 @@ export function initIslamic() {
 			return;
 		}
 
-		listEl.innerHTML = filtered.map(r => \`
+		listEl.innerHTML = filtered.map(r => `
 			<div class="reference-item">
 				<div class="ref-header">
-					<span class="ref-source">\${r.source}</span>
-					<span class="ref-badge \${r.type}">\${r.type}</span>
+					<span class="ref-source">${r.source}</span>
+					<span class="ref-badge ${r.type}">${r.type}</span>
 				</div>
-				\${r.arabic ? \`<p class="ref-arabic">\${r.arabic}</p>\` : ''}
-				<p class="ref-translation">\${r.translation}</p>
+				${r.arabic ? `<p class="ref-arabic">${r.arabic}</p>` : ''}
+				<p class="ref-translation">${r.translation}</p>
 				<div class="ref-footer">
-					<div class="ref-tags">\${r.tags.map(t => \`<span class="ref-tag">#\${t}</span>\`).join('')}</div>
-					<button class="secondary-button small copy-ref-btn" data-id="\${r.id}"><i class="fa-regular fa-copy"></i> Copy</button>
+					<div class="ref-tags">${r.tags.map(t => `<span class="ref-tag">#${t}</span>`).join('')}</div>
+					<button class="secondary-button small copy-ref-btn" data-id="${r.id}"><i class="fa-regular fa-copy"></i> Copy</button>
 				</div>
 			</div>
-		\`).join('');
+		`).join('');
 
 		listEl.querySelectorAll('.copy-ref-btn').forEach(btn => {
 			btn.addEventListener('click', (e) => {
 				const id = parseInt(e.currentTarget.dataset.id);
 				const ref = mockReferences.find(r => r.id === id);
-				const text = \`\${ref.source}\\n\${ref.arabic ? ref.arabic + '\\n' : ''}\${ref.translation}\`;
+				const text = `${ref.source}\n${ref.arabic ? ref.arabic + '\n' : ''}${ref.translation}`;
 				navigator.clipboard.writeText(text);
 				alert('Reference copied!');
 			});

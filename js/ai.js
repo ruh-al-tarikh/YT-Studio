@@ -90,12 +90,12 @@ export function initAI() {
 				];
 			}
 
-			variationsList.innerHTML = mockResults.map((res, i) => \`
+			variationsList.innerHTML = mockResults.map((res, i) => `
 				<div class="ai-variation-card">
-					<p>\${res}</p>
-					<button class="secondary-button small insert-ai-btn" data-text="\${encodeURIComponent(res)}">Insert</button>
+					<p>${res}</p>
+					<button class="secondary-button small insert-ai-btn" data-text="${encodeURIComponent(res)}">Insert</button>
 				</div>
-			\`).join('');
+			`).join('');
 
 			document.querySelectorAll('.insert-ai-btn').forEach(btn => {
 				btn.addEventListener('click', (e) => {

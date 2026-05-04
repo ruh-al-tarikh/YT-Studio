@@ -12,7 +12,7 @@ export function initAutomation() {
 
 function showExportOptions() {
 	// Simple mock modal for export options
-	const html = \`
+	const html = `
 		<div id="exportModal" class="ai-modal show" aria-hidden="false">
 			<div class="ai-modal-content" style="max-width: 400px;">
 				<div class="ai-modal-header">
@@ -26,7 +26,7 @@ function showExportOptions() {
 				</div>
 			</div>
 		</div>
-	\`;
+	`;
 	document.body.insertAdjacentHTML('beforeend', html);
 }
 
@@ -37,7 +37,7 @@ window.exportToTXT = function() {
 	textareas.forEach(ta => {
 		const section = ta.previousElementSibling ? ta.previousElementSibling.textContent : '';
 		if (ta.value.trim()) {
-			content += \`--- \${section} ---\\n\`;
+			content += `--- ${section} ---\n`;
 			content += ta.value.trim() + "\\n\\n";
 		}
 	});

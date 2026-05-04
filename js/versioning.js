@@ -73,7 +73,7 @@ function saveVersion(manual = false) {
 function showHistoryModal() {
 	const versions = JSON.parse(localStorage.getItem(VERSION_KEY) || '[]');
 	
-	let html = \`
+	let html = `
 		<div id="historyModal" class="ai-modal show" aria-hidden="false">
 			<div class="ai-modal-content">
 				<div class="ai-modal-header">
@@ -81,32 +81,32 @@ function showHistoryModal() {
 					<button onclick="document.getElementById('historyModal').remove()" class="icon-button"><i class="fa-solid fa-xmark"></i></button>
 				</div>
 				<div class="ai-modal-body">
-	\`;
+	`;
 
 	if (versions.length === 0) {
-		html += \`<p class="text-soft text-center">No history yet. Start typing to auto-save.</p>\`;
+		html += `<p class="text-soft text-center">No history yet. Start typing to auto-save.</p>`;
 	} else {
 		html += '<div class="history-list" style="display:flex; flex-direction:column; gap:12px;">';
 		versions.forEach((v, idx) => {
 			const date = new Date(v.time).toLocaleString();
-			html += \`
+			html += `
 				<div class="history-item" style="display:flex; justify-content:space-between; align-items:center; padding:12px; border:1px solid var(--line-soft); border-radius:8px;">
 					<div>
-						<strong>\${v.manual ? 'Manual Save' : 'Auto Save'}</strong>
-						<div class="text-sm text-soft">\${date}</div>
+						<strong>${v.manual ? 'Manual Save' : 'Auto Save'}</strong>
+						<div class="text-sm text-soft">${date}</div>
 					</div>
-					<button class="secondary-button small" onclick="restoreVersion(\${idx})">Restore</button>
+					<button class="secondary-button small" onclick="restoreVersion(${idx})">Restore</button>
 				</div>
-			\`;
+			`;
 		});
 		html += '</div>';
 	}
 
-	html += \`
+	html += `
 				</div>
 			</div>
 		</div>
-	\`;
+	`;
 	document.body.insertAdjacentHTML('beforeend', html);
 }
 
