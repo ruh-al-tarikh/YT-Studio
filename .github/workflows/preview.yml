@@ -16,10 +16,6 @@ on:
   pull_request:
     types: [opened, synchronize]
 
-permissions:
-  id-token: write
-  contents: read
-
 jobs:
   preview:
     runs-on: ubuntu-latest
@@ -59,12 +55,6 @@ jobs:
           }
           EOF
 
-      - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v2
-        with:
-          workload_identity_provider: "projects/180228139192/locations/global/workloadIdentityPools/github-actions-pool/providers/github-provider"
-          service_account: "github-actions-deploy@ytstudio-pr.iam.gserviceaccount.com"
-
       - name: Install Firebase CLI
         run: npm install -g firebase-tools
 
@@ -78,6 +68,8 @@ jobs:
           
           echo "📦 Deploying to channel: $CHANNEL_NAME"
           firebase hosting:channel:deploy "$CHANNEL_NAME" --expires 7d --project ytstudio-pr
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
 
       - name: Output Preview URL
         run: |
