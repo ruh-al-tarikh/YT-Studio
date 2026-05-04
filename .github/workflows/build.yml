@@ -23,10 +23,6 @@ jobs:
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-        with:
-          driver: cloud
-          endpoint: "synapsexlocal/ytweb"
-          version: latest
 
       - name: Build and push
         uses: docker/build-push-action@v6
@@ -36,5 +32,4 @@ jobs:
           tags: ${{ vars.DOCKER_USER }}/docker-build-cloud-demo:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          # For pull requests, export results to the build cache only
           outputs: ${{ github.event_name == 'pull_request' && 'type=cacheonly' || 'type=registry' }}
