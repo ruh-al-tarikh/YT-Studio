@@ -1,6 +1,12 @@
 name: Deploy Preview
 
 on:
+  workflow_dispatch:  # Add this line for manual trigger
+    inputs:
+      branch:
+        description: 'Branch to deploy'
+        required: true
+        default: 'main'
   pull_request:
     types: [opened, synchronize]
 
@@ -9,6 +15,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branch || github.ref }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -23,7 +31,8 @@ jobs:
 
       - name: Deploy to Firebase Preview Channel
         run: |
-          firebase hosting:channel:deploy pr-${{ github.event.number }} \
+          CHANNEL_NAME="manual-$(date +'%Y%m%d-%H%M%S')"
+          firebase hosting:channel:deploy $CHANNEL_NAME \
             --expires 7d \
             --project ytstudio-pr
         env:
