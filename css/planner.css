@@ -1,0 +1,140 @@
+/* Planner CSS */
+.planner-layout {
+	display: grid;
+	grid-template-columns: 1fr 300px;
+	gap: 32px;
+	margin-top: 24px;
+}
+
+.kanban-board {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	gap: 16px;
+	height: 100%;
+}
+
+.kanban-column {
+	background: var(--bg-soft);
+	border: 1px solid var(--line-soft);
+	border-radius: var(--radius-md);
+	padding: 16px;
+	display: flex;
+	flex-direction: column;
+}
+
+.kanban-title {
+	font-family: var(--font-display);
+	font-size: 1.1rem;
+	margin-bottom: 16px;
+	padding-bottom: 12px;
+	border-bottom: 1px solid var(--line-soft);
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.kanban-cards {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	min-height: 200px;
+}
+
+.kanban-cards.drag-over {
+	background: oklch(1 0 0 / 0.05);
+	border-radius: var(--radius-sm);
+}
+
+.kanban-card {
+	background: var(--bg-elevated);
+	border: 1px solid var(--line-soft);
+	border-radius: var(--radius-sm);
+	padding: 16px;
+	cursor: grab;
+	box-shadow: var(--shadow-md);
+	font-weight: 600;
+	transition: transform 0.2s;
+}
+
+.kanban-card:active {
+	cursor: grabbing;
+}
+
+.kanban-card:hover {
+	border-color: var(--accent);
+}
+
+.status-dot {
+	width: 10px;
+	height: 10px;
+	border-radius: 50%;
+	display: inline-block;
+}
+.status-dot.active { background: oklch(0.6 0.15 140); }
+.status-dot.warning { background: oklch(0.6 0.15 40); }
+
+.planner-card {
+	background: var(--bg-elevated);
+	border: 1px solid var(--line-soft);
+	border-radius: var(--radius-md);
+	padding: 24px;
+}
+
+.planner-card h3 {
+	font-family: var(--font-display);
+	margin-bottom: 16px;
+}
+
+.goal-item {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	margin-bottom: 12px;
+}
+
+.goal-item input[type="checkbox"] {
+	width: 18px;
+	height: 18px;
+	accent-color: var(--accent);
+	cursor: pointer;
+}
+
+.goal-item label {
+	font-size: 0.95rem;
+	cursor: pointer;
+}
+
+.reminder-list {
+	list-style: none;
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.reminder-list li {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	font-size: 0.95rem;
+}
+
+.reminder-list span {
+	margin-left: auto;
+	color: var(--text-soft);
+	font-size: 0.8rem;
+}
+
+@media (max-width: 1100px) {
+	.planner-layout {
+		grid-template-columns: 1fr;
+	}
+	.kanban-board {
+		overflow-x: auto;
+		padding-bottom: 20px;
+	}
+	.kanban-column {
+		min-width: 260px;
+	}
+}
