@@ -1,7 +1,7 @@
 name: Deploy Preview
 
 on:
-  workflow_dispatch:  # Manual trigger
+  workflow_dispatch:
     inputs:
       branch:
         description: 'Branch to deploy'
@@ -23,7 +23,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.inputs.branch || github.ref }}
+          ref: ${{ github.event.inputs.branch || github.event.pull_request.head.ref || 'main' }}
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -49,6 +50,7 @@ jobs:
             CHANNEL_NAME="pr-${{ github.event.number }}"
           fi
           
+          echo "📦 Deploying to channel: $CHANNEL_NAME"
           firebase hosting:channel:deploy "$CHANNEL_NAME" \
             --expires 7d \
             --project ytstudio-pr
@@ -57,5 +59,10 @@ jobs:
 
       - name: Output Preview URL
         run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            CHANNEL_NAME="${{ github.event.inputs.channel }}"
+          else
+            CHANNEL_NAME="pr-${{ github.event.number }}"
+          fi
           echo "✅ Preview deployed successfully!"
           echo "🔗 Preview URL: https://ytstudio-pr--$CHANNEL_NAME.web.app"
