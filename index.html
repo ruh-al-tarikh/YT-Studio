@@ -107,11 +107,16 @@
 						<i class="fa-solid fa-chart-simple" aria-hidden="true"></i>
 						<span>Dashboard</span>
 					</button>
-					<button id="studioToggleBtn" class="pill-button accent" type="button" aria-label="Toggle Creator Studio">
-						<i class="fa-solid fa-video" aria-hidden="true"></i>
-						<span>Studio</span>
-					</button>
+					<div class="mode-switcher" id="modeSwitcher">
+						<button class="mode-btn active" data-mode="viewer">
+							<i class="fa-solid fa-eye"></i> <span>Viewer</span>
+						</button>
+						<button class="mode-btn" data-mode="creator">
+							<i class="fa-solid fa-wand-magic-sparkles"></i> <span>Creator</span>
+						</button>
+					</div>
 					<a
+						href="https://www.youtube.com/@Ruh-Al-Tarikh"
 						href="https://www.youtube.com/@Ruh-Al-Tarikh"
 						target="_blank"
 						rel="noopener noreferrer"
@@ -326,6 +331,7 @@
 				</aside>
 
 				<div class="studio-main">
+					<nav class="studio-breadcrumbs" id="studioBreadcrumbs">Studio > Projects</nav>
 					<!-- Project View (Active when inside a project) -->
 					<div id="active-project-view" style="display: none;">
 						<header class="project-header">
@@ -333,16 +339,28 @@
 								<button id="backToProjectsBtn" class="icon-button"><i class="fa-solid fa-arrow-left"></i></button>
 								<h2 id="current-project-title">Untitled Video</h2>
 							</div>
-							<div class="project-progress">
-								<span class="progress-step active">Researching</span>
-								<i class="fa-solid fa-chevron-right"></i>
-								<span class="progress-step">Writing</span>
-								<i class="fa-solid fa-chevron-right"></i>
-								<span class="progress-step">Recording</span>
-								<i class="fa-solid fa-chevron-right"></i>
-								<span class="progress-step">Editing</span>
-								<i class="fa-solid fa-chevron-right"></i>
-								<span class="progress-step">Published</span>
+							<div class="project-progress-stepper">
+								<div class="stepper-track"></div>
+								<div class="progress-step active" data-step="1">
+									<div class="step-node"></div>
+									<span class="step-label">Researching</span>
+								</div>
+								<div class="progress-step" data-step="2">
+									<div class="step-node"></div>
+									<span class="step-label">Writing</span>
+								</div>
+								<div class="progress-step" data-step="3">
+									<div class="step-node"></div>
+									<span class="step-label">Recording</span>
+								</div>
+								<div class="progress-step" data-step="4">
+									<div class="step-node"></div>
+									<span class="step-label">Editing</span>
+								</div>
+								<div class="progress-step" data-step="5">
+									<div class="step-node"></div>
+									<span class="step-label">Published</span>
+								</div>
 							</div>
 							<div class="project-actions">
 								<button id="exportProjectBtn" class="secondary-button"><i class="fa-solid fa-file-export"></i> Export</button>
@@ -373,6 +391,7 @@
 							<h2 class="section-title">Your Projects</h2>
 							<p class="section-copy">Manage your upcoming and past videos.</p>
 						</div>
+						<div class="view-controls"><button id="listViewBtn" class="pill-button small active"><i class="fa-solid fa-list"></i> List</button><button id="kanbanViewBtn" class="pill-button small"><i class="fa-solid fa-table-columns"></i> Kanban</button></div>
 						<div class="studio-projects-grid" id="studioProjectsList">
 							<!-- Populated by JS -->
 						</div>
