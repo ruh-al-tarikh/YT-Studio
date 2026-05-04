@@ -32,6 +32,6 @@ jobs:
         env:
           OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          MODEL: ${{ vars.OPENCODE_MODEL || 'opencode/gpt-4o-mini' }}
         with:
           prompt: ${{ github.event_name == 'workflow_dispatch' && inputs.prompt || '' }}
+          model: opencode/gpt-4o-mini
