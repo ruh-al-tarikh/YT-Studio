@@ -57,4 +57,4 @@ jobs:
           base: main
           labels: automated, optimization
           delete-branch: true
-          force-push: false
+
