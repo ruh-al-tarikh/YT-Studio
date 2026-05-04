@@ -1,0 +1,97 @@
+/* Dashboard CSS */
+.studio-dashboard-container {
+	max-width: 1200px;
+}
+
+.insights-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+	gap: 24px;
+	margin-top: 32px;
+}
+
+.insight-card {
+	background: var(--bg-elevated);
+	border: 1px solid var(--line-soft);
+	border-radius: var(--radius-lg);
+	padding: 32px;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+}
+
+.insight-card h3 {
+	font-family: var(--font-display);
+	font-size: 1.25rem;
+	margin-bottom: 16px;
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
+
+.insight-card.highlight {
+	background: oklch(from var(--accent) l c h / 0.1);
+	border-color: var(--accent);
+}
+.insight-card.highlight h3 {
+	color: var(--accent);
+}
+
+.insight-card.warning {
+	background: oklch(0.6 0.15 40 / 0.1);
+	border-color: oklch(0.6 0.15 40 / 0.3);
+}
+.insight-card.warning h3 {
+	color: oklch(0.7 0.15 40);
+}
+
+.insight-text {
+	font-size: 1.05rem;
+	line-height: 1.6;
+	color: var(--text-main);
+	flex: 1;
+}
+
+.metric-big {
+	font-size: 2rem;
+	font-family: var(--font-display);
+	font-weight: 700;
+	color: var(--text-main);
+	margin-bottom: 8px;
+}
+
+.insight-sub {
+	color: var(--text-soft);
+	font-size: 0.95rem;
+}
+
+.simple-bar-chart {
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.bar-wrapper {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
+
+.bar-wrapper span {
+	font-size: 0.85rem;
+	color: var(--text-muted);
+	width: 60px;
+}
+
+.bar-fill {
+	height: 12px;
+	background: var(--accent);
+	border-radius: 6px;
+}
+
+@media (max-width: 900px) {
+	.insights-grid {
+		grid-template-columns: 1fr;
+	}
+}
