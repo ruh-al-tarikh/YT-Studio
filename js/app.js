@@ -80,6 +80,21 @@
 			continueRow: r('continue-row'),
 			emptyHistory: r('empty-history'),
 			clearFilters: r('clearFilters'),
+			studioToggleBtn: r('studioToggleBtn'),
+			appRoot: r('app-root'),
+			studioRoot: r('studio-root'),
+			heroSection: r('hero'),
+			continueBlockSec: r('continue-block'),
+			trendingBlockSec: r('trending-block'),
+			recommendedBlockSec: r('recommended-block'),
+			studioNavBtns: document.querySelectorAll('.studio-nav-btn'),
+			studioViews: document.querySelectorAll('.studio-view'),
+			projectTabBtns: document.querySelectorAll('.project-tab-btn'),
+			ptabContents: document.querySelectorAll('.ptab-content'),
+			newProjectBtn: r('newProjectBtn'),
+			backToProjectsBtn: r('backToProjectsBtn'),
+			activeProjectView: r('active-project-view'),
+			studioViewProjects: r('studio-view-projects'),
 		},
 		n = {
 			videos: [],
@@ -677,6 +692,68 @@
 			t.addEventListener('click', (e) => {
 				e.target === t && (t.setAttribute('aria-hidden', 'true'), (s.body.style.overflow = ''), s.body.classList.remove('modal-open'));
 			});
+
+		// Studio Logic
+		s.studioToggleBtn && s.studioToggleBtn.addEventListener('click', () => {
+			const isStudioOpen = s.studioRoot.style.display === 'block';
+			if (isStudioOpen) {
+				s.studioRoot.style.display = 'none';
+				s.appRoot.style.display = 'block';
+				if(s.heroSection) s.heroSection.style.display = 'block';
+				if(s.continueBlockSec && n.videos.some(v => d(v.id))) s.continueBlockSec.style.display = 'block';
+				s.studioToggleBtn.classList.remove('active');
+				s.studioToggleBtn.querySelector('span').textContent = 'Studio';
+			} else {
+				s.studioRoot.style.display = 'block';
+				s.appRoot.style.display = 'none';
+				if(s.heroSection) s.heroSection.style.display = 'none';
+				if(s.continueBlockSec) s.continueBlockSec.style.display = 'none';
+				s.studioToggleBtn.classList.add('active');
+				s.studioToggleBtn.querySelector('span').textContent = 'Exit Studio';
+			}
+		});
+
+		s.studioNavBtns && s.studioNavBtns.forEach(btn => {
+			btn.addEventListener('click', () => {
+				s.studioNavBtns.forEach(b => b.classList.remove('active'));
+				btn.classList.add('active');
+				const tab = btn.dataset.tab;
+				s.studioViews.forEach(v => v.style.display = 'none');
+				s.activeProjectView.style.display = 'none';
+				const view = r('studio-view-' + tab);
+				if(view) {
+					view.style.display = 'block';
+					view.classList.add('active');
+				}
+			});
+		});
+
+		s.newProjectBtn && s.newProjectBtn.addEventListener('click', () => {
+			s.studioViews.forEach(v => v.style.display = 'none');
+			s.activeProjectView.style.display = 'block';
+			r('current-project-title').textContent = 'New Untitled Video';
+			s.projectTabBtns[0].click(); // open research tab
+		});
+
+		s.backToProjectsBtn && s.backToProjectsBtn.addEventListener('click', () => {
+			s.activeProjectView.style.display = 'none';
+			r('studio-view-projects').style.display = 'block';
+			s.studioNavBtns.forEach(b => {
+				b.classList.remove('active');
+				if(b.dataset.tab === 'projects') b.classList.add('active');
+			});
+		});
+
+		s.projectTabBtns && s.projectTabBtns.forEach(btn => {
+			btn.addEventListener('click', () => {
+				s.projectTabBtns.forEach(b => b.classList.remove('active'));
+				btn.classList.add('active');
+				const ptab = btn.dataset.ptab;
+				s.ptabContents.forEach(v => v.classList.remove('active'));
+				const view = r('ptab-' + ptab);
+				if(view) view.classList.add('active');
+			});
+		});
 	}
 	async function A() {
 		try {
