@@ -45,3 +45,10 @@ logs/
 .vercel
 .env*.local
 deployment-url.txt
+
+# Firebase
+.firebase/
+*.log
+firebase-debug.log*
+firebase.json
+.firebaserc
