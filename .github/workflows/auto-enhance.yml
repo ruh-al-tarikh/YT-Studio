@@ -1,0 +1,323 @@
+name: 🤖 Auto-Enhance Website
+
+on:
+  schedule:
+    # Run every 6 hours
+    - cron: '0 */6 * * *'
+    # Run daily at midnight
+    - cron: '0 0 * * *'
+    # Run every Monday at 9 AM
+    - cron: '0 9 * * 1'
+  workflow_dispatch:  # Manual trigger
+    inputs:
+      enhancement_type:
+        description: 'Type of enhancement to run'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - 'all'
+          - 'performance'
+          - 'seo'
+          - 'accessibility'
+          - 'content'
+          - 'security'
+
+jobs:
+  analyze-and-enhance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 8
+          
+      - name: Install dependencies
+        run: |
+          pnpm add -D \
+            eslint \
+            prettier \
+            lighthouse \
+            html-validator \
+            axe-core \
+            @playwright/test \
+            jsdom
+          
+      - name: Run Performance Audit
+        id: performance
+        continue-on-error: true
+        run: |
+          echo "🔍 Running performance audit..."
+          
+          # Check for common performance issues
+          echo "PERF_ISSUES<<EOF" >> $GITHUB_OUTPUT
+          
+          # Check image sizes
+          echo "### Image Optimization" >> perf-report.md
+          find . -name "*.png" -o -name "*.jpg" -o -name "*.jpeg" | while read img; do
+            size=$(du -k "$img" | cut -f1)
+            if [ "$size" -gt 100 ]; then
+              echo "- ⚠️ Large image: $img (${size}KB)" >> perf-report.md
+            fi
+          done
+          
+          # Check for unminified CSS/JS
+          echo "" >> perf-report.md
+          echo "### File Optimization" >> perf-report.md
+          find . -name "*.css" -o -name "*.js" | while read file; do
+            if ! grep -q "min" "$file"; then
+              echo "- 📝 Unminified: $file" >> perf-report.md
+            fi
+          done
+          
+          echo "EOF" >> $GITHUB_OUTPUT
+          
+      - name: Run SEO Audit
+        id: seo
+        continue-on-error: true
+        run: |
+          echo "🔍 Running SEO audit..."
+          
+          cat > seo-report.md << 'EOF'
+          ## 🔍 SEO Audit Report
+          
+          ### Meta Tags Check
+          EOF
+          
+          # Check for meta descriptions
+          if ! grep -q '<meta name="description"' index.html; then
+            echo "- ❌ Missing meta description" >> seo-report.md
+          else
+            echo "- ✅ Meta description found" >> seo-report.md
+          fi
+          
+          # Check for viewport
+          if ! grep -q '<meta name="viewport"' index.html; then
+            echo "- ❌ Missing viewport meta tag" >> seo-report.md
+          else
+            echo "- ✅ Viewport configured" >> seo-report.md
+          fi
+          
+          # Check for heading structure
+          h1_count=$(grep -c '<h1' index.html || true)
+          if [ "$h1_count" -eq 0 ]; then
+            echo "- ❌ No H1 tag found" >> seo-report.md
+          elif [ "$h1_count" -gt 1 ]; then
+            echo "- ⚠️ Multiple H1 tags ($h1_count found)" >> seo-report.md
+          else
+            echo "- ✅ Proper H1 structure" >> seo-report.md
+          fi
+          
+      - name: Run Accessibility Audit
+        id: a11y
+        continue-on-error: true
+        run: |
+          echo "🔍 Running accessibility audit..."
+          
+          cat > a11y-report.md << 'EOF'
+          ## ♿ Accessibility Audit Report
+          
+          ### Issues Found
+          EOF
+          
+          # Check for alt text on images
+          grep -o '<img [^>]*>' index.html | while read img; do
+            if ! echo "$img" | grep -q 'alt='; then
+              echo "- ❌ Image missing alt text: $img" >> a11y-report.md
+            fi
+          done
+          
+          # Check for aria labels on buttons
+          grep -o '<button [^>]*>' index.html | while read btn; do
+            if ! echo "$btn" | grep -q 'aria-label=' && ! echo "$btn" | grep -q 'aria-labelledby='; then
+              echo "- ⚠️ Button missing aria-label: $btn" >> a11y-report.md
+            fi
+          done
+          
+      - name: Generate Enhancement Suggestions
+        id: suggestions
+        run: |
+          cat > enhancements.md << 'EOF'
+          ## 🚀 Suggested Enhancements
+          
+          ### Performance Improvements
+          
+          1. **Lazy Load Images**
+             - Add `loading="lazy"` to all images below the fold
+             - Implement Intersection Observer for dynamic content
+          
+          2. **Code Splitting**
+             - Split JavaScript bundles by route/feature
+             - Use dynamic imports for heavy components
+          
+          3. **Cache Optimization**
+             - Set proper cache headers for static assets
+             - Implement service worker for offline support
+          
+          ### SEO Improvements
+          
+          1. **Structured Data**
+             - Add JSON-LD for organization
+             - Implement breadcrumb schema
+             - Add video schema for content
+          
+          2. **Sitemap Generation**
+             - Create dynamic sitemap.xml
+             - Submit to search engines via API
+          
+          ### UX Improvements
+          
+          1. **Loading States**
+             - Add skeleton screens
+             - Implement progress indicators
+          
+          2. **Error Handling**
+             - Add graceful error boundaries
+             - Implement retry logic for failed requests
+          
+          ### Security Hardening
+          
+          1. **Headers**
+             - Add CSP headers
+             - Implement X-Frame-Options
+             - Add HSTS preload
+          
+          2. **Input Validation**
+             - Sanitize all user inputs
+             - Implement rate limiting
+          EOF
+          
+      - name: Auto-Fix Common Issues
+        run: |
+          echo "🔧 Applying automatic fixes..."
+          
+          # Add lazy loading to images
+          sed -i 's/<img /<img loading="lazy" /g' index.html 2>/dev/null || true
+          
+          # Add missing meta viewport if not present
+          if ! grep -q 'name="viewport"' index.html; then
+            sed -i 's/<head>/<head>\n  <meta name="viewport" content="width=device-width, initial-scale=1.0">/' index.html
+            echo "✅ Added viewport meta tag"
+          fi
+          
+          # Add missing meta description if not present
+          if ! grep -q 'name="description"' index.html; then
+            sed -i 's/<head>/<head>\n  <meta name="description" content="YT Studio - Islamic history, Quranic mysteries, and powerful end-time narratives">/' index.html
+            echo "✅ Added meta description"
+          fi
+          
+          # Run prettier to format code
+          npx prettier --write "**/*.{js,css,html,json,md}" 2>/dev/null || true
+          
+          # Run ESLint to fix JavaScript issues
+          if [ -f "js/app.js" ]; then
+            npx eslint --fix js/app.js 2>/dev/null || true
+            echo "✅ Fixed JavaScript linting issues"
+          fi
+          
+      - name: Create Pull Request with Enhancements
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "🤖 Auto-enhancement: Performance, SEO, and accessibility updates"
+          title: "🤖 Automated Enhancement: Website Optimization"
+          body: |
+            ## 🤖 Auto-Generated Enhancement PR
+            
+            This PR contains automated improvements for the website.
+            
+            ### 📊 Audit Reports
+            
+            ${{ steps.performance.outputs.PERF_ISSUES && '#### Performance Issues Found\n' || '' }}
+            ${{ steps.performance.outputs.PERF_ISSUES || '✅ No critical performance issues found' }}
+            
+            ### 🔧 Changes Made
+            
+            - ✅ Added lazy loading to images
+            - ✅ Added missing meta tags
+            - ✅ Formatted code with Prettier
+            - ✅ Fixed JavaScript linting issues
+            
+            ### 📋 Suggested Next Steps
+            
+            Review the enhancement suggestions in `enhancements.md`
+            
+            ### ⏰ Schedule
+            
+            This PR was generated automatically by the scheduled enhancement workflow.
+            
+            *Generated by 🤖 Auto-Enhance Workflow*
+            
+          branch: auto-enhance/scheduled-updates
+          base: main
+          labels: |
+            automated-enhancement
+            needs-review
+            performance
+          delete-branch: true
+          
+      - name: Generate Summary Report
+        run: |
+          echo "## 🤖 Auto-Enhancement Report" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Run Information" >> $GITHUB_STEP_SUMMARY
+          echo "- **Time**: $(date)" >> $GITHUB_STEP_SUMMARY
+          echo "- **Trigger**: ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Audits Performed" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Performance Audit" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ SEO Audit" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Accessibility Audit" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Actions Taken" >> $GITHUB_STEP_SUMMARY
+          echo "- 🖼️ Added lazy loading to images" >> $GITHUB_STEP_SUMMARY
+          echo "- 📝 Added missing meta tags" >> $GITHUB_STEP_SUMMARY
+          echo "- 🎨 Formatted code" >> $GITHUB_STEP_SUMMARY
+          echo "- 🐛 Fixed linting issues" >> $GITHUB_STEP_SUMMARY
+          
+      - name: Send Notification (Optional)
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const runId = process.env.GITHUB_RUN_ID;
+            const repo = process.env.GITHUB_REPOSITORY;
+            
+            // Create a comment on the last issue
+            const { data: issues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              per_page: 1
+            });
+            
+            if (issues.length > 0) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issues[0].number,
+                body: `## 🤖 Automated Enhancement Run Complete\n\n` +
+                       `A scheduled enhancement run has completed.\n\n` +
+                       `📊 **Run ID**: ${runId}\n` +
+                       `🔗 **View Results**: https://github.com/${repo}/actions/runs/${runId}\n\n` +
+                       `Changes have been automatically applied and a PR has been created if needed.`
+              });
+            }

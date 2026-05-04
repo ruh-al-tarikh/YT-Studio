@@ -1,0 +1,49 @@
+name: 🖼️ Auto-Optimize Assets
+
+on:
+  schedule:
+    - cron: '0 2 * * 0'  # Weekly on Sunday at 2 AM
+  workflow_dispatch:
+
+jobs:
+  optimize:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Optimize Images
+        run: |
+          # Install image optimization tools
+          sudo apt-get update
+          sudo apt-get install -y optipng jpegoptim
+          
+          # Optimize PNG images
+          find . -name "*.png" -type f -exec optipng -o7 {} \;
+          
+          # Optimize JPEG images
+          find . -name "*.jpg" -o -name "*.jpeg" -type f -exec jpegoptim --strip-all {} \;
+          
+      - name: Minify CSS and JS
+        run: |
+          npm install -g uglify-js csso-cli
+          
+          # Minify JavaScript files
+          for file in $(find . -name "*.js" -not -path "./node_modules/*"); do
+            uglifyjs "$file" -o "$file" --compress --mangle
+          done
+          
+          # Minify CSS files
+          for file in $(find . -name "*.css" -not -path "./node_modules/*"); do
+            csso "$file" -o "$file"
+          done
+          
+      - name: Create PR with Optimized Assets
+        uses: peter-evans/create-pull-request@v6
+        with:
+          commit-message: "🖼️ Auto-optimize images and assets"
+          title: "🤖 Asset Optimization: Minified Assets"
+          branch: auto-optimize/assets
+          base: main
