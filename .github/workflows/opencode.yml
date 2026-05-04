@@ -33,5 +33,4 @@ jobs:
           OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          # Use a simpler model format or let OpenCode choose default
-          model: opencode/claude-3-haiku
+          prompt: ${{ github.event_name == 'workflow_dispatch' && inputs.prompt || '' }}
