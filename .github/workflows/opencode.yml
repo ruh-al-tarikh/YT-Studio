@@ -20,17 +20,19 @@ jobs:
       contents: write
       pull-requests: write
       issues: write
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      
+
       - name: Run OpenCode
         uses: anomalyco/opencode/github@latest
         env:
           OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
+          # Specify the model explicitly. Replace with any valid model name you have access to.
+          model: opencode/gpt-4o-mini
           prompt: ${{ github.event_name == 'workflow_dispatch' && inputs.prompt || '' }}
