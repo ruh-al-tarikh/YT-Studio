@@ -5,6 +5,37 @@ export interface Env {
   API_URL?: string;
 }
 
+function getMockVideos(headers: any, isDemo: boolean): Response {
+  const mockVideos = [
+    {
+      id: "Zzcdtm7Il9U",
+      title: "The hidden wall of Dhul-Qarnayn explained",
+      thumbnail: "https://i.ytimg.com/vi/Zzcdtm7Il9U/mqdefault.jpg",
+      publishedAt: "2024-01-15T10:00:00Z",
+      channel: "Ruh Al Tarikh",
+    },
+    {
+      id: "dQw4w9WgXcQ",
+      title: "Islamic History: The Umayyad Dynasty",
+      thumbnail: "https://i.ytimg.com/vi/dQw4w9WgXcQ/mqdefault.jpg",
+      publishedAt: "2024-01-10T14:30:00Z",
+      channel: "Ruh Al Tarikh",
+    },
+    {
+      id: "jNQXAC9IVRw",
+      title: "Quran Tafsir: Surah Al-Fatiha",
+      thumbnail: "https://i.ytimg.com/vi/jNQXAC9IVRw/mqdefault.jpg",
+      publishedAt: "2024-01-08T09:15:00Z",
+      channel: "Ruh Al Tarikh",
+    }
+  ];
+
+  return Response.json(
+    { success: true, isDemo, videos: mockVideos },
+    { headers }
+  );
+}
+
 export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
@@ -90,10 +121,10 @@ export default {
           }
         } catch (err) {
           console.error("YouTube Fetch Failed:", err);
-          response = this.getMockVideos(corsHeaders, true);
+          response = getMockVideos(corsHeaders, true);
         }
       } else {
-        response = this.getMockVideos(corsHeaders, true);
+        response = getMockVideos(corsHeaders, true);
       }
     }
 
@@ -240,37 +271,6 @@ export default {
     }
 
     return response;
-  },
-
-  getMockVideos(headers: any, isDemo: boolean): Response {
-    const mockVideos = [
-      {
-        id: "Zzcdtm7Il9U",
-        title: "The hidden wall of Dhul-Qarnayn explained",
-        thumbnail: "https://i.ytimg.com/vi/Zzcdtm7Il9U/mqdefault.jpg",
-        publishedAt: "2024-01-15T10:00:00Z",
-        channel: "Ruh Al Tarikh",
-      },
-      {
-        id: "dQw4w9WgXcQ",
-        title: "Islamic History: The Umayyad Dynasty",
-        thumbnail: "https://i.ytimg.com/vi/dQw4w9WgXcQ/mqdefault.jpg",
-        publishedAt: "2024-01-10T14:30:00Z",
-        channel: "Ruh Al Tarikh",
-      },
-      {
-        id: "jNQXAC9IVRw",
-        title: "Quran Tafsir: Surah Al-Fatiha",
-        thumbnail: "https://i.ytimg.com/vi/jNQXAC9IVRw/mqdefault.jpg",
-        publishedAt: "2024-01-08T09:15:00Z",
-        channel: "Ruh Al Tarikh",
-      }
-    ];
-
-    return Response.json(
-      { success: true, isDemo, videos: mockVideos },
-      { headers }
-    );
   },
 
   async scheduled(event: ScheduledEvent, env: Env, ctx: ExecutionContext): Promise<void> {
