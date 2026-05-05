@@ -7,7 +7,7 @@
     "nodejs_compat"
   ],
   "assets": {
-    "directory": "./dist"
+    "directory": "dist"
   },
   "d1_databases": [
     {
