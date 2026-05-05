@@ -7,9 +7,7 @@
     "nodejs_compat"
   ],
   "assets": {
-    "directory": "./dist",
-    "binding": "ASSETS",
-    "html_handling": "none"
+    "directory": "./dist"
   },
   "d1_databases": [
     {
