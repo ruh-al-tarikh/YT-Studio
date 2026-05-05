@@ -26,6 +26,55 @@ const MOCK_VIDEOS = [
     thumbnail: "https://i.ytimg.com/vi/jNQXAC9IVRw/mqdefault.jpg",
     publishedAt: "2024-01-08T09:15:00Z",
     channel: "Ruh Al Tarikh",
+  },
+  {
+    id: "B-K08v-qCmo",
+    title: "The Rise of the Abbasid Caliphate",
+    thumbnail: "https://i.ytimg.com/vi/B-K08v-qCmo/mqdefault.jpg",
+    publishedAt: "2024-01-05T12:00:00Z",
+    channel: "Ruh Al Tarikh",
+  },
+  {
+    id: "qMTCWHz7e8Q",
+    title: "Prophecies of the End Times: An In-depth Study",
+    thumbnail: "https://i.ytimg.com/vi/qMTCWHz7e8Q/mqdefault.jpg",
+    publishedAt: "2023-12-28T16:45:00Z",
+    channel: "Ruh Al Tarikh",
+  },
+  {
+    id: "vS6mH_V_r9I",
+    title: "Discussion: Science and Religion in Islam",
+    thumbnail: "https://i.ytimg.com/vi/vS6mH_V_r9I/mqdefault.jpg",
+    publishedAt: "2023-12-20T11:30:00Z",
+    channel: "Ruh Al Tarikh",
+  },
+  {
+    id: "7_6_m8D5_lA",
+    title: "The Golden Age of Islamic Science",
+    thumbnail: "https://i.ytimg.com/vi/7_6_m8D5_lA/mqdefault.jpg",
+    publishedAt: "2023-12-15T09:00:00Z",
+    channel: "Ruh Al Tarikh",
+  },
+  {
+    id: "X_8z-mG6R9I",
+    title: "Understanding the Five Pillars of Islam",
+    thumbnail: "https://i.ytimg.com/vi/X_8z-mG6R9I/mqdefault.jpg",
+    publishedAt: "2023-12-10T14:00:00Z",
+    channel: "Ruh Al Tarikh",
+  },
+  {
+    id: "Y_9z-mH7S1J",
+    title: "The Conquest of Constantinople",
+    thumbnail: "https://i.ytimg.com/vi/Y_9z-mH7S1J/mqdefault.jpg",
+    publishedAt: "2023-12-05T10:20:00Z",
+    channel: "Ruh Al Tarikh",
+  },
+  {
+    id: "Z_0a-nI8T2K",
+    title: "Signs of the Hour in Islamic Tradition",
+    thumbnail: "https://i.ytimg.com/vi/Z_0a-nI8T2K/mqdefault.jpg",
+    publishedAt: "2023-11-30T15:10:00Z",
+    channel: "Ruh Al Tarikh",
   }
 ];
 
@@ -61,20 +110,68 @@ export default {
                 channel: item.snippet.channelTitle,
                 description: item.snippet.description
               }));
-              return Response.json(
-                { success: true, isDemo: false, videos },
-                { headers: { ...corsHeaders, "Cache-Control": "public, max-age=900" } }
-              );
+              return new Response(JSON.stringify({ success: true, isDemo: false, videos }), {
+                headers: { ...corsHeaders, "Content-Type": "application/json", "Cache-Control": "public, max-age=600" }
+              });
             }
+          } else {
+            const errorData = (await ytRes.json()) as any;
+            return new Response(JSON.stringify({ success: false, error: errorData.error?.message || "YouTube API Error" }), {
+              status: ytRes.status,
+              headers: { ...corsHeaders, "Content-Type": "application/json" }
+            });
           }
         } catch (err) {
           console.error("YouTube Fetch Failed:", err);
         }
       }
-      return Response.json(
-        { success: true, isDemo: true, videos: MOCK_VIDEOS },
-        { headers: corsHeaders }
-      );
+      return new Response(JSON.stringify({ success: true, isDemo: true, videos: MOCK_VIDEOS }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" }
+      });
+    }
+
+    if (url.pathname === "/api/youtube/channel") {
+        const channelId = url.searchParams.get("id");
+        const apiKey = env.YOUTUBE_API_KEY;
+        if (channelId && apiKey) {
+            try {
+                const ytUrl = `https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics,brandingSettings&id=${encodeURIComponent(channelId)}&key=${apiKey}`;
+                const res = await fetch(ytUrl);
+                if (res.ok) {
+                    const data = (await res.json()) as any;
+                    if (data.items && data.items.length > 0) {
+                        const channel = data.items[0];
+                        return new Response(JSON.stringify({
+                            success: true,
+                            data: {
+                                title: channel.snippet.title,
+                                description: channel.snippet.description,
+                                customUrl: channel.snippet.customUrl,
+                                avatar: channel.snippet.thumbnails.medium?.url || channel.snippet.thumbnails.default?.url,
+                                subscribers: channel.statistics.subscriberCount,
+                                videoCount: channel.statistics.videoCount,
+                                viewCount: channel.statistics.viewCount
+                            }
+                        }), {
+                            headers: { ...corsHeaders, "Content-Type": "application/json", "Cache-Control": "public, max-age=600" }
+                        });
+                    }
+                    return new Response(JSON.stringify({ success: false, error: "Channel not found" }), {
+                        status: 404,
+                        headers: { ...corsHeaders, "Content-Type": "application/json" }
+                    });
+                }
+            } catch (err) {
+                return new Response(JSON.stringify({ success: false, error: String(err) }), {
+                    status: 500,
+                    headers: { ...corsHeaders, "Content-Type": "application/json" }
+                });
+            }
+        }
+        return new Response(JSON.stringify({ success: false, error: "Missing ID or API Key" }), {
+            status: 400,
+            headers: { ...corsHeaders, "Content-Type": "application/json" }
+        });
     }
 
     if (url.pathname === "/api/youtube") {
@@ -85,36 +182,56 @@ export default {
           const ytUrl = `https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails,statistics&id=${encodeURIComponent(videoId)}&key=${apiKey}`;
           const res = await fetch(ytUrl);
           if (res.ok) {
-            const data = await res.json();
-            return Response.json({ success: true, videoId, data }, { headers: corsHeaders });
+            const data = (await res.json()) as any;
+            return new Response(JSON.stringify({ success: true, videoId, data }), {
+                headers: { ...corsHeaders, "Content-Type": "application/json", "Cache-Control": "public, max-age=600" }
+            });
           }
         } catch (err) {
-          return Response.json({ success: false, error: String(err) }, { status: 500, headers: corsHeaders });
+          return new Response(JSON.stringify({ success: false, error: String(err) }), {
+              status: 500,
+              headers: { ...corsHeaders, "Content-Type": "application/json" }
+          });
         }
       }
-      return Response.json({ success: false, error: "Missing ID or API Key" }, { status: 400, headers: corsHeaders });
+      return new Response(JSON.stringify({ success: false, error: "Missing ID or API Key" }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" }
+      });
     }
 
     if (url.pathname === "/api/orders") {
-      if (!env.MY_DB) return Response.json({ success: false, error: "D1 not bound" }, { status: 503, headers: corsHeaders });
+      if (!env.MY_DB) return new Response(JSON.stringify({ success: false, error: "D1 not bound" }), {
+          status: 503,
+          headers: { ...corsHeaders, "Content-Type": "application/json" }
+      });
       try {
         const { results } = await env.MY_DB.prepare("SELECT * FROM Orders").all();
-        return Response.json({ success: true, count: results.length, data: results }, { headers: corsHeaders });
+        return new Response(JSON.stringify({ success: true, count: results.length, data: results }), {
+            headers: { ...corsHeaders, "Content-Type": "application/json" }
+        });
       } catch (err) {
-        return Response.json({ success: false, error: String(err) }, { status: 500, headers: corsHeaders });
+        return new Response(JSON.stringify({ success: false, error: String(err) }), {
+            status: 500,
+            headers: { ...corsHeaders, "Content-Type": "application/json" }
+        });
       }
     }
 
     if (url.pathname === "/debug") {
-      return Response.json({
+      return new Response(JSON.stringify({
         environment: env.NODE_ENV || "production",
         bindings: { youtube_key: !!env.YOUTUBE_API_KEY, d1: !!env.MY_DB },
         timestamp: new Date().toISOString()
-      }, { headers: corsHeaders });
+      }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" }
+      });
     }
 
     if (url.pathname === "/health") {
-      return Response.json({ status: "ok", time: new Date().toISOString() }, { headers: corsHeaders });
+      return new Response(JSON.stringify({ status: "ok", time: new Date().toISOString() }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" }
+      });
     }
 
     return new Response("Not Found", { status: 404, headers: corsHeaders });
