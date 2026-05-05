@@ -78,6 +78,15 @@ export function initResearch() {
 	renderNotes();
 }
 
+function escapeHTML(str) {
+	return String(str || '')
+		.replace(/&/g, '&amp;')
+		.replace(/</g, '&lt;')
+		.replace(/>/g, '&gt;')
+		.replace(/"/g, '&quot;')
+		.replace(/'/g, '&#039;');
+}
+
 function renderNotes() {
 	const grid = document.getElementById('researchGrid');
 	if (!grid) return;
@@ -102,7 +111,7 @@ function renderNotes() {
 					<button class="icon-button small delete-note-btn" data-id="${note.id}" title="Delete"><i class="fa-solid fa-trash"></i></button>
 				</div>
 			</div>
-			<p class="research-card-text">${note.text.replace(/\n/g, '<br>')}</p>
+			<p class="research-card-text">${escapeHTML(note.text).replace(/\n/g, '<br>')}</p>
 			<div class="research-card-footer">
 				<span class="research-date">${note.date}</span>
 			</div>

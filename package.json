@@ -20,7 +20,8 @@
     "express": "^5.2.1",
     "flags": "^4.0.6",
     "hypertune": "^2.10.1",
-    "server-only": "^0.0.1"
+    "server-only": "^0.0.1",
+    "skilz": "^0.0.0"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20260502.1",

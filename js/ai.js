@@ -48,6 +48,15 @@ const AI_MODAL_HTML = `
 </div>
 `;
 
+function escapeHTML(str) {
+	return String(str || '')
+		.replace(/&/g, '&amp;')
+		.replace(/</g, '&lt;')
+		.replace(/>/g, '&gt;')
+		.replace(/"/g, '&quot;')
+		.replace(/'/g, '&#039;');
+}
+
 export function initAI() {
 	if (!document.getElementById('aiModal')) {
 		const div = document.createElement('div');
@@ -103,7 +112,7 @@ export function initAI() {
 
 			variationsList.innerHTML = mockResults.map((res, i) => `
 				<div class="ai-variation-card">
-					<p>${res}</p>
+					<p>${escapeHTML(res)}</p>
 					<button class="secondary-button small insert-ai-btn" data-text="${encodeURIComponent(res)}">Insert</button>
 				</div>
 			`).join('');

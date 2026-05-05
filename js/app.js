@@ -89,6 +89,8 @@
 			continueBlockSec: r('continue-block'),
 			trendingBlockSec: r('trending-block'),
 			recommendedBlockSec: r('recommended-block'),
+			trendingRow: r('trending-row'),
+			recommendedRow: r('recommended-row'),
 			studioNavBtns: document.querySelectorAll('.studio-nav-btn'),
 			studioViews: document.querySelectorAll('.studio-view'),
 			projectTabBtns: document.querySelectorAll('.project-tab-btn'),
@@ -116,36 +118,46 @@
 			isMuted: false,
 		},
 		l = {
-			sanitize: (e) =>
-				String(e || '')
+			sanitize: (str) =>
+				String(str ?? '')
 					.replace(/&/g, '&amp;')
 					.replace(/</g, '&lt;')
-					.replace(/>/g, '&gt;'),
-			truncate: (e, t) => (e.length > t ? e.slice(0, t) + '...' : e),
-			formatDate: (e) => {
+					.replace(/>/g, '&gt;')
+					.replace(/"/g, '&quot;')
+					.replace(/'/g, '&#039;'),
+			truncate: (str, len) => (str.length > len ? `${str.slice(0, len)}...` : str),
+			formatDate: (date) => {
 				try {
-					return new Intl.DateTimeFormat('en', { month: 'short', day: 'numeric', year: 'numeric' }).format(new Date(e));
-				} catch (e) {
+					return new Intl.DateTimeFormat('en', { month: 'short', day: 'numeric', year: 'numeric' }).format(new Date(date));
+				} catch {
 					return '';
 				}
 			},
-			highlight: (e, t) => (t ? ((t = new RegExp(`(${t})`, 'gi')), e.replace(t, '<mark>$1</mark>')) : e),
-			highlight: (e, t) => (t ? ((t = new RegExp(`(${t})`, 'gi')), e.replace(t, '<mark>$1</mark>')) : e),
-			saveLS: (e, t) => {
-				try {
-					localStorage.setItem(e, JSON.stringify(t));
-				} catch (e) {}
+			highlight: (str, term) => {
+				if (!term) return str;
+				const regex = new RegExp(`(${term})`, 'gi');
+				return str.replace(regex, '<mark>$1</mark>');
 			},
-			getLS: (e, t = null) => {
+			saveLS: (key, val) => {
 				try {
-					var a = localStorage.getItem(e);
-					return a ? JSON.parse(a) : t;
+					localStorage.setItem(key, JSON.stringify(val));
 				} catch (e) {
-					return t;
+					console.error('LS Save Error:', e);
 				}
 			},
-			showToast: (e) => {
-				s.toast && ((s.toast.textContent = e), s.toast.classList.add('show'), setTimeout(() => s.toast.classList.remove('show'), 3e3));
+			getLS: (key, fallback = null) => {
+				try {
+					const val = localStorage.getItem(key);
+					return val ? JSON.parse(val) : fallback;
+				} catch {
+					return fallback;
+				}
+			},
+			showToast: (msg) => {
+				if (!s.toast) return;
+				s.toast.textContent = msg;
+				s.toast.classList.add('show');
+				setTimeout(() => s.toast.classList.remove('show'), 3000);
 			},
 		};
 	function o(t) {
@@ -196,6 +208,22 @@
 			{ id: "p3", title: "The Silent Silk Road", status: "Editing", progress: 90, date: "2024-05-08" },
 			{ id: "p4", title: "The Golden Age", status: "Published", progress: 100, date: "2024-05-01" }
 		];
+		grid.innerHTML = projects.map(({ id, title, status, progress, date }) => `
+			<div class="project-card">
+				<div class="project-card-header">
+					<span class="status-badge ${status.toLowerCase()}">${status}</span>
+					<span class="project-date">${date}</span>
+				</div>
+				<h3 class="project-title">${title}</h3>
+				<div class="project-progress-container">
+					<div class="project-progress-bar" style="width: ${progress}%"></div>
+				</div>
+				<div class="project-card-footer">
+					<span>${progress}% Complete</span>
+					<button class="secondary-button small resume-project-btn" data-id="${id}">Resume</button>
+				</div>
+			</div>
+		`).join("");
 		const listViewBtn = document.getElementById('listViewBtn');
 		const kanbanViewBtn = document.getElementById('kanbanViewBtn');
 		if (listViewBtn && !listViewBtn.hasListener) {
@@ -211,11 +239,13 @@
 		grid.innerHTML = projects.map(p => `<div class="project-card"><div class="project-card-header"><span class="status-badge ${p.status.toLowerCase()}">${p.status}</span><span class="project-date">${p.date}</span></div><h3 class="project-title">${p.title}</h3><div class="project-progress-container"><div class="project-progress-bar" style="width: ${p.progress}%"></div></div><div class="project-card-footer"><span>${p.progress}% Complete</span><button class="secondary-button small resume-project-btn" data-id="${p.id}">Resume</button></div></div>`).join("");
 		grid.querySelectorAll(".resume-project-btn").forEach(btn => {
 			btn.addEventListener("click", (e) => {
-				const id = e.currentTarget.dataset.id;
+				const { id } = e.currentTarget.dataset;
 				const project = projects.find(p => p.id === id);
 				if (project) {
 					s.studioViews.forEach(v => v.style.display = "none");
 					if (s.activeProjectView) s.activeProjectView.style.display = "block";
+					const titleEl = r("current-project-title");
+					if (titleEl) titleEl.textContent = project.title;
 					if (r("current-project-title")) r("current-project-title").textContent = project.title;
 					updateBreadcrumbs('Studio > Projects > ' + project.title);
 					if (s.projectTabBtns[0]) s.projectTabBtns[0].click();
@@ -223,51 +253,153 @@
 			});
 		});
 	}
-	function t() {
-		var e;
-		s.continueBlock &&
-			s.continueRow &&
-			(0 <
-			(e = n.videos
-				.filter((e) => (e = d(e.id)) && 5 <= e.percent && e.percent < 95)
-				.sort((e, t) => d(t.id).updated - d(e.id).updated)
-				.slice(0, 4)).length
-				? ((s.continueBlock.style.display = 'block'),
-					(s.continueRow.innerHTML = e.map((e) => L(e)).join('')),
-					s.emptyHistory && (s.emptyHistory.style.display = 'none'))
-				: ((s.continueBlock.style.display = 'none'), s.emptyHistory && 0 < n.videos.length && (s.emptyHistory.style.display = 'block')));
+	function R() {
+		if (!s.recommendedRow) return;
+		const history = Object.keys(n.progress)
+			.map(id => n.videos.find(v => v.id === id))
+			.filter(Boolean);
+		
+		let recs = [];
+		if (history.length === 0) {
+			recs = n.videos.slice(4, 8);
+		} else {
+			const categories = history.map(v => v.category);
+			const freq = categories.reduce((acc, c) => ({ ...acc, [c]: (acc[c] || 0) + 1 }), {});
+			const [topCat] = Object.keys(freq).sort((a, b) => freq[b] - freq[a]);
+			
+			recs = n.videos
+				.filter(v => v.category === topCat && !history.some(h => h.id === v.id))
+				.slice(0, 4);
+			
+			if (recs.length < 4) {
+				const others = n.videos
+					.filter(v => v.category !== topCat && !history.some(h => h.id === v.id))
+					.slice(0, 4 - recs.length);
+				recs.push(...others);
+			}
+		}
+		
+		if (recs.length > 0) {
+			if (s.recommendedBlockSec) s.recommendedBlockSec.style.display = 'block';
+			s.recommendedRow.innerHTML = recs.map(v => L(v)).join('');
+		}
 	}
-	function c(o) {
-		var e;
-		o &&
-			s.modal &&
-			s.player &&
-			((e = d((n.current = o).id)?.time || 0),
-			(e = 'https://www.youtube.com/embed/' + o.id + '?autoplay=1&rel=0&modestbranding=1&enablejsapi=1&start=' + Math.floor(e)),
-			(s.player.src = e),
-			window.YT &&
-				window.YT.Player &&
-				(n.ytPlayer && n.ytPlayer.destroy(),
-				(n.ytPlayer = new YT.Player('player', {
-					events: {
-						onStateChange: (e) => {
-							if (e.data === YT.PlayerState.PLAYING) {
-								let s = setInterval(() => {
-									var e, t, a, r;
-									n.ytPlayer && n.ytPlayer.getCurrentTime
-										? ((t = n.ytPlayer.getCurrentTime()),
-											0 < (a = n.ytPlayer.getDuration()) &&
-												(e = o.id) &&
-												((r = (t / a) * 100),
-												(n.progress[e] = { time: t, duration: a, percent: r, updated: Date.now() }),
-												l.saveLS(i.PROGRESS_KEY, n.progress),
-												E()))
-										: clearInterval(s);
-								}, 5e3);
-								n.progressTimer = s;
-							} else n.progressTimer && clearInterval(n.progressTimer);
-						},
+	function t() {
+		if (!s.continueBlock || !s.continueRow) return;
+		const activeProgress = n.videos
+			.filter((v) => {
+				const p = d(v.id);
+				return p && p.percent >= 5 && p.percent < 95;
+			})
+			.sort((a, b) => d(b.id).updated - d(a.id).updated)
+			.slice(0, 4);
+
+		if (activeProgress.length > 0) {
+			s.continueBlock.style.display = 'block';
+			s.continueRow.innerHTML = activeProgress.map((v) => L(v)).join('');
+			if (s.emptyHistory) s.emptyHistory.style.display = 'none';
+		} else {
+			s.continueBlock.style.display = 'none';
+			if (s.emptyHistory && n.videos.length > 0) s.emptyHistory.style.display = 'block';
+		}
+	}
+	function c(video) {
+		if (!video || !s.modal || !s.player) return;
+		n.current = video;
+		const startTime = d(video.id)?.time || 0;
+		s.player.src = `https://www.youtube.com/embed/${video.id}?autoplay=1&rel=0&modestbranding=1&enablejsapi=1&start=${Math.floor(startTime)}`;
+		
+		if (window.YT?.Player) {
+			if (n.ytPlayer) n.ytPlayer.destroy();
+			n.ytPlayer = new YT.Player('player', {
+				events: {
+					onReady: () => {
+						const pipBtn = r('pipBtn');
+						const speedOptions = r('speedOptions');
+						const qualityOptions = r('qualityOptions');
+						const currentSpeedLabel = r('currentSpeed');
+
+						if (pipBtn) {
+							pipBtn.onclick = async () => {
+								try {
+									if (document.pictureInPictureElement) {
+										await document.exitPictureInPicture();
+									} else {
+										l.showToast('PiP mode toggled via YouTube player');
+									}
+								} catch {
+									l.showToast('PiP not supported');
+								}
+							};
+						}
+
+						if (speedOptions) {
+							speedOptions.onclick = (e) => {
+								const btn = e.target.closest('button');
+								if (btn) {
+									const speed = parseFloat(btn.dataset.speed);
+									n.ytPlayer.setPlaybackRate(speed);
+									if (currentSpeedLabel) currentSpeedLabel.textContent = `${speed}x`;
+									speedOptions.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+									btn.classList.add('active');
+									l.showToast(`Speed: ${speed}x`);
+								}
+							};
+						}
+
+						if (qualityOptions) {
+							qualityOptions.onclick = (e) => {
+								const btn = e.target.closest('button');
+								if (btn) {
+									const quality = btn.dataset.quality;
+									n.ytPlayer.setPlaybackQuality(quality);
+									qualityOptions.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+									btn.classList.add('active');
+									l.showToast(`Quality: ${quality}`);
+								}
+							};
+						}
 					},
+					onStateChange: (e) => {
+						if (e.data === YT.PlayerState.PLAYING) {
+							n.progressTimer = setInterval(() => {
+								if (n.ytPlayer?.getCurrentTime) {
+									const time = n.ytPlayer.getCurrentTime();
+									const duration = n.ytPlayer.getDuration();
+									if (duration > 0) {
+										const percent = (time / duration) * 100;
+										n.progress[video.id] = { time, duration, percent, updated: Date.now() };
+										l.saveLS(i.PROGRESS_KEY, n.progress);
+										E();
+									}
+								} else {
+									clearInterval(n.progressTimer);
+								}
+							}, 5000);
+						} else {
+							clearInterval(n.progressTimer);
+						}
+					},
+				},
+			});
+		}
+
+		s.modal.style.display = 'flex';
+		s.modal.setAttribute('aria-hidden', 'false');
+		s.body.style.overflow = 'hidden';
+		s.body.classList.add('modal-open');
+		
+		const titleEl = r('video-title');
+		if (titleEl) titleEl.textContent = video.title;
+		
+		s.transcriptPanel?.setAttribute('aria-hidden', 'true');
+		s.sharePanel?.setAttribute('aria-hidden', 'true');
+
+		if (n.search && !n.searchHistory.includes(n.search)) {
+			n.searchHistory.unshift(n.search);
+			n.searchHistory = n.searchHistory.slice(0, 5);
+			l.saveLS(i.SEARCH_HISTORY_KEY, n.searchHistory);
+		}
 				}))),
 			(s.modal.style.display = 'flex'),
 			n.isPlaying = true,
@@ -282,80 +414,85 @@
 			(n.searchHistory.unshift(n.search), (n.searchHistory = n.searchHistory.slice(0, 5)), l.saveLS(i.SEARCH_HISTORY_KEY, n.searchHistory));
 	}
 	function h() {
-		s.modal &&
-			s.player &&
-			((s.player.src = ''),
-			(s.modal.style.display = 'none'),
-			s.modal.setAttribute('aria-hidden', 'true'),
-			(s.body.style.overflow = ''),
-			s.body.classList.remove('modal-open'),
-			(n.current = null),
-			n.progressTimer && clearInterval(n.progressTimer),
-			t(),
-			k(),
-			s.transcriptPanel && s.transcriptPanel.setAttribute('aria-hidden', 'true'),
-			s.sharePanel) &&
-			s.sharePanel.setAttribute('aria-hidden', 'true');
+		if (!s.modal || !s.player) return;
+		s.player.src = '';
+		s.modal.style.display = 'none';
+		s.modal.setAttribute('aria-hidden', 'true');
+		s.body.style.overflow = '';
+		s.body.classList.remove('modal-open');
+		n.current = null;
+		clearInterval(n.progressTimer);
+		t();
+		k();
+		s.transcriptPanel?.setAttribute('aria-hidden', 'true');
+		s.sharePanel?.setAttribute('aria-hidden', 'true');
 	}
-	function u(t) {
-		if (n.current && n.filtered.length) {
-			var a = n.filtered.findIndex((e) => e.id === n.current.id);
-			if (-1 !== a) {
-				let e = a + t;
-				((e = e < 0 ? n.filtered.length - 1 : e) >= n.filtered.length && (e = 0), c(n.filtered[e]));
-			}
+	function u(direction) {
+		if (!n.current || !n.filtered.length) return;
+		const idx = n.filtered.findIndex((v) => v.id === n.current.id);
+		if (idx !== -1) {
+			let nextIdx = idx + direction;
+			if (nextIdx < 0) nextIdx = n.filtered.length - 1;
+			if (nextIdx >= n.filtered.length) nextIdx = 0;
+			c(n.filtered[nextIdx]);
 		}
 	}
-	function g(t) {
-		var e = n.watchLater.findIndex((e) => e.id === t.id);
-		(-1 === e
-			? (n.watchLater.push(t), l.showToast('Added to Watch Later'))
-			: (n.watchLater.splice(e, 1), l.showToast('Removed from Watch Later')),
-			l.saveLS(i.WATCH_LATER_KEY, n.watchLater),
-			E());
+	function g(video) {
+		const idx = n.watchLater.findIndex((v) => v.id === video.id);
+		if (idx === -1) {
+			n.watchLater.push(video);
+			l.showToast('Added to Watch Later');
+		} else {
+			n.watchLater.splice(idx, 1);
+			l.showToast('Removed from Watch Later');
+		}
+		l.saveLS(i.WATCH_LATER_KEY, n.watchLater);
+		E();
 	}
 	function p() {
-		s.watchLaterPage &&
-			(v(),
-			(s.watchLaterPage.style.display = 'block'),
-			s.watchLaterPage.setAttribute('aria-hidden', 'false'),
-			(s.body.style.overflow = 'hidden'),
-			s.body.classList.add('modal-open'));
+		if (!s.watchLaterPage) return;
+		v();
+		s.watchLaterPage.style.display = 'block';
+		s.watchLaterPage.setAttribute('aria-hidden', 'false');
+		s.body.style.overflow = 'hidden';
+		s.body.classList.add('modal-open');
 	}
 	function y() {
-		s.watchLaterPage &&
-			((s.watchLaterPage.style.display = 'none'),
-			s.watchLaterPage.setAttribute('aria-hidden', 'true'),
-			(s.body.style.overflow = ''),
-			s.body.classList.remove('modal-open'));
+		if (!s.watchLaterPage) return;
+		s.watchLaterPage.style.display = 'none';
+		s.watchLaterPage.setAttribute('aria-hidden', 'true');
+		s.body.style.overflow = '';
+		s.body.classList.remove('modal-open');
 	}
 	function v() {
-		s.watchLaterContainer &&
-			(n.watchLater.length
-				? (s.watchLaterContainer.innerHTML = n.watchLater
-						.map((e) => {
-							var t = e.thumbnail || 'https://i.ytimg.com/vi/' + e.id + '/hqdefault.jpg';
-							return (
-								'<div class="card" data-id="' +
-								e.id +
-								'" data-wl="1" role="button" tabindex="0"><div class="card-thumb-wrapper"><img src="' +
-								t +
-								'" alt="' +
-								l.sanitize(e.title) +
-								'" loading="lazy"><button class="watch-later-btn active" data-id="' +
-								e.id +
-								'" aria-label="Remove from Watch Later"><i class="fa-solid fa-bookmark"></i></button></div><div class="card-copy"><div class="card-title">' +
-								l.highlight(l.sanitize(l.truncate(e.title, 60)), n.search) +
-								'</div><div class="card-meta"><span class="card-tag">' +
-								o(e.category) +
-								'</span><span>' +
-								l.formatDate(e.publishedAt) +
-								'</span></div></div></div>'
-							);
-						})
-						.join(''))
-				: (s.watchLaterContainer.innerHTML =
-						'<div class="empty-state">No episodes saved yet. Click the bookmark icon on any episode to save it.</div>'));
+		if (!s.watchLaterContainer) return;
+		if (n.watchLater.length > 0) {
+			s.watchLaterContainer.innerHTML = n.watchLater
+				.map((video) => {
+					const thumb = video.thumbnail || `https://i.ytimg.com/vi/${video.id}/hqdefault.jpg`;
+					return `
+						<div class="card" data-id="${video.id}" data-wl="1" role="button" tabindex="0">
+							<div class="card-thumb-wrapper">
+								<img data-src="${thumb}" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=" alt="${l.sanitize(video.title)}" class="lazy-img" loading="lazy">
+								<button class="watch-later-btn active" data-id="${video.id}" aria-label="Remove from Watch Later">
+									<i class="fa-solid fa-bookmark"></i>
+								</button>
+							</div>
+							<div class="card-copy">
+								<div class="card-title">${l.highlight(l.sanitize(l.truncate(video.title, 60)), n.search)}</div>
+								<div class="card-meta">
+									<span class="card-tag">${o(video.category)}</span>
+									<span>${l.formatDate(video.publishedAt)}</span>
+								</div>
+							</div>
+						</div>
+					`;
+				})
+				.join('');
+			initLazyLoading();
+		} else {
+			s.watchLaterContainer.innerHTML = '<div class="empty-state">No episodes saved yet. Click the bookmark icon on any episode to save it.</div>';
+		}
 	}
 	function m() {
 		if (s.dashboardModal) {
@@ -439,11 +576,11 @@
 		return (
 			'<div class="card" data-id="' +
 			t.id +
-			'" role="button" tabindex="0"><div class="card-thumb-wrapper"><img src="' +
+			'" role="button" tabindex="0"><div class="card-thumb-wrapper"><img data-src="' +
 			a +
-			'" alt="' +
+			'" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=" alt="' +
 			l.sanitize(t.title) +
-			'" loading="lazy"><div class="card-thumb-overlay"><i class="fa-solid fa-play play-icon"></i></div><div class="duration-badge">HD</div>' +
+			'" class="lazy-img" loading="lazy"><div class="card-thumb-overlay"><i class="fa-solid fa-play play-icon"></i></div><div class="duration-badge">HD</div>' +
 			(d(t.id)
 				? '<div class="progress-bar-container"><div class="progress-bar-fill" style="width:' + d(t.id).percent + '%"></div></div>'
 				: '') +
@@ -463,6 +600,63 @@
 		);
 	}
 	function k() {
+		let a = n.search.toLowerCase();
+		((n.filtered = n.videos.filter((e) => {
+			var t = n.categories.includes('all') || n.categories.includes(e.category),
+				e = !a || e.title.toLowerCase().includes(a);
+			return t && e;
+		})),
+			s.clearFilters && (s.clearFilters.style.display = n.categories.includes('all') ? 'none' : 'inline-flex'),
+			s.resultsMeta && (s.resultsMeta.textContent = n.filtered.length + ' episode' + (1 === n.filtered.length ? '' : 's') + ' found'));
+		var e = n.filtered.slice(0, i.ITEMS_PER_PAGE * (n.page + 1));
+		(s.grid &&
+			(0 === n.filtered.length
+				? (s.grid.innerHTML = `
+          <div class="empty-state-card" style="grid-column: 1 / -1; margin-top: 40px;">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <h3>No results found</h3>
+            <p>Try different keywords or browse by category to find what you're looking for.</p>
+            <button type="button" class="secondary-button" style="margin-top: 20px;" onclick="document.getElementById('searchInput').value=''; document.getElementById('searchInput').dispatchEvent(new Event('input'));">
+              Clear Search
+            </button>
+          </div>
+        `)
+				s.grid.innerHTML = e.map(L).join('');
+
+				// Sentinel for Infinite Scroll
+				if (e.length < n.filtered.length) {
+					const sentinel = document.createElement('div');
+					sentinel.id = 'grid-sentinel';
+					sentinel.style.height = '10px';
+					s.grid.appendChild(sentinel);
+
+					const scrollObserver = new IntersectionObserver((entries) => {
+						if (entries[0].isIntersecting) {
+							scrollObserver.disconnect();
+							n.page++;
+							k();
+						}
+					}, { rootMargin: '400px' });
+					scrollObserver.observe(sentinel);
+				}
+				}
+
+				initLazyLoading();
+				}
+
+
+	function initLazyLoading() {
+		const observer = new IntersectionObserver((entries, observer) => {
+			entries.forEach(entry => {
+				if (entry.isIntersecting) {
+					const img = entry.target;
+					img.src = img.dataset.src;
+					img.onload = () => img.classList.add('loaded');
+					observer.unobserve(img);
+				}
+			});
+		}, { rootMargin: '100px' });
+		document.querySelectorAll('.lazy-img').forEach(img => observer.observe(img));
 		function getFuzzyScore(text, query) {
 			if (!query) return 1;
 			text = text.toLowerCase();
@@ -543,7 +737,29 @@
 				if (icon) icon.className = isOpen ? 'fa-solid fa-xmark' : 'fa-solid fa-bars';
 			});
 		(s.search &&
-			(s.search.addEventListener('input', (e) => {
+			(s.search.addEventListener('keydown', (e) => {
+				const suggestions = s.suggestions.querySelectorAll('.suggestion-item');
+				if (s.suggestions.style.display === 'block' && suggestions.length > 0) {
+					let activeIdx = Array.from(suggestions).findIndex(s => s.classList.contains('active'));
+					if (e.key === 'ArrowDown') {
+						e.preventDefault();
+						if (activeIdx !== -1) suggestions[activeIdx].classList.remove('active');
+						activeIdx = (activeIdx + 1) % suggestions.length;
+						suggestions[activeIdx].classList.add('active');
+						suggestions[activeIdx].scrollIntoView({ block: 'nearest' });
+					} else if (e.key === 'ArrowUp') {
+						e.preventDefault();
+						if (activeIdx !== -1) suggestions[activeIdx].classList.remove('active');
+						activeIdx = (activeIdx - 1 + suggestions.length) % suggestions.length;
+						suggestions[activeIdx].classList.add('active');
+						suggestions[activeIdx].scrollIntoView({ block: 'nearest' });
+					} else if (e.key === 'Enter' && activeIdx !== -1) {
+						e.preventDefault();
+						suggestions[activeIdx].click();
+					}
+				}
+			}),
+			s.search.addEventListener('input', (e) => {
 				var t;
 				((n.search = e.target.value),
 					(n.page = 0),
@@ -782,6 +998,28 @@
 				e.target === t && (t.setAttribute('aria-hidden', 'true'), (s.body.style.overflow = ''), s.body.classList.remove('modal-open'));
 			});
 
+		// Header scroll effect
+		const header = document.querySelector('.header');
+		window.addEventListener('scroll', () => {
+			if (window.scrollY > 20) {
+				header.classList.add('scrolled');
+			} else {
+				header.classList.remove('scrolled');
+			}
+		});
+
+		// Card interactive glow effect
+		document.addEventListener('mousemove', (e) => {
+			const cards = document.querySelectorAll('.card');
+			cards.forEach(card => {
+				const rect = card.getBoundingClientRect();
+				const x = ((e.clientX - rect.left) / rect.width) * 100;
+				const y = ((e.clientY - rect.top) / rect.height) * 100;
+				card.style.setProperty('--mouse-x', `${x}%`);
+				card.style.setProperty('--mouse-y', `${y}%`);
+			});
+		});
+
 		// Studio Logic
 		s.modeBtns && s.modeBtns.forEach(btn => {
 			btn.addEventListener('click', () => {
@@ -928,7 +1166,22 @@
 				!(0 < n.videos.length))
 			)
 				throw new Error('No videos available in the archive.');
-			(T(n.videos[0]), k(), t(), E(), S(), renderProjects());
+			(T(n.videos[0]), k(), t(), S());
+			
+			// Non-critical operations
+			if ('requestIdleCallback' in window) {
+				requestIdleCallback(() => {
+					R();
+					E();
+					renderProjects();
+				});
+			} else {
+				setTimeout(() => {
+					R();
+					E();
+					renderProjects();
+				}, 500);
+			}
 		} catch (e) {
 			(s.error && (s.error.style.display = 'block'),
 				s.errorMsg && (s.errorMsg.textContent = e.message || 'Connection failed. Please try again.'),
