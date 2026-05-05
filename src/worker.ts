@@ -102,40 +102,64 @@ export default {
       });
     };
 
-    if (url.pathname === "/api/videos") {
+    if (url.pathname === "/api/youtube/videos" || url.pathname === "/api/videos") {
       const channelId = url.searchParams.get("channelId") || "UCrjJP_SHUeCmqpTSHJCXkdA";
       const apiKey = env.YOUTUBE_API_KEY;
 
-      console.log(`[Worker] Fetching videos for channel: ${channelId}`);
-      if (apiKey) {
-        try {
-          const ytUrl = `https://www.googleapis.com/youtube/v3/search?key=${apiKey}&channelId=${channelId}&part=snippet,id&order=date&maxResults=50&type=video`;
-          const ytRes = await fetch(ytUrl);
-          if (ytRes.ok) {
-            const ytData = (await ytRes.json()) as any;
-            if (ytData && ytData.items) {
-              const videos = ytData.items.map((item: any) => ({
-                id: item.id.videoId,
-                title: item.snippet.title,
-                thumbnail: item.snippet.thumbnails.high?.url || item.snippet.thumbnails.default?.url,
-                publishedAt: item.snippet.publishedAt,
-                channel: item.snippet.channelTitle,
-                description: item.snippet.description
-              }));
-              console.log(`[Worker] Successfully fetched ${videos.length} videos for ${channelId}`);
-              return respondJSON({ success: true, isDemo: false, videos }, 200, { "Cache-Control": "public, max-age=600" });
-            }
-          } else {
-            const errorData = (await ytRes.json()) as any;
-            console.error("[Worker] YT API Error:", errorData.error?.message);
-            return respondJSON({ success: false, error: errorData.error?.message || "YouTube API Error" }, ytRes.status);
-          }
-        } catch (err) {
-          console.error("[Worker] YouTube Fetch Failed:", err);
-        }
+      if (!apiKey) {
+        console.warn("[Worker] No API key, returning demo videos");
+        return respondJSON({ success: true, isDemo: true, videos: MOCK_VIDEOS }, 200, { "Cache-Control": "public, max-age=600" });
       }
-      console.log("[Worker] Returning demo videos (No API Key or Fetch Failed)");
-      return respondJSON({ success: true, isDemo: true, videos: MOCK_VIDEOS }, 200, { "Cache-Control": "public, max-age=600" });
+
+      try {
+        // 1. Get the uploads playlist ID
+        const channelRes = await fetch(
+          `https://www.googleapis.com/youtube/v3/channels?part=contentDetails&id=${channelId}&key=${apiKey}`
+        );
+
+        if (!channelRes.ok) {
+           const err = await channelRes.json() as any;
+           throw new Error(err.error?.message || "Failed to fetch channel details");
+        }
+
+        const channelData = await channelRes.json() as any;
+        if (!channelData.items || channelData.items.length === 0) {
+          throw new Error("Channel not found");
+        }
+
+        const uploadsPlaylistId = channelData.items[0].contentDetails.relatedPlaylists.uploads;
+
+        // 2. Get the videos from the uploads playlist
+        const playlistRes = await fetch(
+          `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=${uploadsPlaylistId}&key=${apiKey}`
+        );
+
+        if (!playlistRes.ok) {
+          const err = await playlistRes.json() as any;
+          throw new Error(err.error?.message || "Failed to fetch playlist items");
+        }
+
+        const playlistData = await playlistRes.json() as any;
+        const videos = (playlistData.items || []).map((item: any) => ({
+          id: item.snippet.resourceId.videoId,
+          title: item.snippet.title,
+          thumbnail: item.snippet.thumbnails.high?.url || item.snippet.thumbnails.default?.url,
+          publishedAt: item.snippet.publishedAt,
+          channel: item.snippet.channelTitle,
+          description: item.snippet.description
+        }));
+
+        return respondJSON({ success: true, isDemo: false, videos }, 200, { "Cache-Control": "public, max-age=600" });
+
+      } catch (err: any) {
+        console.error("[Worker] YouTube API Error:", err.message);
+        return respondJSON({
+          success: true,
+          isDemo: true,
+          videos: MOCK_VIDEOS,
+          error: err.message
+        }, 200, { "Cache-Control": "public, max-age=600" });
+      }
     }
 
     if (url.pathname === "/api/youtube/channel") {

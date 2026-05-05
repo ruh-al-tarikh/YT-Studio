@@ -1,6 +1,6 @@
 (() => {
 	let i = {
-			API: '/api/videos', CHANNEL_KEY: 'yt_studio_channel_id', FALLBACK_DATA: '/data/demo.json',
+			API: '/api/youtube/videos', CHANNEL_KEY: 'yt_studio_channel_id', FALLBACK_DATA: '/data/demo.json',
 			CACHE_KEY: 'yt_studio_videos_cache_v4',
 			CACHE_EXPIRY: 864e5,
 			PROJECTS_KEY: "yt_studio_projects",
@@ -153,6 +153,23 @@
 					return val ? JSON.parse(val) : fallback;
 				} catch {
 					return fallback;
+				}
+			},
+			fetchWithRetry: async (url, config = i.API_CONFIG) => {
+				let delay = config.delay;
+				for (let t = 0; t < config.retries; t++) {
+					try {
+						const ctrl = new AbortController();
+						const timeout = setTimeout(() => ctrl.abort(), config.timeout);
+						const res = await fetch(url, { signal: ctrl.signal });
+						clearTimeout(timeout);
+						if (res.ok) return res;
+						throw new Error(`API Error: ${res.status}`);
+					} catch (e) {
+						if (t === config.retries - 1) throw e;
+						await new Promise(resolve => setTimeout(resolve, delay));
+						delay *= config.backoff;
+					}
 				}
 			},
 			showToast: (msg) => {
@@ -1217,23 +1234,7 @@
 				}
 
 				try {
-					let delay = i.API_CONFIG.delay;
-					let res;
-					for (let t = 0; t < i.API_CONFIG.retries; t++) {
-						try {
-							const ctrl = new AbortController();
-							const timeout = setTimeout(() => ctrl.abort(), i.API_CONFIG.timeout);
-							res = await fetch(fetchUrl, { signal: ctrl.signal });
-							clearTimeout(timeout);
-							if (res.ok) break;
-							throw new Error(`API Error: ${res.status}`);
-						} catch (e) {
-							if (t === i.API_CONFIG.retries - 1) throw e;
-							await new Promise(resolve => setTimeout(resolve, delay));
-							delay *= i.API_CONFIG.backoff;
-						}
-					}
-
+					const res = await l.fetchWithRetry(fetchUrl);
 					const json = await res.json();
 					if (json.isDemo) {
 						document.body.classList.add('demo-mode');

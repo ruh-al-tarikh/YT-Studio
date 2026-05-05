@@ -17,3 +17,6 @@
 ## 2025-05-04 - Advanced Personalization & Smart UX
 **Learning:** Transitioning from "Good UI" to "Intelligent Experience" involves behavior-based state management (Watch Progress, Multi-select Filtering, Live Suggestions).
 **Action:** Use YouTube Iframe API for granular progress tracking. Implement regex-based highlighting for search discoverability. Use 'modal-open' body classes to trigger global immersive styles (dimming/blurring).
+## 2024-05-04 - YouTube API Data Fetching Optimization
+**Learning:** Using the 'search' endpoint for listing channel videos is quota-intensive and less reliable for production.
+**Action:** Transitioned to 'playlistItems' logic by fetching the channel's 'uploads' playlist ID first. This reduces quota usage and provides more consistent results for live data loading.
