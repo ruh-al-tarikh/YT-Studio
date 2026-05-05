@@ -117,12 +117,11 @@ export default {
           `https://www.googleapis.com/youtube/v3/channels?part=contentDetails&id=${channelId}&key=${apiKey}`
         );
 
+        const channelData = await channelRes.json() as any;
         if (!channelRes.ok) {
-           const err = await channelRes.json() as any;
-           throw new Error(err.error?.message || "Failed to fetch channel details");
+           throw new Error(channelData.error?.message || "Failed to fetch channel details");
         }
 
-        const channelData = await channelRes.json() as any;
         if (!channelData.items || channelData.items.length === 0) {
           throw new Error("Channel not found");
         }
@@ -134,12 +133,11 @@ export default {
           `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=${uploadsPlaylistId}&key=${apiKey}`
         );
 
+        const playlistData = await playlistRes.json() as any;
         if (!playlistRes.ok) {
-          const err = await playlistRes.json() as any;
-          throw new Error(err.error?.message || "Failed to fetch playlist items");
+          throw new Error(playlistData.error?.message || "Failed to fetch playlist items");
         }
 
-        const playlistData = await playlistRes.json() as any;
         const videos = (playlistData.items || []).map((item: any) => ({
           id: item.snippet.resourceId.videoId,
           title: item.snippet.title,
@@ -169,8 +167,8 @@ export default {
             try {
                 const ytUrl = `https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics,brandingSettings&id=${encodeURIComponent(channelId)}&key=${apiKey}`;
                 const res = await fetch(ytUrl);
+                const data = await res.json() as any;
                 if (res.ok) {
-                    const data = (await res.json()) as any;
                     if (data.items && data.items.length > 0) {
                         const channel = data.items[0];
                         return respondJSON({
@@ -187,6 +185,8 @@ export default {
                         }, 200, { "Cache-Control": "public, max-age=600" });
                     }
                     return respondJSON({ success: false, error: "Channel not found" }, 404);
+                } else {
+                    return respondJSON({ success: false, error: data.error?.message || "YouTube API Error" }, res.status);
                 }
             } catch (err) {
                 return respondJSON({ success: false, error: String(err) }, 500);
@@ -202,9 +202,11 @@ export default {
         try {
           const ytUrl = `https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails,statistics&id=${encodeURIComponent(videoId)}&key=${apiKey}`;
           const res = await fetch(ytUrl);
+          const data = await res.json() as any;
           if (res.ok) {
-            const data = (await res.json()) as any;
             return respondJSON({ success: true, videoId, data }, 200, { "Cache-Control": "public, max-age=600" });
+          } else {
+            return respondJSON({ success: false, error: data.error?.message || "YouTube API Error" }, res.status);
           }
         } catch (err) {
           return respondJSON({ success: false, error: String(err) }, 500);
