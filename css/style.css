@@ -226,6 +226,20 @@ button:active {
 .search-container:focus-within {
 	border-color: var(--accent);
 }
+.search-hint {
+	background: var(--bg-soft);
+	padding: 2px 8px;
+	border-radius: 4px;
+	border: 1px solid var(--line-soft);
+	color: var(--text-soft);
+	font-size: 0.8rem;
+	font-weight: 800;
+	pointer-events: none;
+	transition: opacity 0.2s ease;
+}
+.search-container:focus-within .search-hint {
+	opacity: 0;
+}
 .highlight-card p,
 .search-container i {
 	color: var(--text-soft);
