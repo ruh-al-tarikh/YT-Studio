@@ -1693,3 +1693,120 @@ button:focus:not(:focus-visible),
 input:focus:not(:focus-visible) {
 	outline: none;
 }
+/* Global UI Polish & Glassmorphism */
+* {
+    scroll-behavior: smooth;
+}
+
+.glass-panel {
+    background: var(--bg-elevated);
+    backdrop-filter: var(--glass);
+    border: 1px solid var(--line-soft);
+    border-radius: var(--radius-md);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-panel:hover {
+    border-color: var(--accent);
+    box-shadow: var(--shadow-lg), 0 0 20px var(--accent-glow);
+}
+
+/* Enhanced Button States */
+.primary-button, .secondary-button, .pill-button, .icon-button {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.primary-button:hover {
+    transform: translateY(-2px) scale(1.02);
+    filter: brightness(1.1);
+}
+
+.secondary-button:hover {
+    background: var(--bg-soft);
+    border-color: var(--accent);
+    transform: translateY(-1px);
+}
+
+/* Custom Scrollbar for modern feel */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-canvas);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--line-strong);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--accent);
+}
+/* Advanced Mobile Enhancements */
+@media (max-width: 640px) {
+    :root {
+        --radius-lg: 16px;
+        --radius-md: 12px;
+    }
+
+    .header-content {
+        padding: 12px 20px;
+    }
+
+    .identity-title {
+        font-size: 1.75rem !important;
+    }
+
+    .hero-overlay {
+        padding: 30px 20px;
+    }
+
+    .studio-layout {
+        flex-direction: column;
+        height: auto;
+        border-radius: 0;
+        margin: 0;
+    }
+
+    .studio-sidebar {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid var(--line-soft);
+    }
+
+    .studio-nav {
+        flex-direction: row;
+        overflow-x: auto;
+        padding: 10px;
+    }
+
+    .studio-nav-btn {
+        flex: 0 0 auto;
+        padding: 8px 12px;
+        font-size: 0.85rem;
+    }
+
+    .studio-main {
+        min-height: 500px;
+    }
+}
+
+/* Touch Target Optimization */
+button, .chip, .mobile-nav-link, .studio-nav-btn {
+    min-height: 48px; /* WCAG Recommendation */
+}
+
+@media (hover: none) {
+    .card:hover {
+        transform: none !important;
+    }
+    
+    .primary-button:active {
+        transform: scale(0.95);
+    }
+}
