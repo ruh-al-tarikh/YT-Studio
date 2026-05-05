@@ -1874,3 +1874,50 @@ button, .chip, .mobile-nav-link, .studio-nav-btn {
 @keyframes skeleton-shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
 .skeleton-card { position: relative; overflow: hidden; background: var(--bg-elevated); border-radius: var(--radius-md); border: 1px solid var(--line-soft); }
 .skeleton-card::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, oklch(1 0 0 / 0.05), transparent); animation: skeleton-shimmer 1.5s infinite; }
+
+/* Final UI Consistency Polish */
+:root {
+    --spacing-xs: 8px;
+    --spacing-sm: 12px;
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
+    --spacing-xl: 32px;
+}
+
+.identity-content {
+    padding: 0 var(--spacing-lg);
+}
+
+.wow-feature-header h3 {
+    font-size: 1.5rem;
+    color: var(--text-main);
+}
+
+#wowInput:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px var(--accent-glow);
+}
+
+.quick-tool i {
+    font-size: 1.1rem;
+}
+
+/* Ensure all buttons have consistent rounding */
+button, .chip, .card {
+    border-radius: var(--radius-md);
+}
+
+.pill-button {
+    border-radius: 999px;
+}
+
+/* Accessibility pass */
+button:not([aria-label]), a:not([aria-label]) {
+    /* Manual check required for specific elements */
+}
+
+/* Smooth scrolling for anchor links */
+html {
+    scroll-behavior: smooth;
+}

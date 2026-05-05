@@ -400,18 +400,6 @@
 			n.searchHistory = n.searchHistory.slice(0, 5);
 			l.saveLS(i.SEARCH_HISTORY_KEY, n.searchHistory);
 		}
-				}))),
-			(s.modal.style.display = 'flex'),
-			n.isPlaying = true,
-			s.modal.setAttribute('aria-hidden', 'false'),
-			(s.body.style.overflow = 'hidden'),
-			s.body.classList.add('modal-open'),
-			(e = r('video-title')) && (e.textContent = o.title),
-			s.transcriptPanel && s.transcriptPanel.setAttribute('aria-hidden', 'true'),
-			s.sharePanel && s.sharePanel.setAttribute('aria-hidden', 'true'),
-			n.search) &&
-			!n.searchHistory.includes(n.search) &&
-			(n.searchHistory.unshift(n.search), (n.searchHistory = n.searchHistory.slice(0, 5)), l.saveLS(i.SEARCH_HISTORY_KEY, n.searchHistory));
 	}
 	function h() {
 		if (!s.modal || !s.player) return;
@@ -621,7 +609,7 @@
             </button>
           </div>
         `)
-				s.grid.innerHTML = e.map(L).join('');
+				: (s.grid.innerHTML = e.map(L).join(''))))
 
 				// Sentinel for Infinite Scroll
 				if (e.length < n.filtered.length) {
@@ -1051,25 +1039,11 @@
 		}
 		if (openDemoBtn) {
 			openDemoBtn.addEventListener("click", () => {
-				const creatorBtn = Array.from(s.modeBtns).find(b => b.dataset.mode === 'creator'); if (creatorBtn) creatorBtn.click();
-				const resumeBtns = document.querySelectorAll(".resume-project-btn");
-				if (resumeBtns.length > 0) resumeBtns[0].click();
+				document.getElementById("feature-preview").scrollIntoView({ behavior: "smooth" });
 			});
 		}
-		s.studioNavBtns && s.studioNavBtns.forEach(btn => {
-			btn.addEventListener('click', () => {
-				s.studioNavBtns.forEach(b => b.classList.remove('active'));
-				btn.classList.add('active');
-				const tab = btn.dataset.tab;
-				s.studioViews.forEach(v => v.style.display = 'none');
-				s.activeProjectView.style.display = 'none';
-				const view = r('studio-view-' + tab);
-				if(view) {
-					view.style.display = 'block';
-					view.classList.add('active');
-				}
-			});
-		});
+		setupWowFeature();
+		setupDemoData();
 
 		s.newProjectBtn && s.newProjectBtn.addEventListener('click', () => {
 			s.studioViews.forEach(v => v.style.display = 'none');
@@ -1100,6 +1074,78 @@
 			});
 		});
 	}
+	function setupWowFeature() {
+		const wowInput = document.getElementById('wowInput');
+		const wowGenerateBtn = document.getElementById('wowGenerateBtn');
+		const wowResult = document.getElementById('wowResult');
+		const wowText = document.getElementById('wowText');
+		const wowCopyBtn = document.getElementById('wowCopyBtn');
+		const wowRefineBtn = document.getElementById('wowRefineBtn');
+
+		if (!wowGenerateBtn || !wowInput) return;
+
+		const hooks = [
+			"What if I told you that {topic} isn't at all what you were taught in school?",
+			"Most people think they know the story of {topic}. They're wrong.",
+			"Behind the legend of {topic} lies a truth far more cinematic than fiction.",
+			"The year was {date}. The world was changing. And at the center of it all? {topic}.",
+			"How did {topic} change the course of human history forever? The answer might surprise you."
+		];
+
+		wowGenerateBtn.addEventListener('click', () => {
+			const topic = wowInput.value.trim() || "this topic";
+			wowGenerateBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Analyzing...';
+			wowGenerateBtn.disabled = true;
+
+			setTimeout(() => {
+				const randomHook = hooks[Math.floor(Math.random() * hooks.length)]
+					.replace('{topic}', topic)
+					.replace('{date}', new Date().getFullYear() - 100);
+
+				wowText.textContent = randomHook;
+				wowResult.style.display = 'block';
+				wowGenerateBtn.innerHTML = 'Generate Hook';
+				wowGenerateBtn.disabled = false;
+				l.showToast('Hook generated!');
+			}, 1200);
+		});
+
+		wowCopyBtn?.addEventListener('click', () => {
+			navigator.clipboard.writeText(wowText.textContent);
+			l.showToast('Copied to clipboard!');
+		});
+
+		wowRefineBtn?.addEventListener('click', () => {
+			wowGenerateBtn.click();
+		});
+	}
+
+	function setupDemoData() {
+		const hasDemo = localStorage.getItem('yt_studio_demo_loaded_v2');
+		if (hasDemo) return;
+
+		const demoProjects = [
+			{
+				id: 'demo-1',
+				title: 'The Lost Library of Timbuktu',
+				status: 'Writing',
+				progress: 45,
+				date: new Date().toLocaleDateString()
+			},
+			{
+				id: 'demo-2',
+				title: 'Secrets of the Ottoman Archives',
+				status: 'Researching',
+				progress: 20,
+				date: new Date().toLocaleDateString()
+			}
+		];
+
+		l.saveLS(i.PROJECTS_KEY, demoProjects);
+		localStorage.setItem('yt_studio_demo_loaded_v2', 'true');
+		l.showToast('Demo data preloaded!');
+	}
+
 	async function A() {
 		try {
 			if (
