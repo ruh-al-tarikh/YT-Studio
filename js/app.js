@@ -9,7 +9,7 @@
 			THEME_KEY: 'ui_theme',
 			SEARCH_HISTORY_KEY: 'search_history',
 			PROGRESS_KEY: 'watch_progress',
-			ITEMS_PER_PAGE: 12,
+			ITEMS_PER_PAGE: 15,
 			API_CONFIG: { timeout: 1e4, retries: 3, backoff: 1.5, delay: 500 },
 		},
 		a = [
@@ -82,7 +82,7 @@
 			continueRow: r('continue-row'),
 			emptyHistory: r('empty-history'),
 			clearFilters: r('clearFilters'),
-			studioToggleBtn: r('studioToggleBtn'),
+			modeSwitcher: r('modeSwitcher'), modeBtns: document.querySelectorAll('.mode-btn'), studioBreadcrumbs: r('studioBreadcrumbs'),
 			appRoot: r('app-root'),
 			studioRoot: r('studio-root'),
 			heroSection: r('hero'),
@@ -114,6 +114,8 @@
 			searchHistory: JSON.parse(localStorage.getItem(i.SEARCH_HISTORY_KEY) || '[]'),
 			progress: JSON.parse(localStorage.getItem(i.PROGRESS_KEY) || '{}'),
 			ytPlayer: null,
+			isPlaying: false,
+			isMuted: false,
 		},
 		l = {
 			sanitize: (str) =>
@@ -165,14 +167,46 @@
 	function d(e) {
 		return n.progress[e] || null;
 	}
+	function updateBreadcrumbs(path) {
+		if (!s.studioBreadcrumbs) return;
+		const parts = path.split(' > ');
+		s.studioBreadcrumbs.innerHTML = parts.map((p, i) =>
+			i === parts.length - 1 ? `<span class="current">${p}</span>` : `<span>${p}</span>`
+		).join(' <i class="fa-solid fa-chevron-right" style="font-size:0.7rem; margin:0 8px; opacity:0.5;"></i> ');
+	}
+	let currentView = 'list';
+	function renderKanban(projects) {
+		const grid = document.getElementById("studioProjectsList");
+		if (!grid) return;
+		const columns = ['Research', 'Writing', 'Editing', 'Published'];
+		grid.className = 'kanban-grid';
+		grid.innerHTML = columns.map(col => {
+			const colProjects = projects.filter(p => p.status === col || (col === 'Research' && p.status === 'Researching'));
+			return `<div class="kanban-column"><h3>${col} <span class="kanban-count">${colProjects.length}</span></h3><div class="kanban-cards">${colProjects.map(p => `<div class="kanban-card resume-project-btn" data-id="${p.id}"><h4 class="text-sm font-bold mb-2">${p.title}</h4><div class="project-progress-container" style="height:4px;"><div class="project-progress-bar" style="width: ${p.progress}%"></div></div><div class="flex justify-between items-center mt-2 text-xs text-soft"><span>${p.progress}%</span><span>${p.date}</span></div></div>`).join("")}</div></div>`;
+		}).join("");
+		grid.querySelectorAll(".resume-project-btn").forEach(btn => {
+			btn.addEventListener("click", (e) => {
+				const id = e.currentTarget.dataset.id;
+				const project = projects.find(p => p.id === id);
+				if (project) {
+					s.studioViews.forEach(v => v.style.display = "none");
+					if (s.activeProjectView) s.activeProjectView.style.display = "block";
+					if (r("current-project-title")) r("current-project-title").textContent = project.title;
+					updateBreadcrumbs('Studio > Projects > ' + project.title);
+					if (s.projectTabBtns[0]) s.projectTabBtns[0].click();
+				}
+			});
+		});
+	}
 	function renderProjects() {
 		const grid = document.getElementById("studioProjectsList");
 		if (!grid) return;
 		const saved = localStorage.getItem(i.PROJECTS_KEY);
 		const projects = saved ? JSON.parse(saved) : [
 			{ id: "p1", title: "The Fall of the Abbasids", status: "Writing", progress: 65, date: "2024-05-10" },
-			{ id: "p2", title: "Prophecy & Modernity", status: "Research", progress: 30, date: "2024-05-12" },
-			{ id: "p3", title: "The Silent Silk Road", status: "Editing", progress: 90, date: "2024-05-08" }
+			{ id: "p2", title: "Prophecy & Modernity", status: "Researching", progress: 30, date: "2024-05-12" },
+			{ id: "p3", title: "The Silent Silk Road", status: "Editing", progress: 90, date: "2024-05-08" },
+			{ id: "p4", title: "The Golden Age", status: "Published", progress: 100, date: "2024-05-01" }
 		];
 		grid.innerHTML = projects.map(({ id, title, status, progress, date }) => `
 			<div class="project-card">
@@ -190,6 +224,19 @@
 				</div>
 			</div>
 		`).join("");
+		const listViewBtn = document.getElementById('listViewBtn');
+		const kanbanViewBtn = document.getElementById('kanbanViewBtn');
+		if (listViewBtn && !listViewBtn.hasListener) {
+			listViewBtn.addEventListener('click', () => { currentView = 'list'; listViewBtn.classList.add('active'); kanbanViewBtn.classList.remove('active'); renderProjects(); });
+			listViewBtn.hasListener = true;
+		}
+		if (kanbanViewBtn && !kanbanViewBtn.hasListener) {
+			kanbanViewBtn.addEventListener('click', () => { currentView = 'kanban'; kanbanViewBtn.classList.add('active'); listViewBtn.classList.remove('active'); renderProjects(); });
+			kanbanViewBtn.hasListener = true;
+		}
+		if (currentView === 'kanban') { renderKanban(projects); return; }
+		grid.className = 'studio-projects-grid';
+		grid.innerHTML = projects.map(p => `<div class="project-card"><div class="project-card-header"><span class="status-badge ${p.status.toLowerCase()}">${p.status}</span><span class="project-date">${p.date}</span></div><h3 class="project-title">${p.title}</h3><div class="project-progress-container"><div class="project-progress-bar" style="width: ${p.progress}%"></div></div><div class="project-card-footer"><span>${p.progress}% Complete</span><button class="secondary-button small resume-project-btn" data-id="${p.id}">Resume</button></div></div>`).join("");
 		grid.querySelectorAll(".resume-project-btn").forEach(btn => {
 			btn.addEventListener("click", (e) => {
 				const { id } = e.currentTarget.dataset;
@@ -199,6 +246,8 @@
 					if (s.activeProjectView) s.activeProjectView.style.display = "block";
 					const titleEl = r("current-project-title");
 					if (titleEl) titleEl.textContent = project.title;
+					if (r("current-project-title")) r("current-project-title").textContent = project.title;
+					updateBreadcrumbs('Studio > Projects > ' + project.title);
 					if (s.projectTabBtns[0]) s.projectTabBtns[0].click();
 				}
 			});
@@ -351,6 +400,18 @@
 			n.searchHistory = n.searchHistory.slice(0, 5);
 			l.saveLS(i.SEARCH_HISTORY_KEY, n.searchHistory);
 		}
+				}))),
+			(s.modal.style.display = 'flex'),
+			n.isPlaying = true,
+			s.modal.setAttribute('aria-hidden', 'false'),
+			(s.body.style.overflow = 'hidden'),
+			s.body.classList.add('modal-open'),
+			(e = r('video-title')) && (e.textContent = o.title),
+			s.transcriptPanel && s.transcriptPanel.setAttribute('aria-hidden', 'true'),
+			s.sharePanel && s.sharePanel.setAttribute('aria-hidden', 'true'),
+			n.search) &&
+			!n.searchHistory.includes(n.search) &&
+			(n.searchHistory.unshift(n.search), (n.searchHistory = n.searchHistory.slice(0, 5)), l.saveLS(i.SEARCH_HISTORY_KEY, n.searchHistory));
 	}
 	function h() {
 		if (!s.modal || !s.player) return;
@@ -596,6 +657,41 @@
 			});
 		}, { rootMargin: '100px' });
 		document.querySelectorAll('.lazy-img').forEach(img => observer.observe(img));
+		function getFuzzyScore(text, query) {
+			if (!query) return 1;
+			text = text.toLowerCase();
+			if (text.includes(query)) return 10;
+			let score = 0, qIdx = 0;
+			for (let i = 0; i < text.length && qIdx < query.length; i++) {
+				if (text[i] === query[qIdx]) { score++; qIdx++; }
+			}
+			return score / query.length;
+		}
+		const searchLower = n.search.toLowerCase();
+		n.filtered = n.videos.filter(v => {
+			const categoryMatch = n.categories.includes('all') || n.categories.includes(v.category);
+			if (!categoryMatch) return false;
+			if (!searchLower) return true;
+			return Math.max(getFuzzyScore(v.title, searchLower), getFuzzyScore(v.description || '', searchLower), v.category.includes(searchLower) ? 0.8 : 0) > 0.6;
+		});
+		if (searchLower) {
+			n.filtered.sort((a, b) => {
+				const scoreA = Math.max(getFuzzyScore(a.title, searchLower), getFuzzyScore(a.description || '', searchLower));
+				const scoreB = Math.max(getFuzzyScore(b.title, searchLower), getFuzzyScore(b.description || '', searchLower));
+				return scoreB - scoreA;
+			});
+		}
+		const visibleVideos = n.filtered.slice(0, i.ITEMS_PER_PAGE * (n.page + 1));
+		if (s.clearFilters) s.clearFilters.style.display = n.categories.includes('all') ? 'none' : 'inline-flex';
+		if (s.resultsMeta) s.resultsMeta.textContent = n.filtered.length + ' episode' + (n.filtered.length === 1 ? '' : 's') + ' found';
+		if (s.grid) {
+			if (n.filtered.length === 0) {
+				s.grid.innerHTML = `<div class="empty-state-card" style="grid-column: 1 / -1; margin-top: 40px;"><i class="fa-solid fa-magnifying-glass"></i><h3>No results found</h3><p>Try different keywords or browse by category to find what you're looking for.</p><button type="button" class="secondary-button" style="margin-top: 20px;" onclick="document.getElementById('searchInput').value=''; document.getElementById('searchInput').dispatchEvent(new Event('input'));">Clear Search</button></div>`;
+			} else {
+				s.grid.innerHTML = visibleVideos.map(L).join('');
+			}
+		}
+		if (s.loadMoreContainer) s.loadMoreContainer.style.display = visibleVideos.length < n.filtered.length ? 'block' : 'none';
 	}
 	function E() {
 		(s.statTotal && (s.statTotal.textContent = n.videos.length),
@@ -872,6 +968,10 @@
 					? 'Escape' === e.key && e.target.blur()
 					: '/' === (t = e.key.toLowerCase())
 						? (e.preventDefault(), s.search && s.search.focus())
+					: ' ' === t && n.current
+						? (e.preventDefault(), s.player && s.player.contentWindow.postMessage('{"event":"command","func":"' + (n.isPlaying ? 'pauseVideo' : 'playVideo') + '","args":""}', '*'), n.isPlaying = !n.isPlaying)
+					: 'm' === t && n.current
+						? (e.preventDefault(), s.player && s.player.contentWindow.postMessage('{"event":"command","func":"' + (n.isMuted ? 'unMute' : 'mute') + '","args":""}', '*'), n.isMuted = !n.isMuted)
 						: 'escape' === t
 							? (h(),
 								y(),
@@ -921,36 +1021,37 @@
 		});
 
 		// Studio Logic
-		s.studioToggleBtn && s.studioToggleBtn.addEventListener('click', () => {
-			const isStudioOpen = s.studioRoot.style.display === 'block';
-			if (isStudioOpen) {
-				s.studioRoot.style.display = 'none';
-				s.appRoot.style.display = 'block';
-				if(s.heroSection) s.heroSection.style.display = 'block';
-				if(s.continueBlockSec && n.videos.some(v => d(v.id))) s.continueBlockSec.style.display = 'block';
-				s.studioToggleBtn.classList.remove('active');
-				s.studioToggleBtn.querySelector('span').textContent = 'Studio';
-			} else {
-				s.studioRoot.style.display = 'block';
-				s.appRoot.style.display = 'none';
-				if(s.heroSection) s.heroSection.style.display = 'none';
-				if(s.continueBlockSec) s.continueBlockSec.style.display = 'none';
-				s.studioToggleBtn.classList.add('active');
-				s.studioToggleBtn.querySelector('span').textContent = 'Exit Studio';
-			}
+		s.modeBtns && s.modeBtns.forEach(btn => {
+			btn.addEventListener('click', () => {
+				const mode = btn.dataset.mode;
+				s.modeBtns.forEach(b => b.classList.remove('active'));
+				btn.classList.add('active');
+				if (mode === 'creator') {
+					s.studioRoot.style.display = 'block';
+					s.appRoot.style.display = 'none';
+					if(s.heroSection) s.heroSection.style.display = 'none';
+					if(s.continueBlockSec) s.continueBlockSec.style.display = 'none';
+					updateBreadcrumbs('Studio > Projects');
+				} else {
+					s.studioRoot.style.display = 'none';
+					s.appRoot.style.display = 'block';
+					if(s.heroSection) s.heroSection.style.display = 'block';
+					if(s.continueBlockSec && n.videos.some(v => d(v.id))) s.continueBlockSec.style.display = 'block';
+				}
+			});
 		});
 
 		const startScriptBtn = document.getElementById("startScriptBtn");
 		const openDemoBtn = document.getElementById("openDemoBtn");
 		if (startScriptBtn) {
 			startScriptBtn.addEventListener("click", () => {
-				if (s.studioToggleBtn) s.studioToggleBtn.click();
+				const creatorBtn = Array.from(s.modeBtns).find(b => b.dataset.mode === 'creator'); if (creatorBtn) creatorBtn.click();
 				if (s.newProjectBtn) s.newProjectBtn.click();
 			});
 		}
 		if (openDemoBtn) {
 			openDemoBtn.addEventListener("click", () => {
-				if (s.studioToggleBtn) s.studioToggleBtn.click();
+				const creatorBtn = Array.from(s.modeBtns).find(b => b.dataset.mode === 'creator'); if (creatorBtn) creatorBtn.click();
 				const resumeBtns = document.querySelectorAll(".resume-project-btn");
 				if (resumeBtns.length > 0) resumeBtns[0].click();
 			});
@@ -974,12 +1075,14 @@
 			s.studioViews.forEach(v => v.style.display = 'none');
 			s.activeProjectView.style.display = 'block';
 			r('current-project-title').textContent = 'New Untitled Video';
+			updateBreadcrumbs('Studio > Projects > New Untitled Video');
 			s.projectTabBtns[0].click(); // open research tab
 		});
 
 		s.backToProjectsBtn && s.backToProjectsBtn.addEventListener('click', () => {
 			s.activeProjectView.style.display = 'none';
 			r('studio-view-projects').style.display = 'block';
+			updateBreadcrumbs('Studio > Projects');
 			s.studioNavBtns.forEach(b => {
 				b.classList.remove('active');
 				if(b.dataset.tab === 'projects') b.classList.add('active');
@@ -1006,7 +1109,7 @@
 						.fill(0)
 						.map(
 							() => `
-      <div class="skeleton-card animate-pulse">
+      <div class="skeleton-card">
         <div class="skeleton skeleton-thumb" style="aspect-ratio:16/9; border-radius:var(--radius-md);"></div>
         <div class="skeleton skeleton-text" style="height:24px; width:90%; border-radius:4px;"></div>
         <div class="skeleton skeleton-text short" style="height:20px; width:50%; border-radius:4px;"></div>

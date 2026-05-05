@@ -17,6 +17,7 @@
     "@vercel/analytics": "^2.0.1",
     "@vercel/edge-config": "^1.4.3",
     "@vercel/speed-insights": "^2.0.0",
+    "express": "^5.2.1",
     "flags": "^4.0.6",
     "hypertune": "^2.10.1",
     "server-only": "^0.0.1",

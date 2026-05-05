@@ -50,6 +50,20 @@ body {
 	--shadow-lg: 0 20px 50px -12px oklch(0 0 0 / 0.5);
 	--shadow-md: 0 12px 24px -8px oklch(0 0 0 / 0.3);
 	--glass: blur(16px) saturate(180%);
+	--bg-canvas: oklch(0.14 0.02 250);
+	--bg-elevated: oklch(0.18 0.03 250 / 0.8);
+	--bg-panel: oklch(0.22 0.04 250 / 0.85);
+	--bg-soft: oklch(1 0 0 / 0.05);
+	--line-soft: oklch(0.9 0.03 85 / 0.12);
+	--line-strong: oklch(0.85 0.1 85 / 0.3);
+	--text-main: oklch(0.98 0.01 85);
+	--text-muted: oklch(0.85 0.02 250);
+	--text-soft: oklch(0.65 0.03 250);
+	--accent: oklch(0.78 0.14 85);
+	--accent-strong: oklch(0.85 0.12 85);
+	--accent-deep: oklch(0.65 0.15 85);
+	--shadow-lg: 0 30px 70px oklch(0 0 0 / 0.5);
+	--shadow-md: 0 16px 32px oklch(0 0 0 / 0.3);
 	--radius-lg: 24px;
 	--radius-md: 18px;
 	--radius-sm: 12px;
@@ -431,7 +445,7 @@ button:active {
 }
 .grid {
 	display: grid;
-	grid-template-columns: repeat(3, 1fr);
+	grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
 	gap: 24px;
 }
 .card,
@@ -616,7 +630,7 @@ button:active {
 		padding: 40px;
 	}
 	.hero-aside {
-		grid-template-columns: repeat(3, 1fr);
+		grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
 	}
 }
 @media (max-width: 760px) {
@@ -1057,7 +1071,7 @@ button:active {
 }
 .footer-nav {
 	display: grid;
-	grid-template-columns: repeat(3, 1fr);
+	grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
 	gap: 40px;
 }
 .footer-group h3 {
@@ -1810,3 +1824,53 @@ button, .chip, .mobile-nav-link, .studio-nav-btn {
         transform: scale(0.95);
     }
 }
+
+/* Mode Switcher Styles */
+.mode-switcher { display: flex; background: var(--bg-soft); padding: 4px; border-radius: 100px; border: 1px solid var(--line-soft); }
+.mode-btn { display: flex; align-items: center; gap: 8px; padding: 8px 16px; border: none; background: transparent; color: var(--text-muted); border-radius: 100px; cursor: pointer; font-size: 0.9rem; font-weight: 600; transition: all 0.2s ease; }
+.mode-btn i { font-size: 0.85rem; }
+.mode-btn.active { background: var(--accent); color: white; box-shadow: var(--shadow-sm); }
+.mode-btn:hover:not(.active) { background: var(--bg-elevated); color: var(--text-main); }
+
+/* Breadcrumbs Styles */
+.studio-breadcrumbs { font-size: 0.85rem; color: var(--text-soft); margin-bottom: 1.5rem; font-weight: 500; letter-spacing: 0.02em; }
+.studio-breadcrumbs span { color: var(--text-muted); }
+.studio-breadcrumbs .current { color: var(--accent); }
+
+/* Project Progress Stepper */
+.project-progress-stepper { display: flex; align-items: center; justify-content: space-between; position: relative; gap: 2rem; padding: 0 1rem; flex: 1; max-width: 600px; }
+.stepper-track { position: absolute; top: 12px; left: 2rem; right: 2rem; height: 2px; background: var(--line-soft); z-index: 0; }
+.progress-step { display: flex; flex-direction: column; align-items: center; gap: 8px; position: relative; z-index: 1; }
+.step-node { width: 24px; height: 24px; border-radius: 50%; background: var(--bg-canvas); border: 2px solid var(--line-strong); transition: all 0.3s ease; }
+.step-label { font-size: 0.75rem; font-weight: 600; color: var(--text-soft); white-space: nowrap; }
+.progress-step.active .step-node { background: var(--accent); border-color: var(--accent); box-shadow: 0 0 15px var(--accent); }
+.progress-step.active .step-label { color: var(--text-main); }
+.progress-step.completed .step-node { background: var(--accent-deep); border-color: var(--accent-deep); }
+
+/* Kanban Styles */
+.view-controls { display: flex; gap: 8px; margin-bottom: 1.5rem; }
+.kanban-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; align-items: start; }
+.kanban-column { background: var(--bg-soft); border-radius: var(--radius-md); padding: 1rem; min-height: 400px; }
+.kanban-column h3 { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.05em; display: flex; justify-content: space-between; }
+.kanban-count { background: var(--line-soft); padding: 2px 8px; border-radius: 10px; font-size: 0.75rem; }
+.kanban-cards { display: flex; flex-direction: column; gap: 1rem; }
+.kanban-card { background: var(--bg-elevated); border: 1px solid var(--line-soft); border-radius: var(--radius-sm); padding: 1rem; cursor: pointer; transition: transform 0.2s ease; }
+.kanban-card:hover { transform: translateY(-2px); border-color: var(--accent); }
+
+/* Mapping Popup */
+.mapping-popup { position: absolute; background: var(--bg-panel); border: 1px solid var(--accent); padding: 5px; border-radius: 8px; box-shadow: var(--shadow-md); z-index: 1000; display: none; }
+.mapping-popup button { background: var(--accent); color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: 600; display: flex; align-items: center; gap: 5px; }
+.mapping-popup button:hover { background: var(--accent-strong); }
+
+/* SEO Heatmap */
+.seo-heatmap-container { margin-top: 1rem; padding: 1rem; background: var(--bg-soft); border-radius: var(--radius-sm); }
+.heatmap-label { display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 0.5rem; color: var(--text-muted); }
+.heatmap-bar { height: 8px; background: var(--line-soft); border-radius: 4px; overflow: hidden; position: relative; }
+.heatmap-fill { height: 100%; width: 0%; transition: all 0.5s ease; background: #ff4d4d; }
+.heatmap-fill.low { background: #ff4d4d; }
+.heatmap-fill.mid { background: #ffcc00; }
+.heatmap-fill.high { background: #00cc66; }
+
+@keyframes skeleton-shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+.skeleton-card { position: relative; overflow: hidden; background: var(--bg-elevated); border-radius: var(--radius-md); border: 1px solid var(--line-soft); }
+.skeleton-card::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, oklch(1 0 0 / 0.05), transparent); animation: skeleton-shimmer 1.5s infinite; }
