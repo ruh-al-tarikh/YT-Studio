@@ -51,7 +51,7 @@ export default {
           const ytUrl = `https://www.googleapis.com/youtube/v3/search?key=${apiKey}&channelId=${channelId}&part=snippet,id&order=date&maxResults=50&type=video`;
           const ytRes = await fetch(ytUrl);
           if (ytRes.ok) {
-            const ytData: any = await ytRes.json();
+            const ytData = (await ytRes.json()) as any;
             if (ytData && ytData.items) {
               const videos = ytData.items.map((item: any) => ({
                 id: item.id.videoId,
