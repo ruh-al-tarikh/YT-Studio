@@ -1,12 +1,11 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "yt-studio-production-production",
+  "name": "yt-studio",
   "main": "src/worker.ts",
   "compatibility_date": "2024-11-01",
   "compatibility_flags": [
     "nodejs_compat"
   ],
-  "workers_dev": true,
   "assets": {
     "directory": "dist"
   },
@@ -17,20 +16,9 @@
       "database_id": "e36d3eba-7401-4945-b8e8-26cdbd13e3a9"
     }
   ],
-  "env": {
-    "production": {
-      "vars": {
-        "ENVIRONMENT": "production",
-        "NODE_ENV": "production",
-        "API_URL": "https://yt-studio-api.ruhdevopsytstudio.workers.dev"
-      },
-      "d1_databases": [
-        {
-          "binding": "MY_DB",
-          "database_name": "yt-studio-db",
-          "database_id": "e36d3eba-7401-4945-b8e8-26cdbd13e3a9"
-        }
-      ]
-    }
+  "vars": {
+    "ENVIRONMENT": "production",
+    "NODE_ENV": "production",
+    "API_URL": "https://yt-studio-api.ruhdevopsytstudio.workers.dev"
   }
 }
