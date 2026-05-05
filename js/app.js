@@ -1,6 +1,6 @@
 (() => {
 	let i = {
-			API: 'https://yt-proxy.ruhdevopsytstudio.workers.dev/api/videos',
+			API: '/api/videos', CHANNEL_KEY: 'yt_studio_channel_id', FALLBACK_DATA: '/data/demo.json',
 			CACHE_KEY: 'yt_studio_videos_cache_v4',
 			CACHE_EXPIRY: 864e5,
 			PROJECTS_KEY: "yt_studio_projects",
@@ -98,6 +98,8 @@
 			newProjectBtn: r('newProjectBtn'),
 			backToProjectsBtn: r('backToProjectsBtn'),
 			activeProjectView: r('active-project-view'),
+			channelInput: r('channelIdInput'),
+			connectBtn: r('connectChannelBtn'),
 			studioViewProjects: r('studio-view-projects'),
 		},
 		n = {
@@ -133,16 +135,6 @@
 					return '';
 				}
 			},
-			highlight: (e, t) => {
-				if (!t) return e;
-				const escaped = t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-				const regex = new RegExp(`(${escaped})`, 'gi');
-				return e.replace(regex, '<mark>$1</mark>');
-			},
-			saveLS: (e, t) => {
-				try {
-					localStorage.setItem(e, JSON.stringify(t));
-				} catch (e) {}
 			highlight: (str, term) => {
 				if (!term) return str;
 				const regex = new RegExp(`(${term})`, 'gi');
@@ -983,6 +975,17 @@
 						window.open('https://wa.me/?text=' + t + e, '_blank', 'noopener'));
 				}),
 			s.retryBtn && s.retryBtn.addEventListener('click', A),
+			s.connectBtn && s.connectBtn.addEventListener('click', () => {
+				const val = s.channelInput.value.trim();
+				if (val) {
+					localStorage.setItem(i.CHANNEL_KEY, val);
+					localStorage.removeItem(i.CACHE_KEY);
+					l.showToast('Channel ID saved! Reloading archives...');
+					setTimeout(() => location.reload(), 1500);
+				} else {
+					l.showToast('Please enter a valid Channel ID');
+				}
+			}),
 			s.scrollToTop &&
 				(window.addEventListener('scroll', () => {
 					500 < window.scrollY ? s.scrollToTop.classList.add('show') : s.scrollToTop.classList.remove('show');
@@ -1189,95 +1192,121 @@
 	async function A() {
 		try {
 			E(); // Initial accessible state
-			if (
-				(s.error && (s.error.style.display = 'none'),
-				s.grid &&
-					((e = Array(6)
-						.fill(0)
-						.map(
-							() => `
-      <div class="skeleton-card">
-        <div class="skeleton skeleton-thumb" style="aspect-ratio:16/9; border-radius:var(--radius-md);"></div>
-        <div class="skeleton skeleton-text" style="height:24px; width:90%; border-radius:4px;"></div>
-        <div class="skeleton skeleton-text short" style="height:20px; width:50%; border-radius:4px;"></div>
-      </div>
-    `,
-						)
-						.join('')),
-					(s.grid.innerHTML = e)),
-				w(),
-				(n.videos = await (async () => {
-					var e = l.getLS(i.CACHE_KEY);
-					if (e && e.data && e.data.length && Date.now() - e.time < i.CACHE_EXPIRY) return e.data;
-					try {
-						var t = (
-							(
-								await (
-									await (async (r) => {
-										let a = i.API_CONFIG.delay;
-										for (let t = 0; t < i.API_CONFIG.retries; t++)
-											try {
-												let e = new AbortController(),
-													t = setTimeout(() => e.abort(), i.API_CONFIG.timeout),
-													a = await fetch(r, { signal: e.signal });
-												if ((clearTimeout(t), a.ok)) return a;
-												throw new Error('API Error: ' + a.status + ' ' + a.statusText);
-											} catch (e) {
-												if (t === i.API_CONFIG.retries - 1) throw e;
-												(await new Promise((e) => setTimeout(e, a)), (a *= i.API_CONFIG.backoff));
-											}
-									})(i.API)
-								).json()
-							).videos || []
-						).map((e) => {
-							var t = e.id || e.videoId;
-							return {
-								id: t,
-								title: e.title || 'Untitled',
-								thumbnail: e.thumbnail || 'https://i.ytimg.com/vi/' + t + '/hqdefault.jpg',
-								publishedAt: e.publishedAt || new Date().toISOString(),
-								category: ((e) => {
-									let t = e.toLowerCase();
-									return (e = a.find((e) => e.terms.some((e) => t.includes(e)))) ? e.key : 'history';
-								})(e.title || ''),
-								description: e.description || 'Deep dive into Islamic history and theology.',
-							};
-						});
-						return (0 < t.length && l.saveLS(i.CACHE_KEY, { data: t, time: Date.now() }), t);
-					} catch (t) {
-						if ((console.error('Failed to load videos:', t), e && e.data)) return e.data;
-						throw t;
-					}
-				})()),
-				n.videos.sort((e, t) => new Date(t.publishedAt) - new Date(e.publishedAt)),
-				!(0 < n.videos.length))
-			)
-				throw new Error('No videos available in the archive.');
-			(T(n.videos[0]), k(), t(), S());
-			
-			// Non-critical operations
-			if ('requestIdleCallback' in window) {
-				requestIdleCallback(() => {
-					R();
-					E();
-					renderProjects();
-				});
-			} else {
-				setTimeout(() => {
-					R();
-					E();
-					renderProjects();
-				}, 500);
+			if (s.error) s.error.style.display = 'none';
+
+			if (s.grid) {
+				s.grid.innerHTML = Array(6).fill(0).map(() => `
+					<div class="skeleton-card">
+						<div class="skeleton skeleton-thumb" style="aspect-ratio:16/9; border-radius:var(--radius-md);"></div>
+						<div class="skeleton skeleton-text" style="height:24px; width:90%; border-radius:4px;"></div>
+						<div class="skeleton skeleton-text short" style="height:20px; width:50%; border-radius:4px;"></div>
+					</div>
+				`).join('');
 			}
+
+			w();
+			if (s.channelInput) s.channelInput.value = localStorage.getItem(i.CHANNEL_KEY) || '';
+
+			const channelId = localStorage.getItem(i.CHANNEL_KEY);
+			const fetchUrl = channelId ? `${i.API}?channelId=${channelId}` : i.API;
+
+			const fetchData = async () => {
+				const cache = l.getLS(i.CACHE_KEY);
+				if (cache && cache.data && cache.data.length && Date.now() - cache.time < i.CACHE_EXPIRY) {
+					return cache.data;
+				}
+
+				try {
+					let delay = i.API_CONFIG.delay;
+					let res;
+					for (let t = 0; t < i.API_CONFIG.retries; t++) {
+						try {
+							const ctrl = new AbortController();
+							const timeout = setTimeout(() => ctrl.abort(), i.API_CONFIG.timeout);
+							res = await fetch(fetchUrl, { signal: ctrl.signal });
+							clearTimeout(timeout);
+							if (res.ok) break;
+							throw new Error(`API Error: ${res.status}`);
+						} catch (e) {
+							if (t === i.API_CONFIG.retries - 1) throw e;
+							await new Promise(resolve => setTimeout(resolve, delay));
+							delay *= i.API_CONFIG.backoff;
+						}
+					}
+
+					const json = await res.json();
+					if (json.isDemo) {
+						document.body.classList.add('demo-mode');
+						l.showToast('Using demo archives');
+					} else {
+						document.body.classList.remove('demo-mode');
+					}
+
+					const videos = (json.videos || []).map(e => {
+						const id = e.id || e.videoId;
+						return {
+							id,
+							title: e.title || 'Untitled',
+							thumbnail: e.thumbnail || `https://i.ytimg.com/vi/${id}/hqdefault.jpg`,
+							publishedAt: e.publishedAt || new Date().toISOString(),
+							category: ((title) => {
+								const t = title.toLowerCase();
+								const found = a.find(cat => cat.terms.some(term => t.includes(term)));
+								return found ? found.key : 'history';
+							})(e.title || ''),
+							description: e.description || 'Deep dive into Islamic history and theology.'
+						};
+					});
+
+					if (videos.length > 0) {
+						l.saveLS(i.CACHE_KEY, { data: videos, time: Date.now() });
+					}
+					return videos;
+				} catch (err) {
+					console.error('Worker fetch failed, trying local fallback:', err);
+					const fallbackRes = await fetch(i.FALLBACK_DATA);
+					const fallbackJson = await fallbackRes.json();
+					document.body.classList.add('demo-mode');
+					return (fallbackJson.videos || []).map(e => ({
+						...e,
+						category: e.category || 'history',
+						description: e.description || 'Deep dive into Islamic history and theology.'
+					}));
+				}
+			};
+
+			n.videos = await fetchData();
+			n.videos.sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt));
+
+			if (n.videos.length === 0) {
+				throw new Error('No videos available in the archive.');
+			}
+
+			T(n.videos[0]);
+			k();
+			t();
+			S();
+
+			const finalize = () => {
+				R();
+				E();
+				renderProjects();
+			};
+
+			if ('requestIdleCallback' in window) {
+				requestIdleCallback(finalize);
+			} else {
+				setTimeout(finalize, 500);
+			}
+
 		} catch (e) {
-			(s.error && (s.error.style.display = 'block'),
-				s.errorMsg && (s.errorMsg.textContent = e.message || 'Connection failed. Please try again.'),
-				console.error('Init Error:', e),
-				S());
+			if (s.error) s.error.style.display = 'block';
+			if (s.errorMsg) s.errorMsg.textContent = e.message || 'Connection failed. Please try again.';
+			console.error('Init Error:', e);
+			S();
 		} finally {
-			s.loading && (s.loading.style.display = 'none');
+			if (s.loading) s.loading.style.display = 'none';
 		}
-		var e;
 	}
 	'loading' === document.readyState ? document.addEventListener('DOMContentLoaded', A) : A();
 })();
