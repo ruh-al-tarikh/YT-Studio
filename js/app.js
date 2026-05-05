@@ -589,30 +589,32 @@
 	}
 	function k() {
 		let a = n.search.toLowerCase();
-		((n.filtered = n.videos.filter((e) => {
-			var t = n.categories.includes('all') || n.categories.includes(e.category),
-				e = !a || e.title.toLowerCase().includes(a);
-			return t && e;
-		})),
-			s.clearFilters && (s.clearFilters.style.display = n.categories.includes('all') ? 'none' : 'inline-flex'),
-			s.resultsMeta && (s.resultsMeta.textContent = n.filtered.length + ' episode' + (1 === n.filtered.length ? '' : 's') + ' found'));
-		var e = n.filtered.slice(0, i.ITEMS_PER_PAGE * (n.page + 1));
-		(s.grid &&
-			(0 === n.filtered.length
-				? (s.grid.innerHTML = `
-          <div class="empty-state-card" style="grid-column: 1 / -1; margin-top: 40px;">
-            <i class="fa-solid fa-magnifying-glass"></i>
-            <h3>No results found</h3>
-            <p>Try different keywords or browse by category to find what you're looking for.</p>
-            <button type="button" class="secondary-button" style="margin-top: 20px;" onclick="document.getElementById('searchInput').value=''; document.getElementById('searchInput').dispatchEvent(new Event('input'));">
-              Clear Search
-            </button>
-          </div>
-        `)
-				: (s.grid.innerHTML = e.map(L).join(''))))
+		n.filtered = n.videos.filter((v) => {
+			const catMatch = n.categories.includes('all') || n.categories.includes(v.category);
+			const searchMatch = !a || v.title.toLowerCase().includes(a);
+			return catMatch && searchMatch;
+		});
 
-				// Sentinel for Infinite Scroll
-				if (e.length < n.filtered.length) {
+		if (s.clearFilters) s.clearFilters.style.display = n.categories.includes('all') ? 'none' : 'inline-flex';
+		if (s.resultsMeta) s.resultsMeta.textContent = n.filtered.length + ' episode' + (n.filtered.length === 1 ? '' : 's') + ' found';
+
+		const visible = n.filtered.slice(0, i.ITEMS_PER_PAGE * (n.page + 1));
+		if (s.grid) {
+			if (n.filtered.length === 0) {
+				s.grid.innerHTML = `
+					<div class="empty-state-card" style="grid-column: 1 / -1; margin-top: 40px;">
+						<i class="fa-solid fa-magnifying-glass"></i>
+						<h3>No results found</h3>
+						<p>Try different keywords or browse by category to find what you're looking for.</p>
+						<button type="button" class="secondary-button" style="margin-top: 20px;" onclick="document.getElementById('searchInput').value=''; document.getElementById('searchInput').dispatchEvent(new Event('input'));">
+							Clear Search
+						</button>
+					</div>
+				`;
+			} else {
+				s.grid.innerHTML = visible.map(L).join('');
+
+				if (visible.length < n.filtered.length) {
 					const sentinel = document.createElement('div');
 					sentinel.id = 'grid-sentinel';
 					sentinel.style.height = '10px';
@@ -627,11 +629,10 @@
 					}, { rootMargin: '400px' });
 					scrollObserver.observe(sentinel);
 				}
-				}
-
-				initLazyLoading();
-				}
-
+			}
+		}
+		initLazyLoading();
+	}
 
 	function initLazyLoading() {
 		const observer = new IntersectionObserver((entries, observer) => {
