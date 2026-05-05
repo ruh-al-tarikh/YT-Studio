@@ -91,10 +91,20 @@ export default {
       return new Response(null, { headers: corsHeaders });
     }
 
-    try {
-      if (url.pathname === "/api/videos") {
-        const channelId = url.searchParams.get("channelId");
-        const apiKey = env.YOUTUBE_API_KEY;
+    const respondJSON = (data: any, status = 200, extraHeaders = {}) => {
+      return new Response(JSON.stringify(data), {
+        status,
+        headers: {
+          ...corsHeaders,
+          "Content-Type": "application/json",
+          ...extraHeaders
+        }
+      });
+    };
+
+    if (url.pathname === "/api/videos") {
+      const channelId = url.searchParams.get("channelId");
+      const apiKey = env.YOUTUBE_API_KEY;
 
       if (channelId && apiKey) {
         try {
@@ -111,47 +121,17 @@ export default {
                 channel: item.snippet.channelTitle,
                 description: item.snippet.description
               }));
-              return new Response(JSON.stringify({ success: true, isDemo: false, videos }), {
-                headers: { ...corsHeaders, "Content-Type": "application/json", "Cache-Control": "public, max-age=600" }
-              });
+              return respondJSON({ success: true, isDemo: false, videos }, 200, { "Cache-Control": "public, max-age=600" });
             }
           } else {
             const errorData = (await ytRes.json()) as any;
-            return new Response(JSON.stringify({ success: false, error: errorData.error?.message || "YouTube API Error" }), {
-              status: ytRes.status,
-              headers: { ...corsHeaders, "Content-Type": "application/json" }
-            });
-        if (channelId && apiKey) {
-          try {
-            const ytUrl = `https://www.googleapis.com/youtube/v3/search?key=${apiKey}&channelId=${channelId}&part=snippet,id&order=date&maxResults=50&type=video`;
-            const ytRes = await fetch(ytUrl);
-            if (ytRes.ok) {
-              const ytData = (await ytRes.json()) as any;
-              if (ytData && ytData.items) {
-                const videos = ytData.items.map((item: any) => ({
-                  id: item.id.videoId,
-                  title: item.snippet.title,
-                  thumbnail: item.snippet.thumbnails.high?.url || item.snippet.thumbnails.default?.url,
-                  publishedAt: item.snippet.publishedAt,
-                  channel: item.snippet.channelTitle,
-                  description: item.snippet.description
-                }));
-                return new Response(JSON.stringify({ success: true, isDemo: false, videos }), {
-                  headers: { ...corsHeaders, "Content-Type": "application/json", "Cache-Control": "public, max-age=900" }
-                });
-              }
-            }
-          } catch (err) {
-            console.error("YouTube Fetch Failed:", err);
+            return respondJSON({ success: false, error: errorData.error?.message || "YouTube API Error" }, ytRes.status);
           }
+        } catch (err) {
+          console.error("YouTube Fetch Failed:", err);
         }
-        return new Response(JSON.stringify({ success: true, isDemo: true, videos: MOCK_VIDEOS }), {
-          headers: { ...corsHeaders, "Content-Type": "application/json" }
-        });
       }
-      return new Response(JSON.stringify({ success: true, isDemo: true, videos: MOCK_VIDEOS }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" }
-      });
+      return respondJSON({ success: true, isDemo: true, videos: MOCK_VIDEOS });
     }
 
     if (url.pathname === "/api/youtube/channel") {
@@ -165,7 +145,7 @@ export default {
                     const data = (await res.json()) as any;
                     if (data.items && data.items.length > 0) {
                         const channel = data.items[0];
-                        return new Response(JSON.stringify({
+                        return respondJSON({
                             success: true,
                             data: {
                                 title: channel.snippet.title,
@@ -176,130 +156,57 @@ export default {
                                 videoCount: channel.statistics.videoCount,
                                 viewCount: channel.statistics.viewCount
                             }
-                        }), {
-                            headers: { ...corsHeaders, "Content-Type": "application/json", "Cache-Control": "public, max-age=600" }
-                        });
+                        }, 200, { "Cache-Control": "public, max-age=600" });
                     }
-                    return new Response(JSON.stringify({ success: false, error: "Channel not found" }), {
-                        status: 404,
-                        headers: { ...corsHeaders, "Content-Type": "application/json" }
-                    });
+                    return respondJSON({ success: false, error: "Channel not found" }, 404);
                 }
             } catch (err) {
-                return new Response(JSON.stringify({ success: false, error: String(err) }), {
-                    status: 500,
-                    headers: { ...corsHeaders, "Content-Type": "application/json" }
-                });
+                return respondJSON({ success: false, error: String(err) }, 500);
             }
         }
-        return new Response(JSON.stringify({ success: false, error: "Missing ID or API Key" }), {
-            status: 400,
-            headers: { ...corsHeaders, "Content-Type": "application/json" }
-        });
+        return respondJSON({ success: false, error: "Missing ID or API Key" }, 400);
     }
 
-      if (url.pathname === "/api/youtube") {
-        const videoId = url.searchParams.get("id");
-        const apiKey = env.YOUTUBE_API_KEY;
-        if (videoId && apiKey) {
+    if (url.pathname === "/api/youtube") {
+      const videoId = url.searchParams.get("id");
+      const apiKey = env.YOUTUBE_API_KEY;
+      if (videoId && apiKey) {
+        try {
           const ytUrl = `https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails,statistics&id=${encodeURIComponent(videoId)}&key=${apiKey}`;
           const res = await fetch(ytUrl);
           if (res.ok) {
             const data = (await res.json()) as any;
-            return new Response(JSON.stringify({ success: true, videoId, data }), {
-                headers: { ...corsHeaders, "Content-Type": "application/json", "Cache-Control": "public, max-age=600" }
-            });
+            return respondJSON({ success: true, videoId, data }, 200, { "Cache-Control": "public, max-age=600" });
           }
         } catch (err) {
-          return new Response(JSON.stringify({ success: false, error: String(err) }), {
-              status: 500,
-              headers: { ...corsHeaders, "Content-Type": "application/json" }
-          });
-            const data = await res.json();
-            return new Response(JSON.stringify({ success: true, videoId, data }), {
-              headers: { ...corsHeaders, "Content-Type": "application/json" }
-            });
-          }
+          return respondJSON({ success: false, error: String(err) }, 500);
         }
-        return new Response(JSON.stringify({ success: false, error: "Invalid Request" }), {
-          status: 400,
-          headers: { ...corsHeaders, "Content-Type": "application/json" }
-        });
       }
-      return new Response(JSON.stringify({ success: false, error: "Missing ID or API Key" }), {
-          status: 400,
-          headers: { ...corsHeaders, "Content-Type": "application/json" }
-      });
+      return respondJSON({ success: false, error: "Missing ID or API Key" }, 400);
     }
 
     if (url.pathname === "/api/orders") {
-      if (!env.MY_DB) return new Response(JSON.stringify({ success: false, error: "D1 not bound" }), {
-          status: 503,
-          headers: { ...corsHeaders, "Content-Type": "application/json" }
-      });
+      if (!env.MY_DB) return respondJSON({ success: false, error: "D1 not bound" }, 503);
       try {
         const { results } = await env.MY_DB.prepare("SELECT * FROM Orders").all();
-        return new Response(JSON.stringify({ success: true, count: results.length, data: results }), {
-            headers: { ...corsHeaders, "Content-Type": "application/json" }
-        });
+        return respondJSON({ success: true, count: results.length, data: results });
       } catch (err) {
-        return new Response(JSON.stringify({ success: false, error: String(err) }), {
-            status: 500,
-            headers: { ...corsHeaders, "Content-Type": "application/json" }
-
-      if (url.pathname === "/api/orders") {
-        if (!env.MY_DB) {
-          return new Response(JSON.stringify({ success: false, error: "D1 not bound" }), {
-            status: 503,
-            headers: { ...corsHeaders, "Content-Type": "application/json" }
-          });
-        }
-        const { results } = await env.MY_DB.prepare("SELECT * FROM Orders").all();
-        return new Response(JSON.stringify({ success: true, count: results.length, data: results }), {
-          headers: { ...corsHeaders, "Content-Type": "application/json" }
-        });
+        return respondJSON({ success: false, error: String(err) }, 500);
       }
+    }
 
     if (url.pathname === "/debug") {
-      return new Response(JSON.stringify({
+      return respondJSON({
         environment: env.NODE_ENV || "production",
         bindings: { youtube_key: !!env.YOUTUBE_API_KEY, d1: !!env.MY_DB },
         timestamp: new Date().toISOString()
-      }), {
-          headers: { ...corsHeaders, "Content-Type": "application/json" }
       });
     }
 
     if (url.pathname === "/health") {
-      return new Response(JSON.stringify({ status: "ok", time: new Date().toISOString() }), {
-          headers: { ...corsHeaders, "Content-Type": "application/json" }
-      });
+      return respondJSON({ status: "ok", time: new Date().toISOString() });
     }
-      if (url.pathname === "/debug") {
-        return new Response(JSON.stringify({
-          environment: env.NODE_ENV || "production",
-          bindings: { youtube_key: !!env.YOUTUBE_API_KEY, d1: !!env.MY_DB },
-          timestamp: new Date().toISOString()
-        }), {
-          headers: { ...corsHeaders, "Content-Type": "application/json" }
-        });
-      }
 
-      if (url.pathname === "/health") {
-        return new Response(JSON.stringify({ status: "ok", time: new Date().toISOString() }), {
-          headers: { ...corsHeaders, "Content-Type": "application/json" }
-        });
-      }
-
-      return new Response(JSON.stringify({ error: "Not Found" }), {
-        status: 404,
-        headers: { ...corsHeaders, "Content-Type": "application/json" }
-      });
-    } catch (err) {
-      return new Response(JSON.stringify({ success: false, error: String(err) }), {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" }
-      });
-    }
+    return new Response("Not Found", { status: 404, headers: corsHeaders });
   }
 };
