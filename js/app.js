@@ -1,6 +1,6 @@
 (() => {
 	let i = {
-			API: 'https://yt-studio.ruhdevopsytstudio.workers.dev/api/videos',
+			API: 'https://yt-proxy.ruhdevopsytstudio.workers.dev/api/videos',
 			CACHE_KEY: 'yt_studio_videos_cache_v4',
 			CACHE_EXPIRY: 864e5,
 			PROJECTS_KEY: "yt_studio_projects",
@@ -133,6 +133,16 @@
 					return '';
 				}
 			},
+			highlight: (e, t) => {
+				if (!t) return e;
+				const escaped = t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+				const regex = new RegExp(`(${escaped})`, 'gi');
+				return e.replace(regex, '<mark>$1</mark>');
+			},
+			saveLS: (e, t) => {
+				try {
+					localStorage.setItem(e, JSON.stringify(t));
+				} catch (e) {}
 			highlight: (str, term) => {
 				if (!term) return str;
 				const regex = new RegExp(`(${term})`, 'gi');
@@ -453,6 +463,32 @@
 		s.body.classList.remove('modal-open');
 	}
 	function v() {
+		s.watchLaterContainer &&
+			(n.watchLater.length
+				? (s.watchLaterContainer.innerHTML = n.watchLater
+						.map((e) => {
+							var t = e.thumbnail || 'https://i.ytimg.com/vi/' + e.id + '/hqdefault.jpg';
+							return (
+								'<div class="card" data-id="' +
+								e.id +
+								'" data-wl="1" role="button" tabindex="0"><div class="card-thumb-wrapper"><img src="' +
+								t +
+								'" alt="' +
+								l.sanitize(e.title) +
+								'" loading="lazy"><button class="watch-later-btn active" data-id="' +
+								e.id +
+								'" aria-label="Remove from Watch Later"><i class="fa-solid fa-bookmark" aria-hidden="true"></i></button></div><div class="card-copy"><div class="card-title">' +
+								l.highlight(l.sanitize(l.truncate(e.title, 60)), n.search) +
+								'</div><div class="card-meta"><span class="card-tag">' +
+								o(e.category) +
+								'</span><span>' +
+								l.formatDate(e.publishedAt) +
+								'</span></div></div></div>'
+							);
+						})
+						.join(''))
+				: (s.watchLaterContainer.innerHTML =
+						'<div class="empty-state">No episodes saved yet. Click the bookmark icon on any episode to save it.</div>'));
 		if (!s.watchLaterContainer) return;
 		if (n.watchLater.length > 0) {
 			s.watchLaterContainer.innerHTML = n.watchLater
@@ -576,9 +612,9 @@
 			(e ? 'active' : '') +
 			'" data-id="' +
 			t.id +
-			'" aria-label="Save for later"><i class="fa-' +
+			'" aria-label="' + (e ? 'Remove from Watch Later' : 'Save for later') + '"><i class="fa-' +
 			(e ? 'solid' : 'regular') +
-			' fa-bookmark"></i></button></div><div class="card-copy"><div class="card-title">' +
+			' fa-bookmark" aria-hidden="true"></i></button></div><div class="card-copy"><div class="card-title">' +
 			l.highlight(l.sanitize(l.truncate(t.title, 60)), n.search) +
 			'</div><div class="card-meta"><span class="card-tag">' +
 			o(t.category) +
@@ -687,6 +723,9 @@
 			s.statSaved && (s.statSaved.textContent = n.watchLater.length),
 			s.statProgress && (s.statProgress.textContent = Object.keys(n.progress).length),
 			s.watchLaterCount && (s.watchLaterCount.textContent = n.watchLater.length));
+		if (s.watchLaterBadge) {
+			s.watchLaterBadge.setAttribute('aria-label', `Open watch later list (${n.watchLater.length} episodes)`);
+		}
 	}
 	function T(t) {
 		var e, a;
@@ -1149,6 +1188,7 @@
 
 	async function A() {
 		try {
+			E(); // Initial accessible state
 			if (
 				(s.error && (s.error.style.display = 'none'),
 				s.grid &&

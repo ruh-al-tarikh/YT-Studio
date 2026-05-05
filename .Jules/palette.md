@@ -1,0 +1,3 @@
+## 2025-05-15 - [Accessible State Toggles & Robust Search Highlighting]
+**Learning:** In state-heavy interfaces (like bookmarking), visual-only icon changes are insufficient for accessibility; dynamic `aria-label` updates are required to communicate state changes to screen readers. Additionally, search highlighting utilities that use `new RegExp` with user input are a major stability risk if special characters (e.g., `?`, `*`, `(`, `)`) are not escaped.
+**Action:** Always pair visual state changes with `aria-label` or `aria-pressed` updates. Use a regex escape helper for all dynamic string-to-regex operations in the search utility.

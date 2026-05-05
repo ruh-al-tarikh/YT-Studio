@@ -248,6 +248,7 @@
 							aria-autocomplete="list"
 							aria-controls="searchSuggestions"
 						/>
+						<kbd class="search-hint">/</kbd>
 						<button
 							id="clearSearch"
 							class="clear-search"
@@ -363,7 +364,7 @@
 					<h2 class="section-title">Episodes</h2>
 					<p class="section-copy">Every upload, searchable and filterable in one place.</p>
 				</div>
-				<div id="results-meta" class="results-meta"></div>
+				<div id="results-meta" class="results-meta" aria-live="polite"></div>
 				<div id="grid" class="grid"></div>
 				<div id="loadMoreContainer" class="load-more-container" style="display: none">
 					<button id="loadMoreBtn" class="primary-button" type="button">Load More Episodes</button>
