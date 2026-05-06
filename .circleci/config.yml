@@ -1,0 +1,36 @@
+# CircleCI pipeline configuration
+version: 2.1
+
+orbs:
+  node: circleci/node@5.2
+
+jobs:
+  build-and-test:
+    docker:
+      - image: cimg/node:lts
+    resource_class: small
+    steps:
+      - checkout
+      - run:
+          name: Install pnpm
+          command: sudo npm install -g pnpm
+      - run:
+          name: Install dependencies
+          command: pnpm install
+      - run:
+          name: Build
+          command: pnpm run build
+      - run:
+          name: Run tests
+          command: pnpm test
+
+workflows:
+  ci:
+    jobs:
+      - build-and-test:
+          filters:
+            branches:
+              only:
+                - main
+                - /feature\/.*/
+                - /fix\/.*/

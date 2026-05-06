@@ -1,0 +1,38 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Editor directories and files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Claude Code local settings
+.claude/settings.local.json
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+
+# Node modules (if any)
+node_modules/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+env/
+venv/
+.env
+
+# OS generated files
+Thumbs.db
+ehthumbs.db

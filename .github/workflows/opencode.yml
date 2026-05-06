@@ -1,0 +1,187 @@
+name: opencode
+
+on:
+  workflow_dispatch:
+    inputs:
+      prompt:
+        description: 'Prompt for OpenCode'
+        required: true
+        type: string
+      youtube-command:
+        description: 'YouTube API Command (optional)'
+        required: false
+        type: choice
+        options:
+          - ''
+          - 'fetch-analytics'
+          - 'get-stats'
+      channel-id:
+        description: 'YouTube Channel ID (for analytics)'
+        required: false
+        type: string
+      video-id:
+        description: 'YouTube Video ID (for stats)'
+        required: false
+        type: string
+
+  issue_comment:
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
+
+jobs:
+  opencode:
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      contains(github.event.comment.body, '/oc') ||
+      contains(github.event.comment.body, '/opencode') ||
+      contains(github.event.comment.body, '/youtube')
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: write
+      pull-requests: write
+      issues: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python for YouTube integration
+        if: |
+          contains(github.event.comment.body, '/youtube') ||
+          contains(github.event.inputs.youtube-command, 'fetch-analytics') ||
+          contains(github.event.inputs.youtube-command, 'get-stats')
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install YouTube API dependencies
+        if: |
+          contains(github.event.comment.body, '/youtube') ||
+          contains(github.event.inputs.youtube-command, 'fetch-analytics') ||
+          contains(github.event.inputs.youtube-command, 'get-stats')
+        run: |
+          pip install google-auth google-auth-oauthlib google-auth-httplib2 google-api-python-client
+
+      - name: Setup Google Credentials
+        if: |
+          contains(github.event.comment.body, '/youtube') ||
+          contains(github.event.inputs.youtube-command, 'fetch-analytics') ||
+          contains(github.event.inputs.youtube-command, 'get-stats')
+        run: |
+          echo '${{ secrets.GOOGLE_CREDENTIALS }}' > credentials.json
+          echo '{}' > token_youtube.json
+        shell: bash
+        continue-on-error: true
+
+      - name: Run YouTube API Integration
+        id: youtube
+        if: |
+          contains(github.event.comment.body, '/youtube') ||
+          contains(github.event.inputs.youtube-command, 'fetch-analytics') ||
+          contains(github.event.inputs.youtube-command, 'get-stats')
+        env:
+          YOUTUBE_COMMAND: ${{ github.event.inputs.youtube-command || 'fetch-analytics' }}
+          YOUTUBE_CHANNEL_ID: ${{ github.event.inputs.channel-id || secrets.YOUTUBE_CHANNEL_ID }}
+          YOUTUBE_VIDEO_ID: ${{ github.event.inputs.video-id }}
+        continue-on-error: true
+        run: |
+          mkdir -p /tmp
+
+          # Simple YouTube API test
+          cat > /tmp/youtube_test.py << 'PYTHON_SCRIPT'
+          import os, json
+          output_file = '/tmp/youtube_result.md'
+
+          # Check for credentials
+          creds_json = os.environ.get('GOOGLE_CREDENTIALS', '')
+          if not creds_json or creds_json == '':
+              with open(output_file, 'w') as f:
+                  f.write("""## ⚠️ YouTube API Not Configured
+
+          The `GOOGLE_CREDENTIALS` secret is not set.
+
+          ### Setup Instructions:
+          1. Go to **Settings** → **Secrets and variables** → **Actions**
+          2. Click **New repository secret**
+          3. Name: `GOOGLE_CREDENTIALS`
+          4. Value: Paste your service account JSON
+          5. Click **Add secret**
+
+          ### Test without YouTube:
+          Use `/oc` commands for OpenCode AI features.
+          """)
+              print("No credentials found")
+              return
+
+          try:
+              creds = json.loads(creds_json)
+              with open(output_file, 'w') as f:
+                  f.write(f"""## ✅ YouTube API Ready
+
+          **Project:** `{creds.get('project_id', 'unknown')}`
+          **Command:** `{os.environ.get('YOUTUBE_COMMAND', 'fetch-analytics')}`
+          **Channel:** `{os.environ.get('YOUTUBE_CHANNEL_ID', 'Not set')}`
+
+          ### Next Steps:
+          1. Enable YouTube Data API v3 in Google Cloud Console
+          2. Add service account `{creds.get('client_email', 'unknown')}` as channel owner
+          3. Wait 24-48 hours for permissions
+
+          ### Test OpenCode:
+          Comment `/oc What can you help me with?`
+          """)
+              print("Credentials validated")
+          except Exception as e:
+              with open(output_file, 'w') as f:
+                  f.write(f"## ❌ Error: {str(e)}")
+              print(f"Error: {e}")
+          PYTHON_SCRIPT
+
+          python /tmp/youtube_test.py
+
+          echo "youtube_result<<EOF" >> $GITHUB_OUTPUT
+          cat /tmp/youtube_result.md >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Install OpenCode CLI
+        run: |
+          curl -fsSL https://opencode.ai/install | bash
+          echo "$HOME/.opencode/bin" >> $GITHUB_PATH
+
+      - name: Extract clean prompt
+        id: extract-prompt
+        env:
+          RAW_PROMPT: ${{ github.event_name == 'workflow_dispatch' && inputs.prompt || github.event.comment.body }}
+        run: |
+          # Clean the prompt
+          CLEAN_PROMPT=$(echo "$RAW_PROMPT" | sed -E 's/.*\/(oc|opencode|youtube)[[:space:]]*//i' | sed -E 's/<[^>]*>//g' | head -1)
+          if [ -z "$CLEAN_PROMPT" ]; then
+            CLEAN_PROMPT="Please analyze this issue or pull request"
+          fi
+          echo "clean_prompt=$CLEAN_PROMPT" >> $GITHUB_OUTPUT
+          echo "Cleaned prompt: $CLEAN_PROMPT"
+
+      - name: Run OpenCode
+        env:
+          OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Run OpenCode without --model flag
+          opencode run "${{ steps.extract-prompt.outputs.clean_prompt }}"
+
+      - name: Post YouTube results as comment
+        if: steps.youtube.outputs.youtube_result != '' && github.event_name == 'issue_comment'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const result = `${{ steps.youtube.outputs.youtube_result }}`;
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: result
+            });

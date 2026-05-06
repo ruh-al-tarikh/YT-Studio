@@ -1,0 +1,55 @@
+name: 🤖 Auto-Enhance Website
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  enhance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Apply fixes
+        run: |
+          # Add lazy loading
+          sed -i 's/<img /<img loading="lazy" /g' index.html 2>/dev/null || true
+
+          # Add missing meta tags
+          if ! grep -q 'name="viewport"' index.html; then
+            sed -i 's/<head>/<head>\n  <meta name="viewport" content="width=device-width, initial-scale=1.0">/' index.html
+          fi
+
+      - name: Check for changes
+        id: git-check
+        run: |
+          git add -A
+          if ! git diff --cached --quiet; then
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create PR
+        if: steps.git-check.outputs.has_changes == 'true'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "🤖 Auto-enhancement: Website optimizations"
+          title: "🤖 Auto-Enhancement Update"
+          body: "Automated improvements applied."
+          branch: auto-enhance/update-${{ github.run_id }}
+          base: main
+          labels: automated
+          delete-branch: true

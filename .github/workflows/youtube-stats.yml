@@ -1,0 +1,58 @@
+name: YouTube Channel Stats
+
+on:
+  workflow_dispatch:
+    inputs:
+      channel_id:
+        description: 'Channel ID'
+        required: true
+        default: 'UCrjJP_SHUeCmqpTSHJCXkdA'
+  issue_comment:
+    types: [created]
+
+jobs:
+  stats:
+    runs-on: ubuntu-latest
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      contains(github.event.comment.body, '/stats')
+    steps:
+      - name: Get YouTube Stats
+        env:
+          API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+          CHANNEL: ${{ github.event_name == 'workflow_dispatch' && inputs.channel_id || 'UCrjJP_SHUeCmqpTSHJCXkdA' }}
+        run: |
+          if [ -z "$API_KEY" ]; then
+            echo "❌ ERROR: YOUTUBE_API_KEY secret not found"
+            echo "Add it at: https://github.com/${{ github.repository }}/settings/secrets/actions"
+            exit 1
+          fi
+          
+          echo "Fetching stats for channel: $CHANNEL"
+          
+          RESPONSE=$(curl -s "https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id=$CHANNEL&key=$API_KEY")
+          
+          echo "## 📊 YouTube Channel Statistics" > output.md
+          echo "" >> output.md
+          echo '```' >> output.md
+          echo "$RESPONSE" | jq '.items[0] | {title: .snippet.title, subscribers: .statistics.subscriberCount, views: .statistics.viewCount, videos: .statistics.videoCount}' 2>/dev/null >> output.md
+          echo '```' >> output.md
+          
+          cat output.md
+          
+          # Save for comment
+          cat output.md >> $GITHUB_STEP_SUMMARY
+
+      - name: Post Comment
+        if: github.event_name == 'issue_comment'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const content = fs.readFileSync('output.md', 'utf8');
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: content
+            });

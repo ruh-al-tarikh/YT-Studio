@@ -1,0 +1,11 @@
+{
+  "name": "yt-studio-youtube-api",
+  "main": "src/youtube-worker.ts",
+  "compatibility_date": "2025-01-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "env": {
+    "production": {
+      "name": "yt-studio-youtube-api-prod"
+    }
+  }
+}

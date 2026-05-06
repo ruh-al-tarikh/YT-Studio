@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Ruh Al Tarikh - Cinematic Islamic archive exploring history, scripture, prophecy, and deep discussion.">
+  <meta name="author" content="Ruh Al Tarikh">
+  <meta property="og:title" content="Ruh Al Tarikh | Cinematic Islamic Archive">
+  <meta property="og:description" content="Uncovering truth through Islamic history, scripture, and contested ideas.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="https://i.ytimg.com/vi/Zzcdtm7Il9U/maxresdefault.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="theme-color" content="#1a1410">
+  
+  <title>Ruh Al Tarikh | Cinematic Islamic Archive</title>
+  
+  <!-- Preconnects & DNS Prefetch -->
+  <link rel="preconnect" href="https://i.ytimg.com">
+  <link rel="preconnect" href="https://www.youtube.com">
+  <link rel="preconnect" href="https://yt-proxy.ruhdevopsytstudio.workers.dev">
+  <link rel="dns-prefetch" href="https://yt-proxy.ruhdevopsytstudio.workers.dev">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  
+  <!-- Icons -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%23d4a574' width='100' height='100'/><text x='50' y='65' font-size='60' font-weight='bold' text-anchor='middle' fill='%231a1410'>ॐ</text></svg>">
+  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect fill='%23d4a574' width='180' height='180'/><text x='90' y='130' font-size='120' font-weight='bold' text-anchor='middle' fill='%231a1410'>ॐ</text></svg>">
+  
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;800&family=Merriweather:wght@400;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-EvOwYxA2xiaf8SxPxE+EeHyceK8wI8LBt2wMYL5P3A3BVKtTNJHsY3eQr8L3d14XPzKvyLRxAGmWIwKJqM1uQ==" crossorigin="anonymous" referrerpolicy="no-referrer">
+  
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/style.css">
+  
+  <!-- Analytics -->
+  <script>
+    window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+  </script>
+</head>
+<body>
+  <!-- Animated Background -->
+  <div class="animated-bg" aria-hidden="true">
+    <div class="bg-gradient bg-gradient-1"></div>
+    <div class="bg-gradient bg-gradient-2"></div>
+    <div class="bg-gradient bg-gradient-3"></div>
+  </div>
+
+  <!-- Navigation Header -->
+  <header class="navbar">
+    <div class="navbar-container">
+      <div class="navbar-brand">
+        <div class="brand-icon">
+          <svg viewBox="0 0 100 100" width="32" height="32" fill="currentColor">
+            <path d="M50 10 L90 90 L10 90 Z"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h1 class="brand-title">Ruh Al Tarikh</h1>
+          <p class="brand-subtitle">Cinematic Archive</p>
+        </div>
+      </div>
+
+      <nav class="navbar-nav">
+        <button class="nav-link" data-action="scroll-to-episodes">
+          <i class="fas fa-film"></i>
+          <span>Episodes</span>
+        </button>
+        <button class="nav-link" id="searchToggleBtn">
+          <i class="fas fa-search"></i>
+          <span>Search</span>
+        </button>
+      </nav>
+
+      <div class="navbar-actions">
+        <button id="watchLaterBtn" class="action-btn badge-btn" aria-label="Watch Later">
+          <i class="fas fa-bookmark"></i>
+          <span class="badge" id="watchLaterBadge">0</span>
+        </button>
+        <button id="dashboardBtn" class="action-btn" aria-label="Dashboard">
+          <i class="fas fa-chart-line"></i>
+        </button>
+        <a href="https://www.youtube.com/@Ruh-Al-Tarikh" target="_blank" rel="noopener noreferrer" class="action-btn" aria-label="YouTube Channel">
+          <i class="fab fa-youtube"></i>
+        </a>
+        <button id="themeToggleBtn" class="action-btn" aria-label="Toggle Theme">
+          <i class="fas fa-moon"></i>
+        </button>
+        <button id="menuToggleBtn" class="menu-toggle" aria-label="Menu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <!-- Hero Section -->
+    <section class="hero" id="heroSection" aria-label="Featured episode">
+      <div class="hero-background" id="heroBg"></div>
+      <div class="hero-overlay"></div>
+      <div class="hero-container">
+        <div class="hero-content">
+          <div class="hero-badge">Featured</div>
+          <h2 class="hero-title" id="heroTitle">Exploring Islamic History</h2>
+          <p class="hero-description" id="heroDescription">Uncover deep insights into the Islamic civilization</p>
+          <div class="hero-meta">
+            <span class="meta-item" id="heroCategory">History</span>
+            <span class="meta-item" id="heroDate">Recently added</span>
+          </div>
+          <div class="hero-actions">
+            <button id="heroPlayBtn" class="btn btn-primary btn-lg">
+              <i class="fas fa-play"></i>
+              <span>Watch Now</span>
+            </button>
+            <button id="heroSaveBtn" class="btn btn-secondary btn-lg">
+              <i class="fas fa-bookmark"></i>
+              <span>Save</span>
+            </button>
+          </div>
+        </div>
+        <div class="hero-thumbnail" id="heroThumbnail"></div>
+      </div>
+    </section>
+
+    <!-- Search & Filter Section -->
+    <section class="search-section" id="searchSection" aria-label="Search and filter">
+      <div class="container">
+        <div class="search-wrapper">
+          <div class="search-input-group">
+            <i class="fas fa-search search-icon"></i>
+            <input 
+              type="text" 
+              id="searchInput" 
+              class="search-input" 
+              placeholder="Search episodes, topics, speakers..."
+              autocomplete="off"
+            >
+            <button id="clearSearchBtn" class="search-clear" aria-label="Clear search" style="display: none;">
+              <i class="fas fa-times"></i>
+            </button>
+            <div id="searchDropdown" class="search-dropdown"></div>
+          </div>
+        </div>
+
+        <div class="filter-wrapper">
+          <div class="filter-label">Filter by:</div>
+          <div class="filter-tags">
+            <button class="filter-tag active" data-filter="all">All Episodes</button>
+            <button class="filter-tag" data-filter="history">History</button>
+            <button class="filter-tag" data-filter="quran">Quranic Studies</button>
+            <button class="filter-tag" data-filter="prophecy">Prophecy</button>
+            <button class="filter-tag" data-filter="discussion">Discussion</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats-section" aria-label="Archive statistics">
+      <div class="container">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon">
+              <i class="fas fa-video"></i>
+            </div>
+            <div class="stat-content">
+              <p class="stat-label">Total Episodes</p>
+              <p class="stat-value" id="statTotal">0</p>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">
+              <i class="fas fa-clock"></i>
+            </div>
+            <div class="stat-content">
+              <p class="stat-label">Hours of Content</p>
+              <p class="stat-value" id="statHours">0h</p>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">
+              <i class="fas fa-bookmark"></i>
+            </div>
+            <div class="stat-content">
+              <p class="stat-label">Saved Episodes</p>
+              <p class="stat-value" id="statSaved">0</p>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">
+              <i class="fas fa-fire"></i>
+            </div>
+            <div class="stat-content">
+              <p class="stat-label">Most Watched</p>
+              <p class="stat-value" id="statTrending">0</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Loading State -->
+    <div id="loadingState" class="loading-state" style="display: none;">
+      <div class="spinner">
+        <div class="spinner-ring"></div>
+      </div>
+      <p>Consulting the archives...</p>
+    </div>
+
+    <!-- Error State -->
+    <div id="errorState" class="error-state" style="display: none;">
+      <div class="error-icon">
+        <i class="fas fa-exclamation-triangle"></i>
+      </div>
+      <h3>Connection Error</h3>
+      <p id="errorMessage">Unable to load episodes. Please try again.</p>
+      <button id="retryBtn" class="btn btn-primary">Retry</button>
+    </div>
+
+    <!-- Episodes Grid -->
+    <section class="episodes-section" id="episodesSection" aria-label="Episodes">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title">Episode Archive</h2>
+          <p class="section-subtitle" id="resultsMeta">Loading episodes...</p>
+        </div>
+        
+        <div id="episodesGrid" class="episodes-grid">
+          <!-- Episodes rendered here -->
+        </div>
+
+        <div id="loadMoreContainer" class="load-more-container" style="display: none;">
+          <button id="loadMoreBtn" class="btn btn-secondary">Load More Episodes</button>
+        </div>
+
+        <div id="emptyState" class="empty-state" style="display: none;">
+          <i class="fas fa-inbox"></i>
+          <h3>No episodes found</h3>
+          <p>Try adjusting your search or filters</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Video Modal -->
+  <div id="videoModal" class="modal" aria-hidden="true">
+    <div class="modal-content">
+      <button class="modal-close" id="modalCloseBtn" aria-label="Close">
+        <i class="fas fa-times"></i>
+      </button>
+      
+      <div class="modal-header">
+        <h2 id="modalTitle" class="modal-title">Episode Title</h2>
+      </div>
+
+      <div class="modal-body">
+        <div class="video-player">
+          <iframe 
+            id="youtubePlayer" 
+            width="100%" 
+            height="100%" 
+            src="" 
+            title="YouTube video player" 
+            frameborder="0" 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+            allowfullscreen>
+          </iframe>
+        </div>
+
+        <div class="modal-actions">
+          <button id="modalShareBtn" class="modal-action-btn" title="Share">
+            <i class="fas fa-share-alt"></i>
+            <span>Share</span>
+          </button>
+          <button id="modalSaveBtn" class="modal-action-btn" title="Save">
+            <i class="fas fa-bookmark"></i>
+            <span>Save</span>
+          </button>
+          <button id="modalTranscriptBtn" class="modal-action-btn" title="Transcript">
+            <i class="fas fa-closed-captioning"></i>
+            <span>Notes</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Watch Later Panel -->
+  <div id="watchLaterPanel" class="side-panel" aria-hidden="true">
+    <div class="panel-header">
+      <h2>Watch Later</h2>
+      <button class="panel-close" aria-label="Close">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div id="watchLaterContent" class="panel-content">
+      <!-- Watch later items rendered here -->
+    </div>
+  </div>
+
+  <!-- Dashboard Panel -->
+  <div id="dashboardPanel" class="side-panel" aria-hidden="true">
+    <div class="panel-header">
+      <h2>Dashboard</h2>
+      <button class="panel-close" aria-label="Close">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="panel-content">
+      <div class="dashboard-stats">
+        <div class="dash-stat">
+          <p class="dash-label">Episodes Loaded</p>
+          <p class="dash-value" id="dashTotal">0</p>
+        </div>
+        <div class="dash-stat">
+          <p class="dash-label">Saved Episodes</p>
+          <p class="dash-value" id="dashSaved">0</p>
+        </div>
+        <div class="dash-stat">
+          <p class="dash-label">Watch Progress</p>
+          <p class="dash-value" id="dashProgress">0%</p>
+        </div>
+      </div>
+
+      <div class="dashboard-categories">
+        <h3>Category Distribution</h3>
+        <div id="categoryList" class="category-list">
+          <!-- Categories rendered here -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast" aria-live="polite" role="status"></div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-section">
+          <h3>Ruh Al Tarikh</h3>
+          <p>A cinematic archive exploring Islamic history, scripture, and contested ideas.</p>
+        </div>
+        <div class="footer-section">
+          <h4>Quick Links</h4>
+          <ul>
+            <li><a href="#" onclick="document.querySelector('[data-filter=all]').click()">All Episodes</a></li>
+            <li><a href="#" onclick="document.querySelector('[data-filter=history]').click()">History</a></li>
+            <li><a href="#" onclick="document.querySelector('[data-filter=quran]').click()">Quranic Studies</a></li>
+          </ul>
+        </div>
+        <div class="footer-section">
+          <h4>Connect</h4>
+          <div class="social-links">
+            <a href="https://www.youtube.com/@Ruh-Al-Tarikh" target="_blank" rel="noopener" aria-label="YouTube">
+              <i class="fab fa-youtube"></i>
+            </a>
+            <a href="#" aria-label="Twitter">
+              <i class="fab fa-twitter"></i>
+            </a>
+            <a href="#" aria-label="Facebook">
+              <i class="fab fa-facebook"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2024 Ruh Al Tarikh. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/app.js" type="module" defer></script>
+  <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token":"ba884823c06049fc9efb06ab4e1b533c"}'></script>
+</body>
+</html>

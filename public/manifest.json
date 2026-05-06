@@ -1,0 +1,16 @@
+{
+  "name": "Ruh Al Tarikh Creator Studio",
+  "short_name": "RuhStudio",
+  "description": "Scholarly Workspace for Islamic History Documentary Filmmakers.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fdfaf3",
+  "theme_color": "#c5a059",
+  "icons": [
+    {
+      "src": "https://yt-studio.vercel.app/assets/og-image.jpg",
+      "sizes": "512x512",
+      "type": "image/jpg"
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+
+  "name": "yt-proxy",
+
+  "main": "src/index.ts",
+
+  // Keep stable + compatible with Workers runtime
+  "compatibility_date": "2024-01-01",
+
+  // Enable workers.dev deployment
+  "workers_dev": true,
+
+  // Required for fetch + modern APIs
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
+
+  // Enable logs + debugging
+  "observability": {
+    "enabled": true
+  },
+
+  // Optional but useful for debugging TypeScript
+  "upload_source_maps": true
+
+  // ⚠️ DO NOT ADD API KEY HERE
+  // Use: wrangler secret put YOUTUBE_API_KEY
+}
