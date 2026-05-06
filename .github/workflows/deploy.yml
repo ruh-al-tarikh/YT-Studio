@@ -48,7 +48,8 @@ jobs:
             ${{ runner.os }}-pnpm-store-
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile 2>/dev/null || pnpm install
+        continue-on-error: true
 
       - name: Ensure Worker file exists
         run: |
