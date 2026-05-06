@@ -1,45 +1,11 @@
 {
-  "name": "yt-studio",
-  "version": "1.0.0",
-  "description": "Ruh Al Tarikh - Cinematic archive for Islamic history, scripture, prophecy, and deep discussion",
-  "author": "Azeez Mohammed Rizwan",
-  "license": "MIT",
-  "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "vitest run",
     "enhance": "node scripts/auto-enhance.js",
-    "lint": "echo \"Linting not configured\""
-  },
-  "dependencies": {
-    "@flags-sdk/hypertune": "^0.3.2",
-    "@google/generative-ai": "^0.1.3",
-    "@vercel/analytics": "^2.0.1",
-    "@vercel/edge-config": "^1.4.3",
-    "@vercel/speed-insights": "^2.0.0",
-    "dotenv": "^16.6.1",
-    "express": "^5.2.1",
-    "flags": "^4.0.6",
-    "hypertune": "^2.10.1",
-    "server-only": "^0.0.1",
-    "skilz": "^0.0.0",
-    "vite": "^6.0.0"
-  },
-  "devDependencies": {
-    "@cloudflare/workers-types": "^4.20260502.1",
-    "@playwright/test": "^1.59.1",
-    "@types/node": "^25.6.0",
-    "playwright": "^1.59.1",
-    "terser": "^5.46.2",
-    "typescript": "^6.0.3",
-    "vite": "^6.0.0",
-    "vitest": "^4.1.5",
-    "wrangler": "^4.87.0"
-  },
-  "engines": {
-    "node": ">=20.0.0",
-    "pnpm": ">=9.0.0"
+    "deploy": "pnpm build && firebase deploy --only hosting",
+    "deploy:worker": "npx wrangler deploy src/youtube-worker.ts --name yt-studio",
+    "deploy:all": "pnpm build && firebase deploy --only hosting && npx wrangler deploy src/youtube-worker.ts --name yt-studio"
   }
 }
