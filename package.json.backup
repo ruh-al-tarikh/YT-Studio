@@ -1,0 +1,11 @@
+{
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "deploy": "pnpm build && firebase deploy --only hosting",
+    "deploy:worker": "npx wrangler deploy src/youtube-worker.ts --name yt-studio",
+    "deploy:all": "pnpm build && firebase deploy --only hosting && npx wrangler deploy src/youtube-worker.ts --name yt-studio",
+    "enhance": "node scripts/auto-enhance.js"
+  }
+}

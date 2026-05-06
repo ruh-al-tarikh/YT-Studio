@@ -7,7 +7,7 @@ export default defineConfig({
     outDir: 'dist',
     assetsDir: 'assets',
     sourcemap: false,
-    minify: 'esbuild',  // Changed from 'terser' to 'esbuild' (built-in, no extra dependency)
+    minify: 'esbuild',
     rollupOptions: {
       input: {
         main: path.resolve(__dirname, 'index.html'),
@@ -23,6 +23,16 @@ export default defineConfig({
     port: 5173,
     open: true,
     host: true,
+    proxy: {
+      '/api': {
+        target: 'https://yt-studio-production.ruhdevopsytstudio.workers.dev',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, '')
+      }
+    }
+  },
+  define: {
+    __API_URL__: JSON.stringify('https://yt-studio-production.ruhdevopsytstudio.workers.dev')
   },
   resolve: {
     alias: {
