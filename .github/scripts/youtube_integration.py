@@ -1,55 +1,40 @@
 #!/usr/bin/env python3
 import os
 import json
-import sys
-from datetime import datetime, timedelta
-from google.oauth2.credentials import Credentials
+from google.oauth2 import service_account
 from googleapiclient.discovery import build
-from google.auth.exceptions import GoogleAuthError
 
 def setup_youtube_client():
-    """Initialize YouTube API client with better error handling"""
+    """Initialize YouTube API client using service account JSON"""
     try:
-        # Check if credentials file exists and is valid
-        token_path = 'token_youtube.json'
-        creds_path = 'credentials.json'
+        # Get credentials from GitHub secret
+        creds_json = os.environ.get('GOOGLE_CREDENTIALS')
         
-        if not os.path.exists(token_path):
-            return None, "❌ Token file not found. Please set up YouTube API authentication first."
+        if not creds_json:
+            return None, "❌ GOOGLE_CREDENTIALS secret not found"
         
-        if not os.path.exists(creds_path):
-            return None, "❌ Credentials file not found. Please add GOOGLE_CREDENTIALS secret."
+        # Parse JSON and create credentials
+        creds_info = json.loads(creds_json)
+        credentials = service_account.Credentials.from_service_account_info(
+            creds_info,
+            scopes=['https://www.googleapis.com/auth/youtube.readonly']
+        )
         
-        # Try to load credentials
-        try:
-            with open(token_path, 'r') as f:
-                token_data = json.load(f)
-            creds = Credentials.from_authorized_user_file(token_path)
-        except json.JSONDecodeError:
-            return None, "❌ Invalid token file format. Please check YOUTUBE_TOKEN secret."
-        except Exception as e:
-            return None, f"❌ Error loading credentials: {str(e)}"
-        
-        # Build the service
-        youtube = build('youtube', 'v3', credentials=creds)
-        
-        # Test the connection
-        try:
-            youtube.channels().list(part='id', mine=True).execute()
-        except Exception as e:
-            return None, f"❌ Authentication failed: {str(e)}. Token may be expired."
-        
+        # Build YouTube service
+        youtube = build('youtube', 'v3', credentials=credentials)
         return youtube, "✅ Authentication successful"
-    
+        
+    except json.JSONDecodeError as e:
+        return None, f"❌ Invalid JSON in GOOGLE_CREDENTIALS: {e}"
     except Exception as e:
-        return None, f"❌ Setup failed: {str(e)}"
+        return None, f"❌ Setup failed: {e}"
 
-def fetch_channel_analytics(channel_id):
-    """Fetch channel statistics without requiring analytics API"""
+def fetch_channel_stats(channel_id):
+    """Fetch public channel statistics"""
     try:
         youtube, error = setup_youtube_client()
         if error:
-            return f"❌ {error}"
+            return error
         
         # Get channel details
         channel = youtube.channels().list(
@@ -58,104 +43,75 @@ def fetch_channel_analytics(channel_id):
         ).execute()
         
         if not channel['items']:
-            return "❌ Channel not found. Please check the channel ID."
+            return f"❌ Channel not found: {channel_id}"
         
-        channel_data = channel['items'][0]
-        stats = channel_data['statistics']
+        data = channel['items'][0]
+        stats = data['statistics']
         
-        report = f"""## 📊 YouTube Channel Analytics
+        return f"""## 📊 YouTube Channel Statistics
 
-**Channel:** {channel_data['snippet']['title']}
+**Channel:** {data['snippet']['title']}
 **Channel ID:** {channel_id}
 
-### Current Statistics:
+### Current Stats:
 - 👥 **Subscribers:** {int(stats.get('subscriberCount', 0)):,}
 - 👁️ **Total Views:** {int(stats.get('viewCount', 0)):,}
-- 🎬 **Total Videos:** {stats.get('videoCount', 0)}
-- 📈 **Channel Created:** {channel_data['snippet']['publishedAt'][:10]}
+- 🎬 **Videos:** {stats.get('videoCount', 0)}
 
-### Channel URL:
 🔗 https://youtube.com/channel/{channel_id}
-
----
-*✅ YouTube API V3 integration is working!*
-*Note: For detailed analytics (watch time, demographics, etc.), you need to enable YouTube Analytics API and set up OAuth 2.0 properly.*
 """
-        return report
-        
     except Exception as e:
-        return f"❌ YouTube API Error: {str(e)}"
+        return f"❌ API Error: {e}"
 
 def get_video_stats(video_id):
-    """Fetch statistics for a specific video"""
+    """Fetch public video statistics"""
     try:
         youtube, error = setup_youtube_client()
         if error:
-            return f"❌ {error}"
+            return error
         
-        # Get video details
         video = youtube.videos().list(
             part='snippet,statistics',
             id=video_id
         ).execute()
         
         if not video['items']:
-            return f"❌ Video not found. Invalid video ID: {video_id}"
+            return f"❌ Video not found: {video_id}"
         
-        video_data = video['items'][0]
-        stats = video_data['statistics']
+        data = video['items'][0]
+        stats = data['statistics']
         
-        report = f"""## 📹 YouTube Video Statistics
+        return f"""## 📹 Video Statistics
 
-**Title:** {video_data['snippet']['title']}
+**Title:** {data['snippet']['title']}
 **Video ID:** {video_id}
 
-### Performance Metrics:
+### Metrics:
 - 👁️ **Views:** {int(stats.get('viewCount', 0)):,}
 - 👍 **Likes:** {int(stats.get('likeCount', 0)):,}
 - 💬 **Comments:** {int(stats.get('commentCount', 0)):,}
 
-### Video Details:
-- **Published:** {video_data['snippet']['publishedAt'][:10]}
-- **Channel:** {video_data['snippet']['channelTitle']}
-
-### Video URL:
 🔗 https://youtube.com/watch?v={video_id}
 """
-        return report
-        
     except Exception as e:
-        return f"❌ Error fetching video stats: {str(e)}"
+        return f"❌ API Error: {e}"
 
 if __name__ == "__main__":
     cmd = os.environ.get('YOUTUBE_COMMAND', 'fetch-analytics')
     channel_id = os.environ.get('YOUTUBE_CHANNEL_ID')
     video_id = os.environ.get('YOUTUBE_VIDEO_ID')
     
-    print(f"Debug: Command={cmd}, Channel={channel_id}, Video={video_id}")
-    
     if cmd == 'fetch-analytics' and channel_id:
-        result = fetch_channel_analytics(channel_id)
+        result = fetch_channel_stats(channel_id)
     elif cmd == 'get-stats' and video_id:
         result = get_video_stats(video_id)
-    elif cmd == 'fetch-analytics' and not channel_id:
-        result = """❌ **Channel ID Required**
-
-To fetch YouTube analytics, you need to provide a channel ID.
-
-**Usage:**
-- In comment: `/youtube fetch-analytics CHANNEL_ID`
-- Or add `YOUTUBE_CHANNEL_ID` to GitHub Secrets
-
-**Example:** `/youtube fetch-analytics UCrjJP_SHUeCmqpTSHJCXkdA`
-"""
     else:
-        result = f"""❌ **Unknown Command**
+        result = f"""❌ **Usage Error**
 
 Command: `{cmd}`
 
-**Available YouTube commands:**
-- `/youtube fetch-analytics CHANNEL_ID` - Get channel statistics
-- `/youtube get-stats VIDEO_ID` - Get video performance
+**Available commands:**
+- `fetch-analytics CHANNEL_ID` - Get channel statistics
+- `get-stats VIDEO_ID` - Get video stats
 
 **Example:**
