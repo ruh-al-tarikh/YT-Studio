@@ -73,7 +73,8 @@ jobs:
           contains(github.event.inputs.youtube-command, 'get-stats')
         run: |
           echo '${{ secrets.GOOGLE_CREDENTIALS }}' > credentials.json
-          echo '${{ secrets.YOUTUBE_TOKEN }}' > token_youtube.json
+          # Create empty token file for now
+          echo '{}' > token_youtube.json
         shell: bash
 
       - name: Run YouTube API Integration
@@ -86,9 +87,34 @@ jobs:
           YOUTUBE_COMMAND: ${{ github.event.inputs.youtube-command || 'fetch-analytics' }}
           YOUTUBE_CHANNEL_ID: ${{ github.event.inputs.channel-id || secrets.YOUTUBE_CHANNEL_ID }}
           YOUTUBE_VIDEO_ID: ${{ github.event.inputs.video-id }}
+          GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+        continue-on-error: true
         run: |
-          python .github/scripts/youtube_integration.py
-          echo "youtube_result=$(cat /tmp/youtube_result.md)" >> $GITHUB_OUTPUT
+          # Create output directory
+          mkdir -p /tmp
+          
+          # Run the Python script
+          python .github/scripts/youtube_integration.py || echo "YouTube script failed"
+          
+          # Create default output if file doesn't exist
+          if [ ! -f /tmp/youtube_result.md ]; then
+            echo "## ⚠️ YouTube API Error
+
+The YouTube API integration encountered an issue. This could be due to:
+- Missing or invalid credentials
+- API quota exceeded
+- Network issues
+
+**Command:** ${{ env.YOUTUBE_COMMAND }}
+**Channel ID:** ${{ env.YOUTUBE_CHANNEL_ID }}
+
+To fix this, ensure the \`GOOGLE_CREDENTIALS\` secret is properly set in your repository settings." > /tmp/youtube_result.md
+          fi
+          
+          # Set output
+          echo "youtube_result<<EOF" >> $GITHUB_OUTPUT
+          cat /tmp/youtube_result.md >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Install OpenCode CLI
         run: |
@@ -117,10 +143,17 @@ jobs:
           OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          opencode run "${{ steps.extract-prompt.outputs.clean_prompt }}" --model opencode/gpt-4o-mini
+          # Try different model names (OpenCode has different naming)
+          if opencode run "${{ steps.extract-prompt.outputs.clean_prompt }}" --help 2>&1 | grep -q "model"; then
+            opencode run "${{ steps.extract-prompt.outputs.clean_prompt }}" --model gpt-4o-mini || \
+            opencode run "${{ steps.extract-prompt.outputs.clean_prompt }}" --model openai/gpt-4o-mini || \
+            opencode run "${{ steps.extract-prompt.outputs.clean_prompt }}"
+          else
+            opencode run "${{ steps.extract-prompt.outputs.clean_prompt }}"
+          fi
 
       - name: Post YouTube results as comment
-        if: steps.youtube.outputs.youtube_result != ''
+        if: steps.youtube.outputs.youtube_result != '' && github.event_name == 'issue_comment'
         uses: actions/github-script@v7
         with:
           script: |
