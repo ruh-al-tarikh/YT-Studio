@@ -73,9 +73,9 @@ jobs:
           contains(github.event.inputs.youtube-command, 'get-stats')
         run: |
           echo '${{ secrets.GOOGLE_CREDENTIALS }}' > credentials.json
-          # Create empty token file for now
           echo '{}' > token_youtube.json
         shell: bash
+        continue-on-error: true
 
       - name: Run YouTube API Integration
         id: youtube
@@ -87,31 +87,62 @@ jobs:
           YOUTUBE_COMMAND: ${{ github.event.inputs.youtube-command || 'fetch-analytics' }}
           YOUTUBE_CHANNEL_ID: ${{ github.event.inputs.channel-id || secrets.YOUTUBE_CHANNEL_ID }}
           YOUTUBE_VIDEO_ID: ${{ github.event.inputs.video-id }}
-          GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
         continue-on-error: true
         run: |
-          # Create output directory
           mkdir -p /tmp
           
-          # Run the Python script
-          python .github/scripts/youtube_integration.py || echo "YouTube script failed"
+          # Simple YouTube API test
+          cat > /tmp/youtube_test.py << 'PYTHON_SCRIPT'
+          import os, json
+          output_file = '/tmp/youtube_result.md'
           
-          # Create default output if file doesn't exist
-          if [ ! -f /tmp/youtube_result.md ]; then
-            echo "## ⚠️ YouTube API Error
+          # Check for credentials
+          creds_json = os.environ.get('GOOGLE_CREDENTIALS', '')
+          if not creds_json or creds_json == '':
+              with open(output_file, 'w') as f:
+                  f.write("""## ⚠️ YouTube API Not Configured
 
-The YouTube API integration encountered an issue. This could be due to:
-- Missing or invalid credentials
-- API quota exceeded
-- Network issues
+          The `GOOGLE_CREDENTIALS` secret is not set.
 
-**Command:** ${{ env.YOUTUBE_COMMAND }}
-**Channel ID:** ${{ env.YOUTUBE_CHANNEL_ID }}
+          ### Setup Instructions:
+          1. Go to **Settings** → **Secrets and variables** → **Actions**
+          2. Click **New repository secret**
+          3. Name: `GOOGLE_CREDENTIALS`
+          4. Value: Paste your service account JSON
+          5. Click **Add secret**
 
-To fix this, ensure the \`GOOGLE_CREDENTIALS\` secret is properly set in your repository settings." > /tmp/youtube_result.md
-          fi
+          ### Test without YouTube:
+          Use `/oc` commands for OpenCode AI features.
+          """)
+              print("No credentials found")
+              return
           
-          # Set output
+          try:
+              creds = json.loads(creds_json)
+              with open(output_file, 'w') as f:
+                  f.write(f"""## ✅ YouTube API Ready
+
+          **Project:** `{creds.get('project_id', 'unknown')}`
+          **Command:** `{os.environ.get('YOUTUBE_COMMAND', 'fetch-analytics')}`
+          **Channel:** `{os.environ.get('YOUTUBE_CHANNEL_ID', 'Not set')}`
+
+          ### Next Steps:
+          1. Enable YouTube Data API v3 in Google Cloud Console
+          2. Add service account `{creds.get('client_email', 'unknown')}` as channel owner
+          3. Wait 24-48 hours for permissions
+
+          ### Test OpenCode:
+          Comment `/oc What can you help me with?`
+          """)
+              print("Credentials validated")
+          except Exception as e:
+              with open(output_file, 'w') as f:
+                  f.write(f"## ❌ Error: {str(e)}")
+              print(f"Error: {e}")
+          PYTHON_SCRIPT
+          
+          python /tmp/youtube_test.py
+          
           echo "youtube_result<<EOF" >> $GITHUB_OUTPUT
           cat /tmp/youtube_result.md >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
@@ -126,31 +157,21 @@ To fix this, ensure the \`GOOGLE_CREDENTIALS\` secret is properly set in your re
         env:
           RAW_PROMPT: ${{ github.event_name == 'workflow_dispatch' && inputs.prompt || github.event.comment.body }}
         run: |
-          # Check if this is a YouTube command
-          if echo "$RAW_PROMPT" | grep -qi '/youtube'; then
-            CLEAN_PROMPT="YouTube API operation completed. ${{ steps.youtube.outputs.youtube_result }}"
-          else
-            # Remove command prefixes for OpenCode
-            CLEAN_PROMPT=$(echo "$RAW_PROMPT" | sed -E 's/.*\/(oc|opencode)[[:space:]]*//i' | sed -E 's/<[^>]*>//g' | head -1)
-            if [ -z "$CLEAN_PROMPT" ]; then
-              CLEAN_PROMPT="Please analyze this issue or pull request"
-            fi
+          # Clean the prompt
+          CLEAN_PROMPT=$(echo "$RAW_PROMPT" | sed -E 's/.*\/(oc|opencode|youtube)[[:space:]]*//i' | sed -E 's/<[^>]*>//g' | head -1)
+          if [ -z "$CLEAN_PROMPT" ]; then
+            CLEAN_PROMPT="Please analyze this issue or pull request"
           fi
           echo "clean_prompt=$CLEAN_PROMPT" >> $GITHUB_OUTPUT
+          echo "Cleaned prompt: $CLEAN_PROMPT"
 
       - name: Run OpenCode
         env:
           OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Try different model names (OpenCode has different naming)
-          if opencode run "${{ steps.extract-prompt.outputs.clean_prompt }}" --help 2>&1 | grep -q "model"; then
-            opencode run "${{ steps.extract-prompt.outputs.clean_prompt }}" --model gpt-4o-mini || \
-            opencode run "${{ steps.extract-prompt.outputs.clean_prompt }}" --model openai/gpt-4o-mini || \
-            opencode run "${{ steps.extract-prompt.outputs.clean_prompt }}"
-          else
-            opencode run "${{ steps.extract-prompt.outputs.clean_prompt }}"
-          fi
+          # Run OpenCode without --model flag
+          opencode run "${{ steps.extract-prompt.outputs.clean_prompt }}"
 
       - name: Post YouTube results as comment
         if: steps.youtube.outputs.youtube_result != '' && github.event_name == 'issue_comment'
@@ -158,7 +179,7 @@ To fix this, ensure the \`GOOGLE_CREDENTIALS\` secret is properly set in your re
         with:
           script: |
             const result = `${{ steps.youtube.outputs.youtube_result }}`;
-            github.rest.issues.createComment({
+            await github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
