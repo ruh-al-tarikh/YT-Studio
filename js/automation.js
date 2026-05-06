@@ -1,18 +1,4 @@
-// Automation and Export Tools
-
-export function initAutomation() {
-	const exportBtn = document.getElementById('exportProjectBtn');
-	
-	if (exportBtn) {
-		exportBtn.addEventListener('click', () => {
-			showExportOptions();
-		});
-	}
-}
-
-function showExportOptions() {
-	// Simple mock modal for export options
-	const html = `
+function initAutomation(){var t=document.getElementById("exportProjectBtn");t&&t.addEventListener("click",()=>{showExportOptions()})}function showExportOptions(){document.body.insertAdjacentHTML("beforeend",`
 		<div id="exportModal" class="ai-modal show" aria-hidden="false">
 			<div class="ai-modal-content" style="max-width: 400px;">
 				<div class="ai-modal-header">
@@ -26,36 +12,5 @@ function showExportOptions() {
 				</div>
 			</div>
 		</div>
-	`;
-	document.body.insertAdjacentHTML('beforeend', html);
-}
-
-window.exportToTXT = function() {
-	const textareas = document.querySelectorAll('.script-textarea');
-	let content = "PROJECT SCRIPT\\n\\n";
-	
-	textareas.forEach(ta => {
-		const section = ta.previousElementSibling ? ta.previousElementSibling.textContent : '';
-		if (ta.value.trim()) {
-			content += `--- ${section} ---\n`;
-			content += ta.value.trim() + "\\n\\n";
-		}
-	});
-
-	if (content.trim() === "PROJECT SCRIPT") {
-		alert('Script is empty!');
-		return;
-	}
-
-	const blob = new Blob([content], { type: 'text/plain' });
-	const url = URL.createObjectURL(blob);
-	const a = document.createElement('a');
-	a.href = url;
-	a.download = 'Script_Export.txt';
-	a.click();
-	URL.revokeObjectURL(url);
-	
-	document.getElementById('exportModal')?.remove();
-}
-
-document.addEventListener('DOMContentLoaded', initAutomation);
+	`)}window.exportToTXT=function(){var t,e=document.querySelectorAll(".script-textarea");let o="PROJECT SCRIPT\\n\\n";e.forEach(t=>{var e=t.previousElementSibling?t.previousElementSibling.textContent:"";t.value.trim()&&(o=(o+=`--- ${e} ---
+`)+t.value.trim()+"\\n\\n")}),"PROJECT SCRIPT"===o.trim()?alert("Script is empty!"):(e=new Blob([o],{type:"text/plain"}),e=URL.createObjectURL(e),(t=document.createElement("a")).href=e,t.download="Script_Export.txt",t.click(),URL.revokeObjectURL(e),document.getElementById("exportModal")?.remove())},document.addEventListener("DOMContentLoaded",initAutomation);export{initAutomation};

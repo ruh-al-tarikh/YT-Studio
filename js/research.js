@@ -1,6 +1,4 @@
-// Research Intelligence Panel
-
-const RESEARCH_HTML = `
+let RESEARCH_HTML=`
 <div class="research-container">
 	<div class="research-main">
 		<div class="section-heading">
@@ -44,107 +42,24 @@ const RESEARCH_HTML = `
 		</div>
 	</aside>
 </div>
-`;
-
-let researchNotes = JSON.parse(localStorage.getItem('yt_studio_research') || '[]');
-
-export function initResearch() {
-	const container = document.getElementById('ptab-research');
-	if (!container) return;
-
-	container.innerHTML = RESEARCH_HTML;
-
-	const saveBtn = document.getElementById('saveResearchBtn');
-	const inputEl = document.getElementById('researchInput');
-	const tagEl = document.getElementById('researchTag');
-
-	saveBtn.addEventListener('click', () => {
-		const text = inputEl.value.trim();
-		if (!text) return;
-
-		const note = {
-			id: Date.now(),
-			text: text,
-			tag: tagEl.value,
-			date: new Date().toLocaleDateString()
-		};
-
-		researchNotes.unshift(note);
-		localStorage.setItem('yt_studio_research', JSON.stringify(researchNotes));
-		inputEl.value = '';
-		renderNotes();
-	});
-
-	renderNotes();
-}
-
-function escapeHTML(str) {
-	return String(str || '')
-		.replace(/&/g, '&amp;')
-		.replace(/</g, '&lt;')
-		.replace(/>/g, '&gt;')
-		.replace(/"/g, '&quot;')
-		.replace(/'/g, '&#039;');
-}
-
-function renderNotes() {
-	const grid = document.getElementById('researchGrid');
-	if (!grid) return;
-
-	if (researchNotes.length === 0) {
-		grid.innerHTML = `
+`,researchNotes=JSON.parse(localStorage.getItem("yt_studio_research")||"[]");function initResearch(){var e=document.getElementById("ptab-research");if(e){e.innerHTML=RESEARCH_HTML;e=document.getElementById("saveResearchBtn");let t=document.getElementById("researchInput"),a=document.getElementById("researchTag");e.addEventListener("click",()=>{var e=t.value.trim();e&&(e={id:Date.now(),text:e,tag:a.value,date:(new Date).toLocaleDateString()},researchNotes.unshift(e),localStorage.setItem("yt_studio_research",JSON.stringify(researchNotes)),t.value="",renderNotes())}),renderNotes()}}function escapeHTML(e){return String(e||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;")}function renderNotes(){var e=document.getElementById("researchGrid");e&&(0===researchNotes.length?e.innerHTML=`
 			<div class="empty-state-card" style="grid-column: 1 / -1;">
 				<i class="fa-solid fa-book-open"></i>
 				<h3>No research notes yet</h3>
 				<p>Start pasting text or links above.</p>
 			</div>
-		`;
-		return;
-	}
-
-	grid.innerHTML = researchNotes.map(note => `
+		`:(e.innerHTML=researchNotes.map(e=>`
 		<div class="research-card">
 			<div class="research-card-header">
-				<span class="research-tag tag-${note.tag.toLowerCase()}">${note.tag}</span>
+				<span class="research-tag tag-${e.tag.toLowerCase()}">${e.tag}</span>
 				<div class="research-card-actions">
-					<button class="icon-button small copy-note-btn" data-text="${encodeURIComponent(note.text)}" title="Copy"><i class="fa-regular fa-copy"></i></button>
-					<button class="icon-button small delete-note-btn" data-id="${note.id}" title="Delete"><i class="fa-solid fa-trash"></i></button>
+					<button class="icon-button small copy-note-btn" data-text="${encodeURIComponent(e.text)}" title="Copy"><i class="fa-regular fa-copy"></i></button>
+					<button class="icon-button small delete-note-btn" data-id="${e.id}" title="Delete"><i class="fa-solid fa-trash"></i></button>
 				</div>
 			</div>
-			<p class="research-card-text">${escapeHTML(note.text).replace(/\n/g, '<br>')}</p>
+			<p class="research-card-text">${escapeHTML(e.text).replace(/\n/g,"<br>")}</p>
 			<div class="research-card-footer">
-				<span class="research-date">${note.date}</span>
+				<span class="research-date">${e.date}</span>
 			</div>
 		</div>
-	`).join('');
-
-	// Attach event listeners
-	grid.querySelectorAll('.copy-note-btn').forEach(btn => {
-		btn.addEventListener('click', (e) => {
-			const text = decodeURIComponent(e.currentTarget.dataset.text);
-			navigator.clipboard.writeText(text);
-			showToast('Copied research note!');
-		});
-	});
-
-	grid.querySelectorAll('.delete-note-btn').forEach(btn => {
-		btn.addEventListener('click', (e) => {
-			const id = parseInt(e.currentTarget.dataset.id);
-			researchNotes = researchNotes.filter(n => n.id !== id);
-			localStorage.setItem('yt_studio_research', JSON.stringify(researchNotes));
-			renderNotes();
-		});
-	});
-}
-
-function showToast(msg) {
-	const toast = document.getElementById('toast');
-	if(toast) {
-		toast.textContent = msg;
-		toast.classList.add('show');
-		setTimeout(() => toast.classList.remove('show'), 3000);
-	}
-}
-
-// Auto-init on load
-document.addEventListener('DOMContentLoaded', initResearch);
+	`).join(""),e.querySelectorAll(".copy-note-btn").forEach(e=>{e.addEventListener("click",e=>{e=decodeURIComponent(e.currentTarget.dataset.text);navigator.clipboard.writeText(e),showToast("Copied research note!")})}),e.querySelectorAll(".delete-note-btn").forEach(e=>{e.addEventListener("click",e=>{let t=parseInt(e.currentTarget.dataset.id);researchNotes=researchNotes.filter(e=>e.id!==t),localStorage.setItem("yt_studio_research",JSON.stringify(researchNotes)),renderNotes()})})))}function showToast(e){let t=document.getElementById("toast");t&&(t.textContent=e,t.classList.add("show"),setTimeout(()=>t.classList.remove("show"),3e3))}document.addEventListener("DOMContentLoaded",initResearch);export{initResearch};
