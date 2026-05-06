@@ -7,7 +7,7 @@ export default defineConfig({
     outDir: 'dist',
     assetsDir: 'assets',
     sourcemap: false,
-    minify: 'terser',
+    minify: 'esbuild',  // Changed from 'terser' to 'esbuild' (built-in, no extra dependency)
     rollupOptions: {
       input: {
         main: path.resolve(__dirname, 'index.html'),
@@ -35,7 +35,6 @@ export default defineConfig({
     exclude: [],
   },
   esbuild: {
-    // Handle minified JS files
     supported: {
       'top-level-await': true,
     },
