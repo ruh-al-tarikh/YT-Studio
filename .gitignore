@@ -52,3 +52,4 @@ deployment-url.txt
 firebase-debug.log*
 firebase.json
 .firebaserc
+js/*.backup

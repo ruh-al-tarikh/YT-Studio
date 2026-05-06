@@ -1,34 +1,12 @@
 {
-  "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "yt-studio-production-production",
-  "main": "src/worker.ts",
-  "compatibility_date": "2024-11-01",
-  "compatibility_flags": [
-    "nodejs_compat"
-  ],
-  "assets": {
-    "directory": "./dist"
-  },
-  "d1_databases": [
-    {
-      "binding": "MY_DB",
-      "database_name": "yt-studio-db",
-      "database_id": "e36d3eba-7401-4945-b8e8-26cdbd13e3a9"
-    }
-  ],
-  "env": {
-    "production": {
-      "vars": {
-        "ENVIRONMENT": "production",
-        "NODE_ENV": "production"
-      },
-      "d1_databases": [
-        {
-          "binding": "MY_DB",
-          "database_name": "yt-studio-db",
-          "database_id": "e36d3eba-7401-4945-b8e8-26cdbd13e3a9"
-        }
-      ]
-    }
+  "$schema": "https://raw.githubusercontent.com/cloudflare/workers-sdk/main/packages/wrangler/config-schema.json",
+  "name": "yt-studio-youtube-api",
+  "main": "src/youtube-worker.ts",
+  "compatibility_date": "2025-01-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": true,
+  "preview_urls": true,
+  "vars": {
+    "ENVIRONMENT": "production"
   }
 }
