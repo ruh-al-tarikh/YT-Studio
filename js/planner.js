@@ -1,6 +1,4 @@
-// Content Planning Board
-
-const PLANNER_HTML = `
+let PLANNER_HTML=`
 <div class="planner-container">
 	<div class="section-heading flex-between">
 		<div>
@@ -42,30 +40,9 @@ const PLANNER_HTML = `
 		</aside>
 	</div>
 </div>
-`;
-
-export function initPlanner() {
-	const container = document.getElementById('studio-view-planner');
-	if (!container) return;
-	container.innerHTML = PLANNER_HTML;
-
-	const calendarGrid = document.getElementById('calendarGrid');
-	const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-
-	let calendarHTML = days.map(day => `<div class="calendar-day-header">${day}</div>`).join('');
-
-	for(let i=1; i<=28; i++) {
-		const isToday = i === 12;
-		const hasVideo = i === 15 || i === 22;
-		calendarHTML += `
-			<div class="calendar-day ${isToday ? 'today' : ''}">
-				<span class="day-number">${i}</span>
-				${hasVideo ? `<div class="calendar-event ${i === 15 ? 'writing' : 'editing'}">Video Project</div>` : ''}
+`;function initPlanner(){var a=document.getElementById("studio-view-planner");if(a){a.innerHTML=PLANNER_HTML;a=document.getElementById("calendarGrid");let e=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"].map(a=>`<div class="calendar-day-header">${a}</div>`).join("");for(let a=1;a<=28;a++){var i=12===a,d=15===a||22===a;e+=`
+			<div class="calendar-day ${i?"today":""}">
+				<span class="day-number">${a}</span>
+				${d?`<div class="calendar-event ${15===a?"writing":"editing"}">Video Project</div>`:""}
 			</div>
-		`;
-	}
-
-	calendarGrid.innerHTML = calendarHTML;
-}
-
-document.addEventListener('DOMContentLoaded', initPlanner);
+		`}a.innerHTML=e}}document.addEventListener("DOMContentLoaded",initPlanner);export{initPlanner};

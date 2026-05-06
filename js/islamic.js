@@ -1,6 +1,4 @@
-// Islamic Reference Toolkit
-
-const ISLAMIC_HTML = `
+let ISLAMIC_HTML=`
 <div class="islamic-container">
 	<div class="islamic-main">
 		<div class="section-heading">
@@ -37,131 +35,21 @@ const ISLAMIC_HTML = `
 		</div>
 	</aside>
 </div>
-`;
-
-const mockReferences = [
-	{
-		id: 1,
-		type: 'quran',
-		source: 'Surah Al-Baqarah 2:255',
-		arabic: 'اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ',
-		translation: 'Allah! There is no deity except Him, the Ever-Living, the Sustainer of [all] existence.',
-		tags: ['Tawheed', 'Ayatul Kursi']
-	},
-	{
-		id: 2,
-		type: 'hadith',
-		source: 'Sahih al-Bukhari 1',
-		arabic: 'إِنَّمَا الأَعْمَالُ بِالنِّيَّاتِ',
-		translation: 'The reward of deeds depends upon the intentions...',
-		tags: ['Intentions', 'Basics']
-	},
-	{
-		id: 3,
-		type: 'history',
-		source: 'Salahuddin Ayyubi',
-		arabic: '',
-		translation: 'I have become the servant of the two holy sanctuaries.',
-		tags: ['Jerusalem', 'Leadership']
-	}
-];
-
-export function initIslamic() {
-	const container = document.getElementById('studio-view-islamic');
-	if (!container) return;
-	container.innerHTML = ISLAMIC_HTML;
-
-	const listEl = document.getElementById('referenceList');
-	const searchEl = document.getElementById('islamicSearch');
-	const filters = document.querySelectorAll('.islamic-filters .chip');
-
-	let currentFilter = 'all';
-	let searchQuery = '';
-
-	function renderList() {
-		const filtered = mockReferences.filter(r => {
-			const matchFilter = currentFilter === 'all' || r.type === currentFilter;
-			const matchSearch = r.source.toLowerCase().includes(searchQuery) || 
-								r.translation.toLowerCase().includes(searchQuery) ||
-								r.tags.join(' ').toLowerCase().includes(searchQuery);
-			return matchFilter && matchSearch;
-		});
-
-		if (filtered.length === 0) {
-			listEl.innerHTML = '<p class="text-soft">No references found.</p>';
-			return;
-		}
-
-		listEl.innerHTML = filtered.map(r => `
+`,mockReferences=[{id:1,type:"quran",source:"Surah Al-Baqarah 2:255",arabic:"اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ",translation:"Allah! There is no deity except Him, the Ever-Living, the Sustainer of [all] existence.",tags:["Tawheed","Ayatul Kursi"]},{id:2,type:"hadith",source:"Sahih al-Bukhari 1",arabic:"إِنَّمَا الأَعْمَالُ بِالنِّيَّاتِ",translation:"The reward of deeds depends upon the intentions...",tags:["Intentions","Basics"]},{id:3,type:"history",source:"Salahuddin Ayyubi",arabic:"",translation:"I have become the servant of the two holy sanctuaries.",tags:["Jerusalem","Leadership"]}];function initIslamic(){var e=document.getElementById("studio-view-islamic");if(e){e.innerHTML=ISLAMIC_HTML;let a=document.getElementById("referenceList");e=document.getElementById("islamicSearch");let t=document.querySelectorAll(".islamic-filters .chip"),i="all",s="";function c(){var e=mockReferences.filter(e=>{var a="all"===i||e.type===i,e=e.source.toLowerCase().includes(s)||e.translation.toLowerCase().includes(s)||e.tags.join(" ").toLowerCase().includes(s);return a&&e});0===e.length?a.innerHTML='<p class="text-soft">No references found.</p>':(a.innerHTML=e.map(e=>`
 			<div class="reference-item">
 				<div class="ref-header">
-					<span class="ref-source">${r.source}</span>
-					<span class="ref-badge ${r.type}">${r.type}</span>
+					<span class="ref-source">${e.source}</span>
+					<span class="ref-badge ${e.type}">${e.type}</span>
 				</div>
-				${r.arabic ? `<p class="ref-arabic">${r.arabic}</p>` : ''}
-				<p class="ref-translation">${r.translation}</p>
+				${e.arabic?`<p class="ref-arabic">${e.arabic}</p>`:""}
+				<p class="ref-translation">${e.translation}</p>
 				<div class="ref-footer">
-					<div class="ref-tags">${r.tags.map(t => `<span class="ref-tag">#${t}</span>`).join('')}</div>
+					<div class="ref-tags">${e.tags.map(e=>`<span class="ref-tag">#${e}</span>`).join("")}</div>
 					<div class="ref-actions">
-						<button class="secondary-button small copy-ref-btn" data-id="${r.id}"><i class="fa-regular fa-copy"></i> Copy</button>
-						<button class="secondary-button small attach-ref-btn" data-id="${r.id}"><i class="fa-solid fa-paperclip"></i> Attach to Script</button>
+						<button class="secondary-button small copy-ref-btn" data-id="${e.id}"><i class="fa-regular fa-copy"></i> Copy</button>
+						<button class="secondary-button small attach-ref-btn" data-id="${e.id}"><i class="fa-solid fa-paperclip"></i> Attach to Script</button>
 					</div>
 				</div>
 			</div>
-		`).join('');
-
-		listEl.querySelectorAll('.copy-ref-btn').forEach(btn => {
-			btn.addEventListener('click', (e) => {
-				const id = parseInt(e.currentTarget.dataset.id);
-				const ref = mockReferences.find(r => r.id === id);
-				const text = `${ref.source}\n${ref.arabic ? ref.arabic + '\n' : ''}${ref.translation}`;
-				navigator.clipboard.writeText(text);
-				showToast('Reference copied!');
-			});
-		});
-
-		listEl.querySelectorAll('.attach-ref-btn').forEach(btn => {
-			btn.addEventListener('click', (e) => {
-				const id = parseInt(e.currentTarget.dataset.id);
-				const ref = mockReferences.find(r => r.id === id);
-				const text = `[REF: ${ref.source}]`;
-
-				// Find active script textarea or fallback to first
-				const tas = document.querySelectorAll('.script-textarea');
-				if (tas.length > 0) {
-					const ta = tas[2] || tas[0]; // Prefer lesson section
-					ta.value += '\n' + text;
-					ta.dispatchEvent(new Event('input'));
-					showToast('Attached to Script!');
-				}
-			});
-		});
-	}
-
-	function showToast(msg) {
-		const toast = document.getElementById('toast');
-		if(toast) {
-			toast.textContent = msg;
-			toast.classList.add('show');
-			setTimeout(() => toast.classList.remove('show'), 3000);
-		}
-	}
-
-	searchEl.addEventListener('input', (e) => {
-		searchQuery = e.target.value.toLowerCase();
-		renderList();
-	});
-
-	filters.forEach(btn => {
-		btn.addEventListener('click', (e) => {
-			filters.forEach(b => b.classList.remove('active'));
-			e.target.classList.add('active');
-			currentFilter = e.target.dataset.filter;
-			renderList();
-		});
-	});
-
-	renderList();
-}
-
-document.addEventListener('DOMContentLoaded', initIslamic);
+		`).join(""),a.querySelectorAll(".copy-ref-btn").forEach(e=>{e.addEventListener("click",e=>{let a=parseInt(e.currentTarget.dataset.id);e=mockReferences.find(e=>e.id===a),e=e.source+`
+`+(e.arabic?e.arabic+"\n":"")+e.translation;navigator.clipboard.writeText(e),n("Reference copied!")})}),a.querySelectorAll(".attach-ref-btn").forEach(e=>{e.addEventListener("click",e=>{let a=parseInt(e.currentTarget.dataset.id);var e=`[REF: ${mockReferences.find(e=>e.id===a).source}]`,t=document.querySelectorAll(".script-textarea");0<t.length&&((t=t[2]||t[0]).value+="\n"+e,t.dispatchEvent(new Event("input")),n("Attached to Script!"))})}))}function n(e){let a=document.getElementById("toast");a&&(a.textContent=e,a.classList.add("show"),setTimeout(()=>a.classList.remove("show"),3e3))}e.addEventListener("input",e=>{s=e.target.value.toLowerCase(),c()}),t.forEach(e=>{e.addEventListener("click",e=>{t.forEach(e=>e.classList.remove("active")),e.target.classList.add("active"),i=e.target.dataset.filter,c()})}),c()}}document.addEventListener("DOMContentLoaded",initIslamic);export{initIslamic};

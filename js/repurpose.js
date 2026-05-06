@@ -1,6 +1,4 @@
-// Content Repurposing Engine
-
-const REPURPOSE_HTML = `
+let REPURPOSE_HTML=`
 <div class="repurpose-container">
 	<div class="section-heading">
 		<h2 class="section-title">Repurpose Content</h2>
@@ -59,49 +57,6 @@ New episode dropping tomorrow! We dive deep into the mysteries of the past. Are 
 
 	</div>
 </div>
-`;
-
-export function initRepurpose() {
-	const container = document.getElementById('ptab-repurpose');
-	if (!container) return;
-	container.innerHTML = REPURPOSE_HTML;
-
-	const generateBtn = document.getElementById('generateRepurposeBtn');
-	const grid = document.getElementById('repurposeGrid');
-
-	generateBtn.addEventListener('click', () => {
-		generateBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Extracting...';
-		generateBtn.disabled = true;
-
-		// Simulate extraction from script
-		const scriptTextareas = document.querySelectorAll('.script-textarea');
-		let fullScript = '';
-		scriptTextareas.forEach(ta => fullScript += ta.value + ' ');
-
-		setTimeout(() => {
-			generateBtn.innerHTML = '<i class="fa-solid fa-check"></i> Refreshed';
-			generateBtn.disabled = false;
-			grid.style.display = 'grid';
-
-			if (fullScript.trim().length > 50) {
-				const sentences = fullScript.split(/[.!?]/).filter(s => s.trim().length > 10);
-				if (sentences.length > 3) {
-					document.getElementById('shortsScript').value = `Hook: ${sentences[0].trim()}?\nContext: ${sentences[1].trim()}.\nPayoff: Watch the full documentary on our channel!`;
-					document.getElementById('communityPost').value = `Did you know? ${sentences[2].trim()}. Explore more in our latest upload! 🎥`;
-				}
-			}
-		}, 1200);
-	});
-
-	document.querySelectorAll('.copy-rep-btn').forEach(btn => {
-		btn.addEventListener('click', (e) => {
-			const ta = e.currentTarget.closest('.repurpose-card').querySelector('textarea');
-			if (ta) {
-				navigator.clipboard.writeText(ta.value.trim());
-				alert('Copied to clipboard!');
-			}
-		});
-	});
-}
-
-document.addEventListener('DOMContentLoaded', initRepurpose);
+`;function initRepurpose(){var e=document.getElementById("ptab-repurpose");if(e){e.innerHTML=REPURPOSE_HTML;let r=document.getElementById("generateRepurposeBtn"),o=document.getElementById("repurposeGrid");r.addEventListener("click",()=>{r.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> Extracting...',r.disabled=!0;var e=document.querySelectorAll(".script-textarea");let t="";e.forEach(e=>t+=e.value+" "),setTimeout(()=>{var e;r.innerHTML='<i class="fa-solid fa-check"></i> Refreshed',r.disabled=!1,o.style.display="grid",50<t.trim().length&&3<(e=t.split(/[.!?]/).filter(e=>10<e.trim().length)).length&&(document.getElementById("shortsScript").value=`Hook: ${e[0].trim()}?
+Context: ${e[1].trim()}.
+Payoff: Watch the full documentary on our channel!`,document.getElementById("communityPost").value=`Did you know? ${e[2].trim()}. Explore more in our latest upload! 🎥`)},1200)}),document.querySelectorAll(".copy-rep-btn").forEach(e=>{e.addEventListener("click",e=>{e=e.currentTarget.closest(".repurpose-card").querySelector("textarea");e&&(navigator.clipboard.writeText(e.value.trim()),alert("Copied to clipboard!"))})})}}document.addEventListener("DOMContentLoaded",initRepurpose);export{initRepurpose};

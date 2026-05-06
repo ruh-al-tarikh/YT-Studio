@@ -1,6 +1,4 @@
-// Insight Dashboard
-
-const DASHBOARD_HTML = `
+let DASHBOARD_HTML=`
 <div class="studio-dashboard-container">
 	<div class="section-heading">
 		<h2 class="section-title">Smart Insights</h2>
@@ -39,25 +37,4 @@ const DASHBOARD_HTML = `
 
 	</div>
 </div>
-`;
-
-export function initDashboard() {
-	const container = document.getElementById('studio-view-dashboard');
-	if (!container) return;
-	container.innerHTML = DASHBOARD_HTML;
-
-	document.getElementById('startSuggestedProject')?.addEventListener('click', () => {
-		const newBtn = document.getElementById('newProjectBtn');
-		if(newBtn) {
-			newBtn.click();
-			const title = document.getElementById('current-project-title');
-			if(title) title.textContent = 'The early days of the Umayyads';
-		}
-	});
-
-	document.getElementById('reviewHooksBtn')?.addEventListener('click', () => {
-		document.querySelector('[data-tab="projects"]')?.click();
-	});
-}
-
-document.addEventListener('DOMContentLoaded', initDashboard);
+`;function initDashboard(){var t=document.getElementById("studio-view-dashboard");t&&(t.innerHTML=DASHBOARD_HTML,document.getElementById("startSuggestedProject")?.addEventListener("click",()=>{var t=document.getElementById("newProjectBtn");t&&(t.click(),t=document.getElementById("current-project-title"))&&(t.textContent="The early days of the Umayyads")}),document.getElementById("reviewHooksBtn")?.addEventListener("click",()=>{document.querySelector('[data-tab="projects"]')?.click()}))}document.addEventListener("DOMContentLoaded",initDashboard);export{initDashboard};
