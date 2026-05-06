@@ -2,10 +2,32 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "build:watch": "vite build --watch",
     "preview": "vite preview",
+    "clean": "rm -rf dist node_modules/.vite",
+    "type-check": "tsc --noEmit",
+    "lint": "eslint . --ext .ts,.js",
+    "format": "prettier --write .",
+    
     "enhance": "node scripts/auto-enhance.js",
+    "enhance:watch": "nodemon scripts/auto-enhance.js",
+    
     "deploy": "pnpm build && firebase deploy --only hosting",
+    "deploy:hosting": "pnpm build && firebase deploy --only hosting",
     "deploy:worker": "npx wrangler deploy src/youtube-worker.ts --name yt-studio",
-    "deploy:all": "pnpm build && firebase deploy --only hosting && npx wrangler deploy src/youtube-worker.ts --name yt-studio"
+    "deploy:worker:prod": "npx wrangler deploy src/youtube-worker.ts --name yt-studio --env production",
+    "deploy:pages": "npx wrangler pages deploy dist --project-name=yt-studio",
+    "deploy:all": "pnpm build && firebase deploy --only hosting && npx wrangler deploy src/youtube-worker.ts --name yt-studio",
+    
+    "worker:dev": "npx wrangler dev src/youtube-worker.ts",
+    "worker:tail": "npx wrangler tail",
+    "worker:secret:set": "npx wrangler secret put YOUTUBE_API_KEY",
+    
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest --coverage",
+    
+    "prepare": "husky install",
+    "version": "conventional-changelog -p angular -i CHANGELOG.md -s && git add CHANGELOG.md"
   }
 }
