@@ -29,6 +29,16 @@
           "database_id": "e36d3eba-7401-4945-b8e8-26cdbd13e3a9"
         }
       ]
+  "name": "yt-studio-youtube-api",
+  "main": "src/youtube-worker.ts",
+  "compatibility_date": "2025-01-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": true,
+  "env": {
+    "production": {
+      "vars": {
+        "ENVIRONMENT": "production"
+      }
     }
   }
 }

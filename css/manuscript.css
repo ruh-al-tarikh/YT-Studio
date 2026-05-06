@@ -1,0 +1,162 @@
+:root {
+  /* Theme Palette */
+  --manuscript-bg: #fdfaf3;
+  --ink-black: #1a1a1b;
+  --accent-gold: #c5a059;
+  --paper-white: #ffffff;
+  --border-soft: rgba(0, 0, 0, 0.05);
+  --glass-effect: rgba(255, 255, 255, 0.8);
+  --grain-opacity: 0.03;
+}
+
+body {
+  background-color: var(--manuscript-bg);
+  color: var(--ink-black);
+  font-family: 'Inter', sans-serif;
+  line-height: 1.6;
+  position: relative;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background-image: url("https://www.transparenttextures.com/patterns/natural-paper.png");
+  opacity: var(--grain-opacity);
+  pointer-events: none;
+  z-index: 9999;
+}
+
+h1, h2, h3, .modal-title, .section-title {
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+/* Glassmorphism Card Style */
+.studio-card, .sidebar-panel, .glass-panel {
+  background: var(--glass-effect);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--border-soft);
+  border-radius: 12px;
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.studio-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--accent-gold);
+}
+
+/* Primary Action Buttons */
+.btn-primary, .primary-button {
+  background-color: var(--ink-black);
+  color: #fff !important;
+  border-radius: 6px;
+  padding: 10px 24px;
+  transition: all 0.3s;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-primary:hover, .primary-button:hover {
+  background-color: var(--accent-gold);
+  box-shadow: 0 4px 15px rgba(197, 160, 89, 0.3);
+}
+
+/* Search Highlighting */
+mark {
+  background: var(--accent-gold);
+  color: var(--ink-black);
+  padding: 0 2px;
+  border-radius: 2px;
+  transition: background 0.3s;
+  animation: fadeInHighlight 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(2px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Timeline Mapper Beats */
+.timeline-beat {
+  background: var(--paper-white);
+  border-left: 4px solid var(--accent-gold);
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 4px;
+  box-shadow: var(--shadow-sm);
+  cursor: grab;
+}
+
+.timeline-beat:active { cursor: grabbing; }
+
+/* Geographical Pins */
+.region-pin {
+  position: absolute;
+  background: var(--accent-gold);
+  color: var(--ink-black);
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border: 2px solid white;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.region-pin:hover {
+  transform: scale(1.1);
+  background: var(--ink-black);
+  z-index: 10;
+}
+
+/* Transcript Styles */
+.transcript-line {
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.transcript-line:hover {
+  background: rgba(197, 160, 89, 0.1);
+}
+
+.transcript-line.active {
+  background: rgba(197, 160, 89, 0.2);
+  border-left: 3px solid var(--accent-gold);
+}
+
+/* Mobile Responsive Overrides */
+@media (max-width: 768px) {
+  .creator-workspace-grid {
+    grid-template-columns: 1fr;
+  }
+}
+@keyframes fadeInHighlight { from { opacity: 0; transform: translateY(2px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Mobile responsiveness for search and map */
+@media (max-width: 768px) {
+  .search-suggestions {
+    max-height: 40vh;
+    overflow-y: auto;
+  }
+
+  .transcript-panel {
+    max-height: 50vh;
+    overflow-y: auto;
+  }
+
+  #mapModal .modal-content {
+    height: 90vh;
+    padding: 1rem;
+  }
+
+  #mapModal .map-container {
+    height: 60%;
+  }
+}

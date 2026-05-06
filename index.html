@@ -10,6 +10,7 @@
 		<meta name="keywords" content="Islamic history, Quran, prophecy, theology, Islamic podcast, Muslim history, end times, Islamic education" />
 		<meta name="author" content="Azeez Mohammed Rizwan" />
 		<link rel="canonical" href="https://yt-studio.vercel.app/" />
+		<link rel="manifest" href="manifest.json" />
 
 		<!-- Open Graph / Facebook -->
 		<meta property="og:type" content="website" />
@@ -33,13 +34,14 @@
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 		
 		<!-- Fonts -->
-		<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400..900&family=Manrope:wght@200..800&display=swap" rel="stylesheet" />
+		<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400..900&family=Manrope:wght@200..800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Inter:wght@100..900&display=swap" rel="stylesheet" />
 		
 		<!-- Icons -->
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
 		
 		<!-- Styles -->
 		<link rel="stylesheet" href="css/style.css" />
+		<link rel="stylesheet" href="css/manuscript.css" />
         <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%234f46e5'/%3E%3Cpath d='M30 30L70 50L30 70V30Z' fill='white'/%3E%3C/svg%3E" />
 		<!-- Creator Studio Modules CSS -->
 		<link rel="stylesheet" href="css/editor.css" />
@@ -242,7 +244,7 @@
 						<i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
 						<input
 							type="text"
-							id="searchInput"
+							id="search"
 							placeholder="Search episodes, topics, people, or places (/ to focus)"
 							autocomplete="off"
 							aria-autocomplete="list"
@@ -264,6 +266,7 @@
 				</div>
 
 				<nav class="filter-chips" aria-label="Filter by category">
+					<button class="chip" id="geoBrowseBtn" data-cat="geo"><i class="fa-solid fa-earth-africa"></i> Geographical Browse</button>
 					<button class="chip active" data-cat="all">All Episodes</button>
 					<button class="chip" data-cat="quran">Quranic Studies</button>
 					<button class="chip" data-cat="prophecy">Prophecy</button>
@@ -370,6 +373,21 @@
 					<button id="loadMoreBtn" class="primary-button" type="button">Load More Episodes</button>
 				</div>
 			</section>
+				<!-- Geographical Browse Modal -->
+		<div id="mapModal" class="modal" style="display: none; align-items: center; justify-content: center;">
+			<div class="modal-content glass-panel" style="max-width: 900px; width: 95%; height: 80vh; position: relative; padding: 2rem;">
+				<button id="closeMap" class="close-btn" aria-label="Close map">&times;</button>
+				<h2 class="section-title">Geographical Archive</h2>
+				<p class="section-copy">Explore historical episodes by region.</p>
+				<div class="map-container" style="position: relative; background: #eee; height: 70%; border-radius: 8px; margin-top: 1rem; overflow: hidden; border: 1px solid var(--border-soft);">
+					<img src="https://upload.wikimedia.org/wikipedia/commons/e/ea/BlankMap-World6.svg" alt="Map" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.5;">
+					<div class="region-pin" style="top: 40%; left: 55%;" onclick="document.getElementById('search').value='Hejaz'; document.getElementById('search').dispatchEvent(new Event('input')); document.getElementById('closeMap').click();">Hejaz</div>
+					<div class="region-pin" style="top: 35%; left: 45%;" onclick="document.getElementById('search').value='Andalusia'; document.getElementById('search').dispatchEvent(new Event('input')); document.getElementById('closeMap').click();">Andalusia</div>
+					<div class="region-pin" style="top: 45%; left: 60%;" onclick="document.getElementById('search').value='Levant'; document.getElementById('search').dispatchEvent(new Event('input')); document.getElementById('closeMap').click();">Levant</div>
+				</div>
+			</div>
+		</div>
+
 		</main>
 
 		<!-- Creator Studio Shell -->
@@ -469,6 +487,7 @@
 					<div id="studio-view-islamic" class="studio-view" style="display: none;"></div>
 				</div>
 			</div>
+		<!-- Geographical Browse Modal -->
 		</main>
 
 
@@ -759,6 +778,8 @@
 		</button>
 
 		<!-- Scripts -->
+		<script src="js/citation.js" type="module"></script>
+		<script src="js/search.js" type="module"></script>
 		<script src="js/app.js" type="module"></script>
 		<script src="js/research.js" type="module"></script>
 		<script src="js/script.js" type="module"></script>
