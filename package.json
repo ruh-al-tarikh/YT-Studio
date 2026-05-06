@@ -10,10 +10,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "vitest run",
-    "lint": "echo \"Linting not configured\"",
-    "worker:dev": "wrangler dev src/youtube-worker.ts",
-    "worker:deploy": "wrangler deploy",
-    "worker:deploy:prod": "wrangler deploy --env production"
+    "lint": "echo \"Linting not configured\""
   },
   "dependencies": {
     "@flags-sdk/hypertune": "^0.3.2",
@@ -39,6 +36,6 @@
   },
   "engines": {
     "node": ">=20.0.0",
-    "npm": ">=10.0.0"
+    "pnpm": ">=9.0.0"
   }
 }
