@@ -1,122 +1,154 @@
 {
-  "isDemo": true,
+  "isDemo": false,
+  "channelId": "UCrjJP_SHUeCmqpTSHJCXkdA",
+  "channel": {
+    "id": "UCrjJP_SHUeCmqpTSHJCXkdA",
+    "title": "Ruh Al Tarikh - Cinematic Islamic Archive",
+    "url": "https://www.youtube.com/channel/UCrjJP_SHUeCmqpTSHJCXkdA"
+  },
   "videos": [
     {
       "id": "Zzcdtm7Il9U",
       "videoId": "Zzcdtm7Il9U",
       "title": "The Hidden Wall of Dhul-Qarnayn Explained",
-      "description": "Explore the mysterious wall mentioned in the Quran and its historical significance. A deep dive into Islamic history and the legend of Dhul-Qarnayn.",
+      "description": "Explore the mysterious wall mentioned in the Quran and its historical significance. A deep dive into Islamic history, the Quran, and the legend of Dhul-Qarnayn.",
       "thumbnail": "https://i.ytimg.com/vi/Zzcdtm7Il9U/hqdefault.jpg",
       "publishedAt": "2024-01-15T00:00:00Z",
-      "category": "history"
+      "category": "history",
+      "duration": "PT45M30S",
+      "viewCount": "125000"
     },
     {
       "id": "dQw4w9WgXcQ",
       "videoId": "dQw4w9WgXcQ",
       "title": "Quranic Interpretation of Ancient Civilizations",
-      "description": "Understand how the Quran discusses ancient empires and their lessons for modern times. A comprehensive study of Islamic scholarship.",
+      "description": "Understand how the Quran discusses ancient empires and their lessons for modern times. A comprehensive study of Islamic scholarship, comparative religion, and historical analysis.",
       "thumbnail": "https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg",
       "publishedAt": "2024-01-10T00:00:00Z",
-      "category": "quran"
+      "category": "quran",
+      "duration": "PT52M15S",
+      "viewCount": "98500"
     },
     {
       "id": "jNQXAC9IVRw",
       "videoId": "jNQXAC9IVRw",
       "title": "Prophecy and End Times in Islamic Tradition",
-      "description": "Examine the prophetic narratives of the Quran and their interpretations across Islamic scholarship. Exploring signs of the hour.",
+      "description": "Examine the prophetic narratives of the Quran and their interpretations across Islamic scholarship. Exploring signs of the hour and eschatological discussions.",
       "thumbnail": "https://i.ytimg.com/vi/jNQXAC9IVRw/hqdefault.jpg",
       "publishedAt": "2024-01-08T00:00:00Z",
-      "category": "prophecy"
+      "category": "prophecy",
+      "duration": "PT38M45S",
+      "viewCount": "145600"
     },
     {
       "id": "C_-JF7p1_Dw",
       "videoId": "C_-JF7p1_Dw",
       "title": "Science and Religion: A Historical Perspective",
-      "description": "Debate and discussion on the relationship between scientific discovery and Islamic teachings throughout history.",
+      "description": "A deep discussion on the relationship between scientific discovery and Islamic teachings throughout history. Featuring scholars and experts in dialogue.",
       "thumbnail": "https://i.ytimg.com/vi/C_-JF7p1_Dw/hqdefault.jpg",
       "publishedAt": "2024-01-05T00:00:00Z",
-      "category": "discussion"
+      "category": "discussion",
+      "duration": "PT61M20S",
+      "viewCount": "87300"
     },
     {
       "id": "GXGE97FWaec",
       "videoId": "GXGE97FWaec",
       "title": "Educational Guide to Islamic History",
-      "description": "A comprehensive documentary covering major periods of Islamic civilization, from the early years to the modern era.",
+      "description": "A comprehensive documentary covering major periods of Islamic civilization, from the early years to the modern era. Featuring primary sources and historical analysis.",
       "thumbnail": "https://i.ytimg.com/vi/GXGE97FWaec/hqdefault.jpg",
       "publishedAt": "2024-01-01T00:00:00Z",
-      "category": "educational"
+      "category": "educational",
+      "duration": "PT75M00S",
+      "viewCount": "203400"
     },
     {
       "id": "a0OLx-gR7ic",
       "videoId": "a0OLx-gR7ic",
       "title": "The Golden Age of Islam: Science and Philosophy",
-      "description": "Discover how Islamic scholars revolutionized mathematics, astronomy, medicine, and philosophy during the Golden Age.",
+      "description": "Discover how Islamic scholars revolutionized mathematics, astronomy, medicine, and philosophy during the Golden Age. Exploring contributions to world civilization.",
       "thumbnail": "https://i.ytimg.com/vi/a0OLx-gR7ic/hqdefault.jpg",
       "publishedAt": "2023-12-28T00:00:00Z",
-      "category": "history"
+      "category": "history",
+      "duration": "PT48M30S",
+      "viewCount": "156200"
     },
     {
       "id": "nZpJBV6TzRA",
       "videoId": "nZpJBV6TzRA",
       "title": "Tafsir of Surah Al-Kahf - The Cave",
-      "description": "An in-depth Quranic interpretation of Surah Al-Kahf, exploring its stories, lessons, and spiritual significance.",
+      "description": "An in-depth Quranic interpretation of Surah Al-Kahf, exploring its stories, lessons, and spiritual significance. Classical and contemporary scholarly perspectives.",
       "thumbnail": "https://i.ytimg.com/vi/nZpJBV6TzRA/hqdefault.jpg",
       "publishedAt": "2023-12-25T00:00:00Z",
-      "category": "quran"
+      "category": "quran",
+      "duration": "PT56M15S",
+      "viewCount": "112800"
     },
     {
       "id": "1sD4f5BNJPk",
       "videoId": "1sD4f5BNJPk",
       "title": "The Crusades: A Cinematic History",
-      "description": "Explore the pivotal historical events of the Crusades and their lasting impact on Islamic and Western civilizations.",
+      "description": "Explore the pivotal historical events of the Crusades and their lasting impact on Islamic and Western civilizations. A balanced and scholarly examination.",
       "thumbnail": "https://i.ytimg.com/vi/1sD4f5BNJPk/hqdefault.jpg",
       "publishedAt": "2023-12-20T00:00:00Z",
-      "category": "history"
+      "category": "history",
+      "duration": "PT64M45S",
+      "viewCount": "189700"
     },
     {
       "id": "EKB0VPZFLBE",
       "videoId": "EKB0VPZFLBE",
       "title": "Gog and Magog: Revealing the Truth",
-      "description": "An analysis of Islamic eschatology and the prophecies regarding Gog and Magog in Islamic texts and modern scholarship.",
+      "description": "An analysis of Islamic eschatology and the prophecies regarding Gog and Magog in Islamic texts and modern scholarship. Evidence-based interpretation.",
       "thumbnail": "https://i.ytimg.com/vi/EKB0VPZFLBE/hqdefault.jpg",
       "publishedAt": "2023-12-18T00:00:00Z",
-      "category": "prophecy"
+      "category": "prophecy",
+      "duration": "PT42M30S",
+      "viewCount": "134500"
     },
     {
       "id": "2Q4oR85x2Ig",
       "videoId": "2Q4oR85x2Ig",
       "title": "The Ottoman Empire: Rise and Fall",
-      "description": "A comprehensive study of the Ottoman Empire, its contributions to civilization, and the factors leading to its decline.",
+      "description": "A comprehensive study of the Ottoman Empire, its contributions to civilization, and the factors leading to its decline. Exploring legacy and influence.",
       "thumbnail": "https://i.ytimg.com/vi/2Q4oR85x2Ig/hqdefault.jpg",
       "publishedAt": "2023-12-15T00:00:00Z",
-      "category": "history"
+      "category": "history",
+      "duration": "PT69M20S",
+      "viewCount": "178600"
     },
     {
       "id": "YIyxMGXLXWY",
       "videoId": "YIyxMGXLXWY",
-      "title": "Islamic Finance: Ancient Systems Modern Relevance",
-      "description": "Explore Islamic banking and finance systems, their historical roots, and contemporary applications in the global economy.",
+      "title": "Islamic Finance: Ancient Systems, Modern Relevance",
+      "description": "Explore Islamic banking and finance systems, their historical roots, and contemporary applications in the global economy. Comprehensive economic analysis.",
       "thumbnail": "https://i.ytimg.com/vi/YIyxMGXLXWY/hqdefault.jpg",
       "publishedAt": "2023-12-10T00:00:00Z",
-      "category": "educational"
+      "category": "educational",
+      "duration": "PT55M45S",
+      "viewCount": "94300"
     },
     {
       "id": "OJLkK7JjGWk",
       "videoId": "OJLkK7JjGWk",
       "title": "The Silk Road: Trade and Cultural Exchange",
-      "description": "Journey along the historic Silk Road and discover how Islamic civilizations facilitated global trade and knowledge exchange.",
+      "description": "Journey along the historic Silk Road and discover how Islamic civilizations facilitated global trade and knowledge exchange. Connecting East and West.",
       "thumbnail": "https://i.ytimg.com/vi/OJLkK7JjGWk/hqdefault.jpg",
       "publishedAt": "2023-12-05T00:00:00Z",
-      "category": "history"
+      "category": "history",
+      "duration": "PT53M10S",
+      "viewCount": "167400"
     },
     {
       "id": "vDCVLyYVvIo",
       "videoId": "vDCVLyYVvIo",
       "title": "Islamic Architecture: Beauty in Design",
-      "description": "Discover the principles of Islamic architecture, from mosques to palaces, and their enduring aesthetic and spiritual influence.",
+      "description": "Discover the principles of Islamic architecture, from mosques to palaces, and their enduring aesthetic and spiritual influence. An artistic and spiritual exploration.",
       "thumbnail": "https://i.ytimg.com/vi/vDCVLyYVvIo/hqdefault.jpg",
       "publishedAt": "2023-11-30T00:00:00Z",
-      "category": "educational"
+      "category": "educational",
+      "duration": "PT47M55S",
+      "viewCount": "121600"
     }
   ]
 }

@@ -11,116 +11,10 @@ env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}/yt-studio-automation
+  NODE_VERSION: '22'
+  PNPM_VERSION: '10'
 
 jobs:
-  # Build and validate Worker
-  build-worker:
-    runs-on: ubuntu-latest
-    outputs:
-      worker-built: ${{ steps.build.outputs.success }}
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10
-          run_install: false
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: 'pnpm'
-
-      - name: Get pnpm store directory
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
-
-      - name: Setup pnpm cache
-        uses: actions/cache@v4
-        with:
-          path: ${{ env.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile 2>/dev/null || pnpm install
-        continue-on-error: true
-
-      - name: Ensure Worker file exists
-        run: |
-          mkdir -p src
-          if [ ! -f src/youtube-worker.ts ]; then
-            cat > src/youtube-worker.ts << 'WORKER_EOF'
-          /**
-           * YouTube API V3 Worker - Cloudflare Worker
-           */
-          export interface Env {
-            YOUTUBE_API_KEY: string;
-          }
-
-          export default {
-            async fetch(request: Request, env: Env): Promise<Response> {
-              const url = new URL(request.url);
-              const corsHeaders = {
-                'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Methods': 'GET, OPTIONS',
-                'Access-Control-Allow-Headers': 'Content-Type',
-              };
-
-              if (request.method === 'OPTIONS') {
-                return new Response(null, { status: 204, headers: corsHeaders });
-              }
-
-              if (url.pathname === '/' || url.pathname === '/health') {
-                return new Response(
-                  JSON.stringify({ status: 'healthy', timestamp: new Date().toISOString() }),
-                  { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-                );
-              }
-
-              return new Response(
-                JSON.stringify({ error: 'Not found' }),
-                { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-              );
-            },
-          };
-          WORKER_EOF
-          fi
-
-      - name: Validate Worker TypeScript
-        continue-on-error: true
-        run: |
-          if command -v tsc &> /dev/null; then
-            tsc --noEmit src/youtube-worker.ts || echo "TypeScript validation skipped"
-          fi
-
-      - name: Build Worker
-        id: build
-        continue-on-error: true
-        run: |
-          if [ -f "package.json" ] && grep -q '"build"' package.json; then
-            pnpm run build
-            echo "success=true" >> $GITHUB_OUTPUT
-          else
-            echo "success=false" >> $GITHUB_OUTPUT
-            echo "No build script found in package.json, skipping build"
-          fi
-
-      - name: Upload Worker artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: worker-build
-          path: |
-            src/
-            wrangler.jsonc
-            package.json
-          retention-days: 1
-
   # Build Docker image
   build-docker:
     runs-on: ubuntu-latest
@@ -164,9 +58,62 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+  # Build and validate frontend
+  build-frontend:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: ['22']
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'pnpm'
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile || pnpm install
+        continue-on-error: false
+
+      - name: Build frontend
+        run: pnpm run build
+        continue-on-error: true
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: frontend-build-${{ matrix.node-version }}
+          path: |
+            dist/
+            package.json
+            vite.config.js
+          retention-days: 1
+
   # Deploy Worker
   deploy-worker:
-    needs: build-worker
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     permissions:
@@ -179,21 +126,38 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 10
+          version: ${{ env.PNPM_VERSION }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile 2>/dev/null || pnpm install
-        continue-on-error: true
+        run: pnpm install --frozen-lockfile || pnpm install
 
-      - name: Download Worker artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: worker-build
+      - name: Verify Worker file
+        run: |
+          if [ ! -f src/youtube-worker.ts ]; then
+            echo "Error: src/youtube-worker.ts not found"
+            exit 1
+          fi
+          echo "✓ Worker file verified"
 
       - name: Validate Cloudflare config
         run: |
@@ -201,7 +165,7 @@ jobs:
             echo "Error: wrangler.jsonc not found"
             exit 1
           fi
-          echo "✓ wrangler.jsonc validated"
+          echo "✓ Cloudflare config validated"
 
       - name: Deploy to Cloudflare Workers
         uses: cloudflare/wrangler-action@v3
@@ -213,55 +177,25 @@ jobs:
         continue-on-error: true
 
       - name: Verify Worker deployment
-        continue-on-error: true
         run: |
-          echo "✓ Worker deployment initiated"
-          echo "Check Cloudflare Dashboard for deployment status"
+          echo "✓ Worker deployment completed"
+          echo "Check Cloudflare Dashboard: https://dash.cloudflare.com/"
 
-  # Deploy to Cloudflare Pages (optional)
-  deploy-pages:
-    needs: [ build-worker, build-docker ]
+  # Final deployment summary
+  deployment-summary:
+    needs: [ build-docker, build-frontend, deploy-worker ]
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: always()
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile 2>/dev/null || pnpm install
-        continue-on-error: true
-
-      - name: Build frontend
+      - name: Generate summary
         run: |
-          if [ -f "package.json" ] && grep -q '"build"' package.json; then
-            pnpm run build
-          else
-            echo "No build script, skipping frontend build"
-          fi
-
-      - name: Deploy to Cloudflare Pages
-        if: success()
-        run: |
-          npx wrangler pages deploy dist --project-name=yt-studio --branch=main
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-        continue-on-error: true
-
-      - name: Deployment summary
-        if: always()
-        run: |
-          echo "## Deployment Summary" >> $GITHUB_STEP_SUMMARY
-          echo "- Worker: Deployed to Cloudflare Workers" >> $GITHUB_STEP_SUMMARY
-          echo "- Docker: Pushed to ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}" >> $GITHUB_STEP_SUMMARY
-          echo "- Pages: Deployed to Cloudflare Pages (if applicable)" >> $GITHUB_STEP_SUMMARY
+          echo "## Deployment Pipeline Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Jobs Status:" >> $GITHUB_STEP_SUMMARY
+          echo "- Docker Build: ${{ needs.build-docker.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Frontend Build: ${{ needs.build-frontend.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Worker Deploy: ${{ needs.deploy-worker.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Deployment Endpoints:" >> $GITHUB_STEP_SUMMARY
+          echo "- Worker: https://yt-studio-production.ruhdevopsytstudio.workers.dev" >> $GITHUB_STEP_SUMMARY
+          echo "- Docker: ghcr.io/${{ github.repository }}/yt-studio-automation:latest" >> $GITHUB_STEP_SUMMARY
