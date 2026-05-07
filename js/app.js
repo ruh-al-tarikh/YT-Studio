@@ -55,6 +55,99 @@ const CATEGORIES = [
     { key: 'prophecy', label: 'Prophecy', terms: ['prophecy', 'dajjal', 'gog', 'magog', 'end times'] },
     { key: 'discussion', label: 'Discussion', terms: ['podcast', 'debate', 'interview', 'conversation'] },
     { key: 'educational', label: 'Educational', terms: ['lesson', 'guide', 'explained', 'documentary'] },
+    { key: 'history', label: 'History', terms: ['history', 'empire', 'caliph', 'war', 'civilization'] }
+];
+
+// ============================================
+// DOM ELEMENTS
+// ============================================
+const DOM = {
+    // Core elements
+    body: document.body,
+    grid: document.getElementById('grid'),
+    modal: document.getElementById('modal'),
+    player: document.getElementById('player'),
+    closeModal: document.getElementById('close'),
+    toast: document.getElementById('toast'),
+    
+    // Hero section
+    heroTitle: document.getElementById('hero-title'),
+    heroDesc: document.getElementById('hero-desc'),
+    heroBtn: document.getElementById('hero-btn'),
+    heroSave: document.getElementById('hero-save'),
+    heroCategory: document.getElementById('hero-category'),
+    heroDate: document.getElementById('hero-date'),
+    bg: document.getElementById('bg'),
+    
+    // Search
+    search: document.getElementById('searchInput'),
+    clearSearch: document.getElementById('clearSearch'),
+    resultsMeta: document.getElementById('results-meta'),
+    
+    // Pagination & Loading
+    loadMore: document.getElementById('loadMoreBtn'),
+    loadMoreContainer: document.getElementById('loadMoreContainer'),
+    loading: document.getElementById('loading'),
+    error: document.getElementById('error'),
+    errorMsg: document.getElementById('error-msg'),
+    retryBtn: document.getElementById('retryBtn'),
+    
+    // Theme & UI
+    themeToggle: document.getElementById('themeToggleBtn'),
+    scrollToTop: document.getElementById('scrollToTop'),
+    
+    // Watch Later
+    watchLaterBadge: document.getElementById('watchLaterBadge'),
+    watchLaterCount: document.getElementById('watchLaterCount'),
+    watchLaterPage: document.getElementById('watchLaterPage'),
+    watchLaterContainer: document.getElementById('watchLaterContainer'),
+    closeWatchLater: document.getElementById('closeWatchLater'),
+    
+    // Dashboard
+    dashboardBtn: document.getElementById('dashboardBtn'),
+    dashboardModal: document.getElementById('dashboardModal'),
+    closeDashboard: document.getElementById('closeDashboard'),
+    dashTotal: document.getElementById('dashboard-total'),
+    dashSaved: document.getElementById('dashboard-saved'),
+    dashProgress: document.getElementById('dashboard-progress'),
+    dashHours: document.getElementById('dashboard-hours'),
+    dashCategories: document.getElementById('dashboardCategories'),
+    dashResumeList: document.getElementById('dashboardResumeList'),
+    
+    // Studio Mode
+    modeSwitcher: document.getElementById('modeSwitcher'),
+    modeBtns: document.querySelectorAll('.mode-btn'),
+    studioRoot: document.getElementById('studio-root'),
+    appRoot: document.getElementById('app-root'),
+    heroSection: document.getElementById('hero'),
+    continueBlock: document.getElementById('continue-block'),
+    continueRow: document.getElementById('continue-row'),
+    emptyHistory: document.getElementById('empty-history'),
+    recommendedRow: document.getElementById('recommended-row'),
+    recommendedBlockSec: document.getElementById('recommended-block'),
+    continueBlockSec: document.getElementById('continue-block'),
+    
+    // Studio Navigation
+    studioNavBtns: document.querySelectorAll('.studio-nav-btn'),
+    studioViews: document.querySelectorAll('.studio-view'),
+    studioBreadcrumbs: document.getElementById('studioBreadcrumbs'),
+    studioViewProjects: document.getElementById('studio-view-projects'),
+    activeProjectView: document.getElementById('active-project-view'),
+    newProjectBtn: document.getElementById('newProjectBtn'),
+    backToProjectsBtn: document.getElementById('backToProjectsBtn'),
+    projectTabBtns: document.querySelectorAll('.project-tab-btn'),
+    ptabContents: document.querySelectorAll('.ptab-content'),
+    
+    // Misc
+    channelInput: document.getElementById('channelIdInput'),
+    connectBtn: document.getElementById('connectChannelBtn'),
+    clearFilters: document.getElementById('clearFilters')
+};
+
+// ============================================
+// APPLICATION STATE
+// ============================================
+const AppState = {
     videos: [],
     filtered: [],
     hero: null,
@@ -209,13 +302,7 @@ async function loadVideos() {
         
         const response = await Utils.fetchWithRetry(url);
         const data = await response.json();
-        
-        if (data.isDemo) {
-            document.body.classList.add('demo-mode');
-            Utils.showToast('Using demo archives');
-        } else {
-            document.body.classList.remove('demo-mode');
-        }
+        console.log('API Fetch Success:', data);
         
         const videos = (data.videos || []).map(video => ({
             id: video.id || video.videoId,
@@ -226,6 +313,8 @@ async function loadVideos() {
             description: video.description || 'Deep dive into Islamic history and theology.'
         }));
         
+        console.log('Processed Videos:', videos.length);
+        
         if (videos.length) {
             Utils.saveLS(CONFIG.STORAGE.CACHE_KEY, { data: videos, time: Date.now() });
         }
@@ -234,14 +323,24 @@ async function loadVideos() {
         
     } catch (error) {
         console.error('Worker fetch failed, using fallback:', error);
-        const fallback = await fetch(CONFIG.API.FALLBACK_DATA);
-        const data = await fallback.json();
-        document.body.classList.add('demo-mode');
-        return (data.videos || []).map(video => ({
-            ...video,
-            category: video.category || 'history',
-            description: video.description || 'Deep dive into Islamic history and theology.'
-        }));
+        try {
+            const fallback = await fetch(CONFIG.API.FALLBACK_DATA);
+            if (!fallback.ok) throw new Error(`Fallback HTTP error: ${fallback.status}`);
+            const data = await fallback.json();
+            console.log('Fallback Data Loaded:', data);
+            
+            document.body.classList.add('demo-mode');
+            const videos = (data.videos || []).map(video => ({
+                ...video,
+                category: video.category || 'history',
+                description: video.description || 'Deep dive into Islamic history and theology.'
+            }));
+            console.log('Processed Fallback Videos:', videos.length);
+            return videos;
+        } catch (fallbackError) {
+            console.error('Fallback fetch also failed:', fallbackError);
+            return [];
+        }
     }
 }
 
