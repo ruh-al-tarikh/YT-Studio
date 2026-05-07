@@ -1,13 +1,10 @@
-#  🚀 Ruh-Al-Tarikh 
-## YT Studio Archive
+<img width="1200" height="675" alt="gitcity-ruhdevops-landscape" src="https://github.com/user-attachments/assets/78f27b70-ffce-47ca-8c56-22ce98cfc38e" />
 
-A **cinematic, performance-focused video archive** for *Ruh Al Tarikh*, designed to explore Islamic history, scripture, prophecy, and deep discussions through a modern, app-like web experience.
-
----
 
 ## ✨ Overview
 
-This project is not just a video gallery — it’s a **progressive content platform** engineered for:
+This project is not just a video gallery 
+>it’s a **progressive content platform** engineered for:
 
 - ⚡ Speed & responsiveness  
 - 🧠 Intelligent UX patterns  
@@ -210,7 +207,7 @@ Sample Response
 | `J`       | Previous episode |
 | `K`       | Next episode     |
 | `Esc`     | Close modals     |
-| `↑ ↓ ← →`| Navigate grid    |
+| `↑ ↓ ← →` | Navigate grid    |  
 
 
 🌐 Browser Support
