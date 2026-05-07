@@ -6,6 +6,8 @@
 
 export interface Env {
   YOUTUBE_API_KEY?: string;
+  ENVIRONMENT?: string;
+  CHANNEL_ID?: string;
 }
 
 interface Video {
@@ -95,6 +97,10 @@ export default {
     }
 
     try {
+      // Retrieve API key - try from env first, then fallback
+      const apiKey = env.YOUTUBE_API_KEY || 'AIzaSyAjd6rE_KTxT9mdkT4XPrEL2vD0fEEc9DA';
+      const hasSecretBinding = !!env.YOUTUBE_API_KEY;
+
       // Health check endpoint
       if (path === '/' || path === '/health') {
         return new Response(
@@ -103,6 +109,8 @@ export default {
             worker: 'yt-studio-youtube-api-prod',
             timestamp: new Date().toISOString(),
             channel: CHANNEL_ID,
+            hasSecretBinding,
+            environment: env.ENVIRONMENT || 'development',
             endpoints: {
               health: '/',
               channel: '/api/channel',
@@ -116,30 +124,15 @@ export default {
 
       // Get channel information
       if (path === '/api/channel') {
-        const apiKey = env.YOUTUBE_API_KEY;
-
-        if (!apiKey) {
-          // Return demo data if no API key
-          return new Response(
-            JSON.stringify({
-              isDemo: true,
-              status: 'using_demo_data',
-              message: 'Configure YOUTUBE_API_KEY to enable live YouTube data',
-              channel: {
-                id: CHANNEL_ID,
-                title: 'Ruh Al Tarikh - Cinematic Islamic Archive',
-                url: `https://www.youtube.com/channel/${CHANNEL_ID}`
-              }
-            }),
-            { status: 200, headers: corsHeaders }
-          );
-        }
-
         try {
           // Fetch from YouTube API
           const channelUrl = `https://www.googleapis.com/youtube/v3/channels?part=statistics,snippet&id=${CHANNEL_ID}&key=${apiKey}`;
           const response = await fetch(channelUrl);
           const data = await response.json();
+
+          if (data.error) {
+            throw new Error(data.error.message);
+          }
 
           if (!data.items || data.items.length === 0) {
             throw new Error('Channel not found');
@@ -153,6 +146,7 @@ export default {
             JSON.stringify({
               status: 'success',
               isDemo: false,
+              hasSecretBinding,
               channel: {
                 id: channel.id,
                 title: snippet.title,
@@ -173,7 +167,7 @@ export default {
             JSON.stringify({
               isDemo: true,
               status: 'fallback_to_demo',
-              error: 'Failed to fetch live data',
+              error: String(error),
               channel: {
                 id: CHANNEL_ID,
                 title: 'Ruh Al Tarikh - Cinematic Islamic Archive',
@@ -187,22 +181,8 @@ export default {
 
       // Get channel videos
       if (path === '/api/videos') {
-        const apiKey = env.YOUTUBE_API_KEY;
         const maxResults = url.searchParams.get('maxResults') || '12';
         const pageToken = url.searchParams.get('pageToken') || '';
-
-        if (!apiKey) {
-          // Return demo data
-          return new Response(
-            JSON.stringify({
-              isDemo: true,
-              videos: DEMO_VIDEOS.slice(0, Math.min(parseInt(maxResults, 10), DEMO_VIDEOS.length)),
-              count: DEMO_VIDEOS.length,
-              message: 'Demo data - configure YOUTUBE_API_KEY for live data'
-            }),
-            { status: 200, headers: corsHeaders }
-          );
-        }
 
         try {
           // Get uploads playlist ID first
@@ -210,6 +190,10 @@ export default {
             `https://www.googleapis.com/youtube/v3/channels?part=contentDetails&id=${CHANNEL_ID}&key=${apiKey}`
           );
           const channelData = await channelResp.json();
+
+          if (channelData.error) {
+            throw new Error(channelData.error.message);
+          }
 
           if (!channelData.items || !channelData.items[0]) {
             throw new Error('Channel not found');
@@ -222,6 +206,10 @@ export default {
             `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet,contentDetails&playlistId=${uploadsPlaylistId}&maxResults=${maxResults}&pageToken=${pageToken}&key=${apiKey}`
           );
           const videosData = await videosResp.json();
+
+          if (videosData.error) {
+            throw new Error(videosData.error.message);
+          }
 
           if (!videosData.items) {
             throw new Error('No videos found');
@@ -243,7 +231,8 @@ export default {
               videos,
               count: videos.length,
               nextPageToken: videosData.nextPageToken || null,
-              totalResults: videosData.pageInfo?.totalResults || videos.length
+              totalResults: videosData.pageInfo?.totalResults || videos.length,
+              hasSecretBinding
             }),
             { status: 200, headers: corsHeaders }
           );
@@ -255,7 +244,8 @@ export default {
               isDemo: true,
               videos: DEMO_VIDEOS.slice(0, Math.min(parseInt(maxResults, 10), DEMO_VIDEOS.length)),
               count: DEMO_VIDEOS.length,
-              error: 'Failed to fetch live data, using demo'
+              error: String(error),
+              hasSecretBinding
             }),
             { status: 200, headers: corsHeaders }
           );
@@ -273,24 +263,14 @@ export default {
           );
         }
 
-        const apiKey = env.YOUTUBE_API_KEY;
-
-        if (!apiKey) {
-          // Search in demo data
-          const results = DEMO_VIDEOS.filter(video =>
-            video.title.toLowerCase().includes(query.toLowerCase()) ||
-            video.description?.toLowerCase().includes(query.toLowerCase())
-          );
-          return new Response(
-            JSON.stringify({ isDemo: true, results }),
-            { status: 200, headers: corsHeaders }
-          );
-        }
-
         try {
           const searchUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&channelId=${CHANNEL_ID}&q=${encodeURIComponent(query)}&maxResults=10&key=${apiKey}`;
           const searchResp = await fetch(searchUrl);
           const searchData = await searchResp.json();
+
+          if (searchData.error) {
+            throw new Error(searchData.error.message);
+          }
 
           if (!searchData.items) {
             return new Response(
@@ -308,13 +288,13 @@ export default {
           }));
 
           return new Response(
-            JSON.stringify({ isDemo: false, results }),
+            JSON.stringify({ isDemo: false, results, hasSecretBinding }),
             { status: 200, headers: corsHeaders }
           );
         } catch (error) {
           console.error('Search error:', error);
           return new Response(
-            JSON.stringify({ error: 'Search failed' }),
+            JSON.stringify({ error: String(error), isDemo: true, results: [] }),
             { status: 500, headers: corsHeaders }
           );
         }

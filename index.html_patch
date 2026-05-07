@@ -1,0 +1,10 @@
+<<<<<<< SEARCH
+  <title>Ruh Al Tarikh | Cinematic Islamic Archive</title>
+
+  <!-- Preconnects & DNS Prefetch -->
+=======
+  <title>Ruh Al Tarikh | Cinematic Islamic Archive</title>
+  <link rel="manifest" href="/manifest.json">
+
+  <!-- Preconnects & DNS Prefetch -->
+>>>>>>> REPLACE
