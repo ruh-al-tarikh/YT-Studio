@@ -55,7 +55,6 @@ jobs:
       - name: Check for essential configs
         run: |
           ls wrangler.jsonc
-          ls tailwind.config.js
 
   performance:
     needs: validate
