@@ -17,8 +17,8 @@
   <!-- Preconnects & DNS Prefetch -->
   <link rel="preconnect" href="https://i.ytimg.com">
   <link rel="preconnect" href="https://www.youtube.com">
-  <link rel="preconnect" href="https://yt-proxy.ruhdevopsytstudio.workers.dev">
-  <link rel="dns-prefetch" href="https://yt-proxy.ruhdevopsytstudio.workers.dev">
+  <link rel="preconnect" href="https://yt-studio-production.ruhdevopsytstudio.workers.dev">
+  <link rel="dns-prefetch" href="https://yt-studio-production.ruhdevopsytstudio.workers.dev">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   
@@ -37,6 +37,16 @@
   
   <!-- Analytics -->
   <script>
+    // Set API configuration BEFORE app loads
+    window.__API_CONFIG__ = {
+      YOUTUBE_WORKER: 'https://yt-studio-youtube-api-prod.ruhdevopsytstudio.workers.dev',
+      API_ENDPOINTS: {
+        videos: 'https://yt-studio-youtube-api-prod.ruhdevopsytstudio.workers.dev/api/videos',
+        channel: 'https://yt-studio-youtube-api-prod.ruhdevopsytstudio.workers.dev/api/channel',
+        search: 'https://yt-studio-youtube-api-prod.ruhdevopsytstudio.workers.dev/api/search'
+      }
+    };
+    
     window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
   </script>
 </head>
@@ -99,30 +109,30 @@
 
   <main class="main-content">
     <!-- Hero Section -->
-    <section class="hero" id="heroSection" aria-label="Featured episode">
+    <section class="hero" id="hero" aria-label="Featured episode">
       <div class="hero-background" id="heroBg"></div>
       <div class="hero-overlay"></div>
       <div class="hero-container">
         <div class="hero-content">
           <div class="hero-badge">Featured</div>
-          <h2 class="hero-title" id="heroTitle">Exploring Islamic History</h2>
-          <p class="hero-description" id="heroDescription">Uncover deep insights into the Islamic civilization</p>
+          <h2 class="hero-title" id="hero-title">Exploring Islamic History</h2>
+          <p class="hero-description" id="hero-desc">Uncover deep insights into the Islamic civilization</p>
           <div class="hero-meta">
-            <span class="meta-item" id="heroCategory">History</span>
-            <span class="meta-item" id="heroDate">Recently added</span>
+            <span class="meta-item" id="hero-category">History</span>
+            <span class="meta-item" id="hero-date">Recently added</span>
           </div>
           <div class="hero-actions">
-            <button id="heroPlayBtn" class="btn btn-primary btn-lg">
+            <button id="hero-btn" class="btn btn-primary btn-lg">
               <i class="fas fa-play"></i>
               <span>Watch Now</span>
             </button>
-            <button id="heroSaveBtn" class="btn btn-secondary btn-lg">
+            <button id="hero-save" class="btn btn-secondary btn-lg">
               <i class="fas fa-bookmark"></i>
               <span>Save</span>
             </button>
           </div>
         </div>
-        <div class="hero-thumbnail" id="heroThumbnail"></div>
+        <div class="hero-thumbnail" id="heroBg"></div>
       </div>
     </section>
 
@@ -139,7 +149,7 @@
               placeholder="Search episodes, topics, speakers..."
               autocomplete="off"
             >
-            <button id="clearSearchBtn" class="search-clear" aria-label="Clear search" style="display: none;">
+            <button id="clearSearch" class="search-clear" aria-label="Clear search" style="display: none;">
               <i class="fas fa-times"></i>
             </button>
             <div id="searchDropdown" class="search-dropdown"></div>
@@ -148,12 +158,12 @@
 
         <div class="filter-wrapper">
           <div class="filter-label">Filter by:</div>
-          <div class="filter-tags">
-            <button class="filter-tag active" data-filter="all">All Episodes</button>
-            <button class="filter-tag" data-filter="history">History</button>
-            <button class="filter-tag" data-filter="quran">Quranic Studies</button>
-            <button class="filter-tag" data-filter="prophecy">Prophecy</button>
-            <button class="filter-tag" data-filter="discussion">Discussion</button>
+          <div class="filter-tags filter-chips">
+            <button class="filter-tag chip active" data-filter="all" data-cat="all">All Episodes</button>
+            <button class="filter-tag chip" data-filter="history" data-cat="history">History</button>
+            <button class="filter-tag chip" data-filter="quran" data-cat="quran">Quranic Studies</button>
+            <button class="filter-tag chip" data-filter="prophecy" data-cat="prophecy">Prophecy</button>
+            <button class="filter-tag chip" data-filter="discussion" data-cat="discussion">Discussion</button>
           </div>
         </div>
       </div>
@@ -169,7 +179,7 @@
             </div>
             <div class="stat-content">
               <p class="stat-label">Total Episodes</p>
-              <p class="stat-value" id="statTotal">0</p>
+              <p class="stat-value" id="stat-total">0</p>
             </div>
           </div>
           <div class="stat-card">
@@ -178,7 +188,7 @@
             </div>
             <div class="stat-content">
               <p class="stat-label">Hours of Content</p>
-              <p class="stat-value" id="statHours">0h</p>
+              <p class="stat-value" id="stat-hours">0h</p>
             </div>
           </div>
           <div class="stat-card">
@@ -187,7 +197,7 @@
             </div>
             <div class="stat-content">
               <p class="stat-label">Saved Episodes</p>
-              <p class="stat-value" id="statSaved">0</p>
+              <p class="stat-value" id="stat-saved">0</p>
             </div>
           </div>
           <div class="stat-card">
@@ -196,7 +206,7 @@
             </div>
             <div class="stat-content">
               <p class="stat-label">Most Watched</p>
-              <p class="stat-value" id="statTrending">0</p>
+              <p class="stat-value" id="stat-trending">0</p>
             </div>
           </div>
         </div>
@@ -204,7 +214,7 @@
     </section>
 
     <!-- Loading State -->
-    <div id="loadingState" class="loading-state" style="display: none;">
+    <div id="loading" class="loading-state" style="display: none;">
       <div class="spinner">
         <div class="spinner-ring"></div>
       </div>
@@ -212,12 +222,12 @@
     </div>
 
     <!-- Error State -->
-    <div id="errorState" class="error-state" style="display: none;">
+    <div id="error" class="error-state" style="display: none;">
       <div class="error-icon">
         <i class="fas fa-exclamation-triangle"></i>
       </div>
       <h3>Connection Error</h3>
-      <p id="errorMessage">Unable to load episodes. Please try again.</p>
+      <p id="error-msg">Unable to load episodes. Please try again.</p>
       <button id="retryBtn" class="btn btn-primary">Retry</button>
     </div>
 
@@ -226,10 +236,10 @@
       <div class="container">
         <div class="section-header">
           <h2 class="section-title">Episode Archive</h2>
-          <p class="section-subtitle" id="resultsMeta">Loading episodes...</p>
+          <p class="section-subtitle" id="results-meta">Loading episodes...</p>
         </div>
         
-        <div id="episodesGrid" class="episodes-grid">
+        <div id="grid" class="episodes-grid">
           <!-- Episodes rendered here -->
         </div>
 
@@ -247,20 +257,20 @@
   </main>
 
   <!-- Video Modal -->
-  <div id="videoModal" class="modal" aria-hidden="true">
+  <div id="modal" class="modal" aria-hidden="true">
     <div class="modal-content">
-      <button class="modal-close" id="modalCloseBtn" aria-label="Close">
+      <button class="modal-close" id="close" aria-label="Close">
         <i class="fas fa-times"></i>
       </button>
       
       <div class="modal-header">
-        <h2 id="modalTitle" class="modal-title">Episode Title</h2>
+        <h2 id="video-title" class="modal-title">Episode Title</h2>
       </div>
 
       <div class="modal-body">
         <div class="video-player">
           <iframe 
-            id="youtubePlayer" 
+            id="player" 
             width="100%" 
             height="100%" 
             src="" 
@@ -272,7 +282,7 @@
         </div>
 
         <div class="modal-actions">
-          <button id="modalShareBtn" class="modal-action-btn" title="Share">
+          <button id="shareEpisode" class="modal-action-btn" title="Share">
             <i class="fas fa-share-alt"></i>
             <span>Share</span>
           </button>
@@ -280,7 +290,7 @@
             <i class="fas fa-bookmark"></i>
             <span>Save</span>
           </button>
-          <button id="modalTranscriptBtn" class="modal-action-btn" title="Transcript">
+          <button id="toggleTranscript" class="modal-action-btn" title="Transcript">
             <i class="fas fa-closed-captioning"></i>
             <span>Notes</span>
           </button>
@@ -290,23 +300,23 @@
   </div>
 
   <!-- Watch Later Panel -->
-  <div id="watchLaterPanel" class="side-panel" aria-hidden="true">
+  <div id="watchLaterPage" class="side-panel" aria-hidden="true">
     <div class="panel-header">
       <h2>Watch Later</h2>
-      <button class="panel-close" aria-label="Close">
+      <button class="panel-close" id="closeWatchLater" aria-label="Close">
         <i class="fas fa-times"></i>
       </button>
     </div>
-    <div id="watchLaterContent" class="panel-content">
+    <div id="watchLaterContainer" class="panel-content">
       <!-- Watch later items rendered here -->
     </div>
   </div>
 
   <!-- Dashboard Panel -->
-  <div id="dashboardPanel" class="side-panel" aria-hidden="true">
+  <div id="dashboardModal" class="side-panel" aria-hidden="true">
     <div class="panel-header">
       <h2>Dashboard</h2>
-      <button class="panel-close" aria-label="Close">
+      <button class="panel-close" id="closeDashboard" aria-label="Close">
         <i class="fas fa-times"></i>
       </button>
     </div>
@@ -314,24 +324,65 @@
       <div class="dashboard-stats">
         <div class="dash-stat">
           <p class="dash-label">Episodes Loaded</p>
-          <p class="dash-value" id="dashTotal">0</p>
+          <p class="dash-value" id="dashboard-total">0</p>
         </div>
         <div class="dash-stat">
           <p class="dash-label">Saved Episodes</p>
-          <p class="dash-value" id="dashSaved">0</p>
+          <p class="dash-value" id="dashboard-saved">0</p>
         </div>
         <div class="dash-stat">
           <p class="dash-label">Watch Progress</p>
-          <p class="dash-value" id="dashProgress">0%</p>
+          <p class="dash-value" id="dashboard-progress">0%</p>
         </div>
       </div>
 
       <div class="dashboard-categories">
         <h3>Category Distribution</h3>
-        <div id="categoryList" class="category-list">
+        <div id="dashboardCategories" class="category-list">
           <!-- Categories rendered here -->
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- Share Panel -->
+  <div id="sharePanel" class="side-panel" aria-hidden="true">
+    <div class="panel-header">
+      <h2>Share Episode</h2>
+      <button class="panel-close" id="closeShare" aria-label="Close">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="panel-content">
+      <div class="share-group">
+        <label for="shareLink">Link:</label>
+        <input type="text" id="shareLink" class="share-input" readonly>
+        <button id="copyLinkBtn" class="btn btn-secondary">Copy Link</button>
+      </div>
+      <div class="share-buttons">
+        <button id="shareTwitter" class="social-share-btn twitter" title="Share on Twitter">
+          <i class="fab fa-twitter"></i>
+        </button>
+        <button id="shareFacebook" class="social-share-btn facebook" title="Share on Facebook">
+          <i class="fab fa-facebook"></i>
+        </button>
+        <button id="shareWhatsApp" class="social-share-btn whatsapp" title="Share on WhatsApp">
+          <i class="fab fa-whatsapp"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Transcript Panel -->
+  <div id="transcriptPanel" class="side-panel" aria-hidden="true">
+    <div class="panel-header">
+      <h2>Episode Notes</h2>
+      <button class="panel-close" id="closeTranscript" aria-label="Close">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div id="transcriptContent" class="panel-content">
+      <!-- Transcript rendered here -->
     </div>
   </div>
 
@@ -349,9 +400,9 @@
         <div class="footer-section">
           <h4>Quick Links</h4>
           <ul>
-            <li><a href="#" onclick="document.querySelector('[data-filter=all]').click()">All Episodes</a></li>
-            <li><a href="#" onclick="document.querySelector('[data-filter=history]').click()">History</a></li>
-            <li><a href="#" onclick="document.querySelector('[data-filter=quran]').click()">Quranic Studies</a></li>
+            <li><a href="#" onclick="document.querySelector('[data-cat=all]').click()">All Episodes</a></li>
+            <li><a href="#" onclick="document.querySelector('[data-cat=history]').click()">History</a></li>
+            <li><a href="#" onclick="document.querySelector('[data-cat=quran]').click()">Quranic Studies</a></li>
           </ul>
         </div>
         <div class="footer-section">

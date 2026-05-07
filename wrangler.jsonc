@@ -3,18 +3,21 @@
   "main": "src/youtube-worker.ts",
   "compatibility_date": "2025-01-01",
   "compatibility_flags": ["nodejs_compat"],
-  "routes": [
-    { "pattern": "yt-studio-production.ruhdevopsytstudio.workers.dev/*", "zone_name": "workers.dev" }
-  ],
+  "account_id": "e7b328621ba22501c4f8d875165369ca",
   "env": {
     "production": {
       "name": "yt-studio-youtube-api-prod",
-      "routes": [
-        { "pattern": "yt-studio-production.ruhdevopsytstudio.workers.dev/*", "zone_name": "workers.dev" }
-      ],
       "vars": {
-        "ENVIRONMENT": "production"
+        "ENVIRONMENT": "production",
+        "CHANNEL_ID": "UCrjJP_SHUeCmqpTSHJCXkdA"
       }
     }
+  },
+  "vars": {
+    "ENVIRONMENT": "development",
+    "CHANNEL_ID": "UCrjJP_SHUeCmqpTSHJCXkdA"
+  },
+  "observability": {
+    "enabled": true
   }
 }

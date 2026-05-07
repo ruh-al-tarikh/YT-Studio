@@ -7,7 +7,6 @@ node_modules/
 .env.local
 .DS_Store
 *.log
-dist/
 .vite/
 .vercel/
 .wrangler/
@@ -17,6 +16,5 @@ README.md
 .idea/
 .vscode/
 coverage/
-.wrangler/
 workflows-starter/
 yt-studio-api/
