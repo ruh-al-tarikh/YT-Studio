@@ -692,15 +692,15 @@ function renderCard(video) {
     const progress = getProgress(video.id);
     
     return `
-        <div class="card" data-id="${video.id}" role="button" tabindex="0">
+        <div class="card" data-id="${video.id}" role="button" tabindex="0" aria-label="Watch ${Utils.sanitize(video.title)}">
             <div class="card-thumb-wrapper">
                 <img data-src="${thumbnail}" 
                      src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=" 
-                     alt="${Utils.sanitize(video.title)}" 
+                     alt=""
                      class="lazy-img" 
                      loading="lazy">
                 <div class="card-thumb-overlay">
-                    <i class="fa-solid fa-play play-icon"></i>
+                    <i class="fa-solid fa-play play-icon" aria-hidden="true"></i>
                 </div>
                 <div class="duration-badge">HD</div>
                 ${progress ? `<div class="progress-bar-container"><div class="progress-bar-fill" style="width:${progress.percent}%"></div></div>` : ''}
@@ -839,11 +839,11 @@ function renderWatchLater() {
         DOM.watchLaterContainer.innerHTML = AppState.watchLater.map(video => {
             const thumbnail = video.thumbnail || `https://i.ytimg.com/vi/${video.id}/hqdefault.jpg`;
             return `
-                <div class="card" data-id="${video.id}" data-wl="1" role="button" tabindex="0">
+                <div class="card" data-id="${video.id}" data-wl="1" role="button" tabindex="0" aria-label="Watch ${Utils.sanitize(video.title)}">
                     <div class="card-thumb-wrapper">
-                        <img data-src="${thumbnail}" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=" alt="${Utils.sanitize(video.title)}" class="lazy-img" loading="lazy">
-                        <button class="watch-later-btn active" data-id="${video.id}" aria-label="Remove from Watch Later">
-                            <i class="fa-solid fa-bookmark"></i>
+                        <img data-src="${thumbnail}" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=" alt="" class="lazy-img" loading="lazy">
+                        <button class="watch-later-btn active" data-id="${video.id}" aria-label="Remove ${Utils.sanitize(video.title)} from Watch Later">
+                            <i class="fa-solid fa-bookmark" aria-hidden="true"></i>
                         </button>
                     </div>
                     <div class="card-copy">
