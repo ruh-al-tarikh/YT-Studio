@@ -47,6 +47,9 @@ const CONFIG = {
         delay: 500
     }
 };
+
+// ... (rest of the code will be appended from line 372 of the original file)
+
 // ============================================
 // CATEGORIES
 // ============================================
@@ -55,6 +58,141 @@ const CATEGORIES = [
     { key: 'prophecy', label: 'Prophecy', terms: ['prophecy', 'dajjal', 'gog', 'magog', 'end times'] },
     { key: 'discussion', label: 'Discussion', terms: ['podcast', 'debate', 'interview', 'conversation'] },
     { key: 'educational', label: 'Educational', terms: ['lesson', 'guide', 'explained', 'documentary'] },
+    { key: 'history', label: 'History', terms: ['history', 'empire', 'caliph', 'war', 'civilization'] }
+];
+
+// ============================================
+// DOM ELEMENTS
+// ============================================
+const DOM = {
+    // Core elements
+    body: document.body,
+    grid: document.getElementById('grid'),
+    modal: document.getElementById('modal'),
+    player: document.getElementById('player'),
+    closeModal: document.getElementById('close'),
+    
+    // Hero section
+    heroTitle: document.getElementById('hero-title'),
+    heroDesc: document.getElementById('hero-desc'),
+    heroSubtitle: document.getElementById('hero-subtitle'),
+    heroBtn: document.getElementById('hero-btn'),
+    heroSave: document.getElementById('hero-save'),
+    heroCategory: document.getElementById('hero-category'),
+    heroDate: document.getElementById('hero-date'),
+    
+    // Search
+    search: document.getElementById('searchInput'),
+    clearSearch: document.getElementById('clearSearch'),
+    suggestions: document.getElementById('searchSuggestions'),
+    
+    // Pagination
+    loadMore: document.getElementById('loadMoreBtn'),
+    loadMoreContainer: document.getElementById('loadMoreContainer'),
+    
+    // Status
+    loading: document.getElementById('loading'),
+    error: document.getElementById('error'),
+    errorMsg: document.getElementById('error-msg'),
+    retryBtn: document.getElementById('retryBtn'),
+    toast: document.getElementById('toast'),
+    
+    // Theme
+    themeToggle: document.getElementById('darkModeToggle'),
+    
+    // Mobile
+    mobileToggle: document.getElementById('mobileMenuToggle'),
+    mobileNav: document.getElementById('mobileNav'),
+    
+    // Watch Later
+    watchLaterBadge: document.getElementById('watchLaterBadge'),
+    watchLaterCount: document.getElementById('watchLaterCount'),
+    watchLaterPage: document.getElementById('watchLaterPage'),
+    watchLaterContainer: document.getElementById('watchLaterContainer'),
+    closeWatchLater: document.getElementById('closeWatchLater'),
+    
+    // Dashboard
+    dashboardBtn: document.getElementById('dashboardBtn'),
+    dashboardModal: document.getElementById('dashboardModal'),
+    closeDashboard: document.getElementById('closeDashboard'),
+    
+    // Stats
+    resultsMeta: document.getElementById('results-meta'),
+    statTotal: document.getElementById('stat-total'),
+    statSaved: document.getElementById('stat-saved'),
+    statProgress: document.getElementById('stat-progress'),
+    dashTotal: document.getElementById('dashboard-total'),
+    dashSaved: document.getElementById('dashboard-saved'),
+    dashProgress: document.getElementById('dashboard-progress'),
+    dashHours: document.getElementById('dashboard-hours'),
+    dashCategories: document.getElementById('dashboardCategories'),
+    dashResumeList: document.getElementById('dashboardResumeList'),
+    
+    // Transcript & Share
+    toggleTranscript: document.getElementById('toggleTranscript'),
+    shareEpisode: document.getElementById('shareEpisode'),
+    transcriptPanel: document.getElementById('transcriptPanel'),
+    sharePanel: document.getElementById('sharePanel'),
+    closeTranscript: document.getElementById('closeTranscript'),
+    closeShare: document.getElementById('closeShare'),
+    shareLink: document.getElementById('shareLink'),
+    copyLinkBtn: document.getElementById('copyLinkBtn'),
+    shareTwitter: document.getElementById('shareTwitter'),
+    shareFacebook: document.getElementById('shareFacebook'),
+    shareWhatsApp: document.getElementById('shareWhatsApp'),
+    
+    // Scroll
+    scrollToTop: document.getElementById('scrollToTop'),
+    
+    // Blocks
+    continueBlock: document.getElementById('continue-block'),
+    continueRow: document.getElementById('continue-row'),
+    emptyHistory: document.getElementById('empty-history'),
+    clearFilters: document.getElementById('clearFilters'),
+    trendingRow: document.getElementById('trending-row'),
+    recommendedRow: document.getElementById('recommended-row'),
+    
+    // Studio Mode
+    modeSwitcher: document.getElementById('modeSwitcher'),
+    modeBtns: document.querySelectorAll('.mode-btn'),
+    studioRoot: document.getElementById('studio-root'),
+    appRoot: document.getElementById('app-root'),
+    heroSection: document.getElementById('hero'),
+    continueBlockSec: document.getElementById('continue-block'),
+    trendingBlockSec: document.getElementById('trending-block'),
+    recommendedBlockSec: document.getElementById('recommended-block'),
+    
+    // Studio Navigation
+    studioNavBtns: document.querySelectorAll('.studio-nav-btn'),
+    studioViews: document.querySelectorAll('.studio-view'),
+    studioBreadcrumbs: document.getElementById('studioBreadcrumbs'),
+    
+    // Projects
+    projectTabBtns: document.querySelectorAll('.project-tab-btn'),
+    ptabContents: document.querySelectorAll('.ptab-content'),
+    newProjectBtn: document.getElementById('newProjectBtn'),
+    backToProjectsBtn: document.getElementById('backToProjectsBtn'),
+    activeProjectView: document.getElementById('active-project-view'),
+    studioViewProjects: document.getElementById('studio-view-projects'),
+    
+    // Channel
+    channelInput: document.getElementById('channelIdInput'),
+    connectBtn: document.getElementById('connectChannelBtn'),
+    
+    // Chips
+    chips: document.querySelectorAll('.chip'),
+    
+    // Background
+    bg: document.getElementById('bg'),
+    
+    // Filters
+    clearFiltersBtn: document.getElementById('clearFilters')
+};
+
+// ============================================
+// APPLICATION STATE
+// ============================================
+const AppState = {
     videos: [],
     filtered: [],
     hero: null,

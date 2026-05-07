@@ -1,1 +1,66 @@
-.islamic-container{display:grid;grid-template-columns:1fr 300px;gap:32px;max-width:1200px}.islamic-search{display:flex;align-items:center;background:var(--bg-elevated);border:1px solid var(--line-soft);border-radius:var(--radius-md);padding:16px 20px;margin:24px 0}.islamic-search i{color:var(--text-soft);margin-right:12px;font-size:1.2rem}.islamic-search input{flex:1;font-size:1.1rem}.islamic-filters{display:flex;gap:12px;margin-bottom:24px}.reference-list{display:flex;flex-direction:column;gap:20px}.reference-item{background:var(--bg-elevated);border:1px solid var(--line-soft);border-radius:var(--radius-md);padding:24px}.ref-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}.ref-source{font-family:var(--font-display);font-size:1.1rem;font-weight:700}.ref-badge{font-size:.75rem;text-transform:uppercase;font-weight:700;padding:4px 8px;border-radius:4px}.ref-badge.quran{background:oklch(.5 .15 150/.2);color:oklch(.8 .1 150)}.ref-badge.hadith{background:oklch(.5 .15 200/.2);color:oklch(.8 .1 200)}.ref-badge.history{background:oklch(.5 .15 50/.2);color:oklch(.8 .1 50)}.ref-arabic{font-size:1.5rem;text-align:right;direction:rtl;margin-bottom:12px;color:var(--text-main);line-height:1.8}.ref-translation{font-size:1.05rem;color:var(--text-muted);line-height:1.6;margin-bottom:16px}.ref-footer{display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--line-soft);padding-top:16px}.ref-tags{display:flex;gap:8px}.collection-list span,.ref-tag{font-size:.85rem;color:var(--text-soft)}.islamic-card{background:var(--bg-elevated);border:1px solid var(--line-soft);border-radius:var(--radius-md);padding:24px}.collection-list{list-style:none;padding:0;display:flex;flex-direction:column;gap:12px;margin-top:16px}.collection-list li{display:flex;align-items:center;gap:12px;padding:12px;background:var(--bg-soft);border-radius:var(--radius-sm);cursor:pointer;transition:background .2s}.collection-list li:hover{background:oklch(from var(--accent) l c h/.1)}.collection-list span{margin-left:auto}@media (max-width:900px){.islamic-container{grid-template-columns:1fr}}
+/* Islamic History Hub Styles */
+.timeline-container {
+  position: relative;
+  padding: 2rem 0;
+}
+
+.timeline-line {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(to bottom, var(--primary) 0%, var(--primary-dark) 100%);
+  transform: translateX(-50%);
+  opacity: 0.3;
+}
+
+.timeline-event {
+  position: relative;
+  width: 45%;
+  margin-bottom: 3rem;
+}
+
+.timeline-event.left {
+  left: 0;
+  text-align: right;
+}
+
+.timeline-event.right {
+  left: 55%;
+  text-align: left;
+}
+
+.timeline-dot {
+  position: absolute;
+  top: 10px;
+  width: 12px;
+  height: 12px;
+  background: var(--primary);
+  border-radius: 50%;
+  box-shadow: 0 0 10px var(--primary);
+}
+
+.left .timeline-dot {
+  right: -31px;
+}
+
+.right .timeline-dot {
+  left: -31px;
+}
+
+.timeline-date {
+  font-family: var(--font-display);
+  color: var(--primary);
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.timeline-card {
+  transition: transform 0.3s ease;
+}
+
+.timeline-card:hover {
+  transform: scale(1.02);
+}

@@ -35,6 +35,7 @@
   
   <!-- Styles -->
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/islamic.css">
   
   <!-- Analytics -->
   <script>
@@ -112,6 +113,10 @@
             <button class="theme-opt w-full text-left px-4 py-2 hover:bg-white/5 text-sm" data-theme="neon">Creator Neon</button>
           </div>
         </div>
+        <div id="modeSwitcher" class="mode-switcher glass-card p-1 flex gap-1 mx-4">
+          <button class="mode-btn active px-3 py-1 text-[10px] rounded-md transition-all font-bold uppercase tracking-wider" data-mode="archive">Archive</button>
+          <button class="mode-btn px-3 py-1 text-[10px] rounded-md transition-all font-bold uppercase tracking-wider" data-mode="creator">Studio</button>
+        </div>
         <button id="menuToggleBtn" class="menu-toggle" aria-label="Menu">
           <span></span>
           <span></span>
@@ -124,7 +129,7 @@
   <main class="main-content" id="main-content">
     <!-- Hero Section -->
     <section class="hero" id="hero" aria-label="Featured episode">
-      <div class="hero-background" id="heroBg"></div>
+      <div class="hero-background" id="bg"></div>
       <div class="hero-overlay"></div>
       <div class="hero-container">
         <div class="hero-content">
@@ -136,24 +141,19 @@
             <span class="meta-item" id="hero-date">Recently added</span>
           </div>
           <div class="hero-actions">
-            <button id="heroPlayBtn" class="btn btn-primary btn-lg" aria-label="Watch Featured Episode">
+            <button id="hero-btn" class="btn btn-primary btn-lg" aria-label="Watch Featured Episode">
               <i class="fas fa-play" aria-hidden="true"></i>
               <span>Watch Now</span>
             </button>
-            <button id="heroSaveBtn" class="btn btn-secondary btn-lg" aria-label="Save Featured Episode for Later">
+            <button id="hero-save" class="btn btn-secondary btn-lg" aria-label="Save Featured Episode for Later">
               <i class="fas fa-bookmark" aria-hidden="true"></i>
-            <button id="hero-btn" class="btn btn-primary btn-lg">
-              <i class="fas fa-play"></i>
-              <span>Watch Now</span>
-            </button>
-            <button id="hero-save" class="btn btn-secondary btn-lg">
-              <i class="fas fa-bookmark"></i>
               <span>Save</span>
             </button>
           </div>
         </div>
-        <div class="hero-thumbnail" id="heroBg"></div>
+        <div class="hero-thumbnail" id="heroThumb"></div>
       </div>
+
     </section>
 
     <!-- Search & Filter Section -->
@@ -274,6 +274,135 @@
         </div>
       </div>
     </section>
+
+    <!-- Trending Section -->
+    <section class="trending-section" id="trending-block" style="display: none;">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title">Trending Now</h2>
+        </div>
+        <div id="trending-row" class="episodes-grid"></div>
+      </div>
+    </section>
+
+    <!-- Recommended Section -->
+    <section class="recommended-section" id="recommended-block" style="display: none;">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title">Recommended for You</h2>
+        </div>
+        <div id="recommended-row" class="episodes-grid"></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Creator Studio View (Hidden by Default) -->
+  <main class="studio-content hidden" id="studio-root">
+    <div class="container py-8">
+      <div class="flex items-center justify-between mb-8">
+        <div>
+          <h2 class="font-display text-3xl mb-2 premium-gradient-text">Creator Studio</h2>
+          <div id="studioBreadcrumbs" class="text-xs text-soft flex items-center gap-2">
+            <span>Studio</span>
+            <i class="fa-solid fa-chevron-right text-[10px]"></i>
+            <span class="current">Projects</span>
+          </div>
+        </div>
+        <div class="flex gap-3">
+          <button id="newProjectBtn" class="btn btn-primary btn-sm">
+            <i class="fas fa-plus"></i> New Project
+          </button>
+        </div>
+      </div>
+
+      <div class="studio-layout grid grid-cols-12 gap-8">
+        <!-- Sidebar Navigation -->
+        <aside class="col-span-3">
+          <nav class="studio-nav space-y-2">
+            <button class="studio-nav-btn active w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all" data-tab="projects">
+              <i class="fas fa-folder-open"></i> <span>Video Projects</span>
+            </button>
+            <button class="studio-nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all" data-tab="islamic">
+              <i class="fas fa-scroll"></i> <span>History Hub</span>
+            </button>
+            <button class="studio-nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all" data-tab="analytics">
+              <i class="fas fa-chart-line"></i> <span>Insights</span>
+            </button>
+            <button class="studio-nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all" data-tab="settings">
+              <i class="fas fa-cog"></i> <span>Studio Settings</span>
+            </button>
+          </nav>
+
+          <div class="mt-8 p-4 glass-card border-primary/20">
+            <h4 class="text-xs font-bold uppercase tracking-widest mb-3 text-primary">Live API Status</h4>
+            <div class="flex items-center gap-2 text-xs text-soft">
+              <span class="w-2 h-2 rounded-full bg-accent-green"></span>
+              YouTube Worker: Active
+            </div>
+          </div>
+        </aside>
+
+        <!-- Main Workspace -->
+        <div class="col-span-9">
+          <!-- Projects View -->
+          <div id="studio-view-projects" class="studio-view active">
+            <div class="flex items-center justify-between mb-6">
+              <h3 class="font-display text-xl">Active Projects</h3>
+              <div class="flex bg-black/20 p-1 rounded-lg">
+                <button id="listViewBtn" class="p-2 rounded-md active"><i class="fas fa-list"></i></button>
+                <button id="kanbanViewBtn" class="p-2 rounded-md"><i class="fas fa-th-large"></i></button>
+              </div>
+            </div>
+            <div id="studioProjectsList" class="studio-projects-grid">
+              <!-- Rendered by JS -->
+            </div>
+          </div>
+
+          <!-- History Hub View -->
+          <div id="studio-view-islamic" class="studio-view hidden">
+            <!-- Rendered by islamic.js -->
+          </div>
+
+          <!-- Active Project Detail View -->
+          <div id="active-project-view" class="studio-view hidden">
+            <div class="flex items-center gap-4 mb-6">
+              <button id="backToProjectsBtn" class="action-btn"><i class="fas fa-arrow-left"></i></button>
+              <h3 id="current-project-title" class="font-display text-xl">New Project</h3>
+            </div>
+            
+            <div class="project-workspace glass-card p-6 min-h-[600px]">
+              <div class="workspace-tabs flex border-b border-white/5 mb-6">
+                <button class="project-tab-btn active px-6 py-3" data-ptab="research">Research</button>
+                <button class="project-tab-btn px-6 py-3" data-ptab="script">Scripting</button>
+                <button class="project-tab-btn px-6 py-3" data-ptab="seo">SEO & Assets</button>
+              </div>
+              
+              <div id="ptab-research" class="ptab-content active">
+                <div class="grid grid-cols-2 gap-6">
+                  <div class="space-y-4">
+                    <label class="text-sm font-bold">Topic Analysis</label>
+                    <textarea class="w-full bg-black/20 border border-white/10 rounded-xl p-4 min-h-[200px]" placeholder="Paste sources or type research notes..."></textarea>
+                  </div>
+                  <div class="space-y-4">
+                    <label class="text-sm font-bold">AI Research Assistant</label>
+                    <div id="ai-research-output" class="bg-primary/5 border border-primary/20 rounded-xl p-4 min-h-[200px] text-sm text-soft italic">
+                      AI is ready to analyze your topic...
+                    </div>
+                    <button class="btn btn-secondary w-full">Deep Analyze Topic</button>
+                  </div>
+                </div>
+              </div>
+              
+              <div id="ptab-script" class="ptab-content hidden">
+                <div id="script-editor-container" class="space-y-4">
+                  <!-- Script components -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </main>
 
   <!-- Video Modal -->
@@ -471,38 +600,49 @@
   <footer class="footer">
     <div class="container">
       <div class="footer-content">
-        <div class="footer-section">
-          <h3>Ruh Al Tarikh</h3>
-          <p>A cinematic archive exploring Islamic history, scripture, and contested ideas.</p>
+        <div class="footer-section brand-section">
+          <h3 class="premium-gradient-text">Ruh Al Tarikh</h3>
+          <p>A cinematic archive exploring Islamic history, scripture, and contested ideas through a professional, high-fidelity lens.</p>
+          <div class="social-links mt-4">
+            <a href="https://www.youtube.com/@Ruh-Al-Tarikh" target="_blank" rel="noopener" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+            <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+            <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+          </div>
         </div>
         <div class="footer-section">
-          <h4>Quick Links</h4>
+          <h4>Explore</h4>
           <ul>
-            <li><a href="#" onclick="document.querySelector('[data-cat=all]').click()">All Episodes</a></li>
-            <li><a href="#" onclick="document.querySelector('[data-cat=history]').click()">History</a></li>
-            <li><a href="#" onclick="document.querySelector('[data-cat=quran]').click()">Quranic Studies</a></li>
+            <li><a href="#" onclick="document.querySelector('[data-cat=all]').click()">Archive</a></li>
+            <li><a href="#" onclick="document.querySelector('[data-cat=history]').click()">Historical Analysis</a></li>
+            <li><a href="#" onclick="document.querySelector('[data-cat=quran]').click()">Scriptural Deep-Dives</a></li>
+            <li><a href="#" onclick="document.querySelector('[data-cat=prophecy]').click()">Prophetic Timeline</a></li>
           </ul>
         </div>
         <div class="footer-section">
-          <h4>Connect</h4>
-          <div class="social-links">
-            <a href="https://www.youtube.com/@Ruh-Al-Tarikh" target="_blank" rel="noopener" aria-label="YouTube">
-              <i class="fab fa-youtube"></i>
-            </a>
-            <a href="#" aria-label="Twitter">
-              <i class="fab fa-twitter"></i>
-            </a>
-            <a href="#" aria-label="Facebook">
-              <i class="fab fa-facebook"></i>
-            </a>
-          </div>
+          <h4>Studio</h4>
+          <ul>
+            <li><a href="#" onclick="document.querySelector('[data-mode=creator]').click()">Creator Workspace</a></li>
+            <li><a href="#" onclick="document.querySelector('[data-tab=islamic]').click()">History Hub</a></li>
+            <li><a href="#">Research Tools</a></li>
+            <li><a href="#">API Documentation</a></li>
+          </ul>
+        </div>
+        <div class="footer-section">
+          <h4>Support</h4>
+          <ul>
+            <li><a href="#">Help Center</a></li>
+            <li><a href="#">Terms of Service</a></li>
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">Contact Us</a></li>
+          </ul>
         </div>
       </div>
       <div class="footer-bottom">
-        <p>&copy; 2024 Ruh Al Tarikh. All rights reserved.</p>
+        <p>&copy; 2024 Ruh Al Tarikh. Premium Studio Experience.</p>
       </div>
     </div>
   </footer>
+
 
   <!-- Scroll to Top -->
   <button id="scrollToTop" class="scroll-to-top" aria-label="Scroll to top" title="Scroll to top">
