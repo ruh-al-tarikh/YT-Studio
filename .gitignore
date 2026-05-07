@@ -54,4 +54,3 @@ firebase.json
 .firebaserc
 js/*.backup
 *.json
-.secret_key

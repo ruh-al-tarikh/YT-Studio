@@ -59,8 +59,6 @@
 					</div>
 				`).join("")),E(),l.channelInput&&(l.channelInput.value=localStorage.getItem(n.CHANNEL_KEY)||"");var e=localStorage.getItem(n.CHANNEL_KEY);let r=e?n.API+"?channelId="+e:n.API;if(o.videos=await(async()=>{var t=d.getLS(n.CACHE_KEY);if(t&&t.data&&t.data.length&&Date.now()-t.time<n.CACHE_EXPIRY)return t.data;try{var e=await(await d.fetchWithRetry(r)).json(),a=(e.isDemo?(document.body.classList.add("demo-mode"),d.showToast("Using demo archives")):document.body.classList.remove("demo-mode"),(e.videos||[]).map(a=>{var e=a.id||a.videoId;return{id:e,title:a.title||"Untitled",thumbnail:a.thumbnail||`https://i.ytimg.com/vi/${e}/hqdefault.jpg`,publishedAt:a.publishedAt||(new Date).toISOString(),category:(()=>{let t=(a.title||"").toLowerCase();var e=s.find(e=>e.terms.some(e=>t.includes(e)));return e?e.key:"history"})(),description:a.description||"Deep dive into Islamic history and theology."}}));return 0<a.length&&d.saveLS(n.CACHE_KEY,{data:a,time:Date.now()}),a}catch(e){console.error("Worker fetch failed, trying local fallback:",e);t=await(await fetch(n.FALLBACK_DATA)).json();return document.body.classList.add("demo-mode"),(t.videos||[]).map(e=>({...e,category:e.category||"history",description:e.description||"Deep dive into Islamic history and theology."}))}})(),o.videos.sort((e,t)=>new Date(t.publishedAt)-new Date(e.publishedAt)),0===o.videos.length)throw new Error("No videos available in the archive.");P(o.videos[0]),C(),a(),I();var t=()=>{if(l.recommendedRow){let r=Object.keys(o.progress).map(t=>o.videos.find(e=>e.id===t)).filter(Boolean),t=[];if(0===r.length)t=o.videos.slice(4,8);else{var s;let a=r.map(e=>e.category).reduce((e,t)=>({...e,[t]:(e[t]||0)+1}),{}),[e]=Object.keys(a).sort((e,t)=>a[t]-a[e]);(t=o.videos.filter(t=>t.category===e&&!r.some(e=>e.id===t.id)).slice(0,4)).length<4&&(s=o.videos.filter(t=>t.category!==e&&!r.some(e=>e.id===t.id)).slice(0,4-t.length),t.push(...s))}0<t.length&&(l.recommendedBlockSec&&(l.recommendedBlockSec.style.display="block"),l.recommendedRow.innerHTML=t.map(e=>T(e)).join(""))}S(),p()};"requestIdleCallback"in window?requestIdleCallback(t):setTimeout(t,500)}catch(e){l.error&&(l.error.style.display="block"),l.errorMsg&&(l.errorMsg.textContent=e.message||"Connection failed. Please try again."),console.error("Init Error:",e),I()}finally{l.loading&&(l.loading.style.display="none")}}"loading"===document.readyState?document.addEventListener("DOMContentLoaded",M):M()})();
 import { DeepSearch } from './search.js';
-import { isFeatureEnabled } from './config.js';
-import { initMonitoring } from './monitoring.js';
 import { initScriptStudio } from './script.js';
 import { initIslamic } from './islamic.js';
 
@@ -121,23 +119,6 @@ import { initIslamic } from './islamic.js';
   };
 
   const utils = {
-    showToast: (message, type = 'info') => {
-      let container = document.getElementById('toast-container');
-      if (!container) {
-        container = document.createElement('div');
-        container.id = 'toast-container';
-        document.body.appendChild(container);
-      }
-      const toast = document.createElement('div');
-      toast.className = `toast ${type}`;
-      const icon = type === 'success' ? 'check-circle' : type === 'warning' ? 'exclamation-triangle' : 'info-circle';
-      toast.innerHTML = `<i class="fas fa-${icon}"></i><span>${message}</span>`;
-      container.appendChild(toast);
-      setTimeout(() => {
-        toast.style.animation = 'toast-out 0.3s ease-in forwards';
-        setTimeout(() => toast.remove(), 300);
-      }, 3000);
-    },
     sanitize: str => str.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])),
     truncate: (str, len) => str.length > len ? str.substring(0, len) + '...' : str,
     formatDate: d => new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
@@ -1020,126 +1001,9 @@ function closeWatchLater() {
 // ============================================
 // DASHBOARD FUNCTIONS
 // ============================================
-const initAnalyticsChart = async () => {
-  const canvas = document.getElementById('analyticsChart');
-  if (!canvas) return;
-
-  if (!window.Chart) {
-    await new Promise((resolve) => {
-      const script = document.createElement('script');
-      script.src = 'https://cdn.jsdelivr.net/npm/chart.js';
-      script.onload = resolve;
-      document.head.appendChild(script);
-    });
-  }
-
-  const ctx = canvas.getContext('2d');
-  if (window.myChart) window.myChart.destroy();
-
-  window.myChart = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-      datasets: [{
-        label: 'Subscriber Growth',
-        data: [12, 19, 3, 5, 2, 3, 9],
-        borderColor: '#e50914',
-        backgroundColor: 'rgba(229, 9, 20, 0.1)',
-        fill: true,
-        tension: 0.4
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
-      scales: {
-        y: { display: false },
-        x: { grid: { display: false }, ticks: { color: '#808080', font: { size: 10 } } }
-      }
-    }
-  });
-};
-
-const initAIAssistant = () => {
-  if (!isFeatureEnabled('AI_ASSISTANT')) {
-    const aiPanel = document.getElementById('ai-assistant-panel');
-    if (aiPanel) aiPanel.style.display = 'none';
-    return;
-  }
-  const scoreBtn = document.getElementById('ai-score-title');
-  const hookBtn = document.getElementById('ai-generate-hook');
-  const titleInput = document.getElementById('ai-title-input');
-
-  if (scoreBtn) {
-    scoreBtn.addEventListener('click', () => {
-      const title = titleInput.value.trim();
-      if (!title) {
-        Utils.showToast('Please enter a title', 'warning');
-        return;
-      }
-
-      scoreBtn.disabled = true;
-      scoreBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-
-      setTimeout(() => {
-        const score = Math.floor(Math.random() * (95 - 65) + 65);
-        const result = document.getElementById('ai-score-result');
-        const scoreVal = document.getElementById('ai-score-value');
-        const scoreBar = document.getElementById('ai-score-bar');
-
-        result.classList.remove('hidden');
-        scoreVal.textContent = `${score}/100`;
-        scoreBar.style.width = `${score}%`;
-
-        scoreBtn.disabled = false;
-        scoreBtn.textContent = 'Score';
-        Utils.showToast('Title analyzed!', 'success');
-      }, 1000);
-    });
-  }
-
-  if (hookBtn) {
-    hookBtn.addEventListener('click', () => {
-      hookBtn.disabled = true;
-      hookBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyzing...';
-
-      const hooks = [
-        "What if everything you knew about the fall of Andalusia was wrong?",
-        "Behind the silence of history lies a truth far more cinematic than fiction.",
-        "The year was 1492. The world was changing. And at the center of it all?",
-        "How did one decision change the course of human history forever?"
-      ];
-
-      setTimeout(() => {
-        const result = document.getElementById('ai-hook-result');
-        result.classList.remove('hidden');
-        result.textContent = hooks[Math.floor(Math.random() * hooks.length)];
-
-        hookBtn.disabled = false;
-        hookBtn.innerHTML = '<i class="fas fa-bolt mr-2 text-primary"></i> Generate Viral Hook';
-        Utils.showToast('Hook generated!', 'success');
-      }, 1200);
-    });
-  }
-
-  const topicChips = document.querySelectorAll('#ai-topics span');
-  topicChips.forEach(chip => {
-    chip.addEventListener('click', () => {
-      const topic = chip.textContent;
-      if (titleInput) {
-        titleInput.value = topic;
-        Utils.showToast(`Selected: ${topic}`, 'info');
-      }
-    });
-  });
-};
-
 function openDashboard() {
     if (!DOM.dashboardModal) return;
     renderDashboard();
-    initAnalyticsChart();
-    initAIAssistant();
     DOM.dashboardModal.style.display = 'block';
     DOM.dashboardModal.setAttribute('aria-hidden', 'false');
     DOM.body.style.overflow = 'hidden';
@@ -1161,21 +1025,16 @@ function setTheme(theme) {
     AppState.theme = theme;
     Utils.saveLS(CONFIG.STORAGE.THEME_KEY, theme);
     
-    DOM.body.classList.remove('light-mode', 'theme-neon');
     if (theme === 'light') {
         DOM.body.classList.add('light-mode');
-    } else if (theme === 'neon') {
-        DOM.body.classList.add('theme-neon');
+    } else {
+        DOM.body.classList.remove('light-mode');
     }
     
     const icon = DOM.themeToggle?.querySelector('i');
     if (icon) {
-        icon.className = theme === 'dark' ? 'fa-regular fa-moon' : theme === 'neon' ? 'fa-solid fa-bolt' : 'fa-regular fa-sun';
+        icon.className = theme === 'dark' ? 'fa-regular fa-moon' : 'fa-regular fa-sun';
     }
-
-    document.querySelectorAll('.theme-opt').forEach(opt => {
-      opt.classList.toggle('active', opt.dataset.theme === theme);
-    });
 }
 
 function toggleTheme() {
@@ -1337,9 +1196,11 @@ function initSearch() {
             }
             
             document.querySelectorAll('.chip').forEach(ch => {
-                const isActive = AppState.categories.includes(ch.dataset.cat);
-                ch.classList.toggle('active', isActive);
-                ch.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+                if (AppState.categories.includes(ch.dataset.cat)) {
+                    ch.classList.add('active');
+                } else {
+                    ch.classList.remove('active');
+                }
             });
             
             AppState.page = 0;
@@ -1368,7 +1229,6 @@ function initSearch() {
 // ============================================
 async function init() {
     try {
-        initMonitoring();
         // Load saved theme
         const savedTheme = Utils.getLS(CONFIG.STORAGE.THEME_KEY);
         if (savedTheme) setTheme(savedTheme);
@@ -1383,11 +1243,11 @@ async function init() {
         
         // Show skeleton loading
         if (DOM.grid) {
-            DOM.grid.innerHTML = Array(CONFIG.UI.ITEMS_PER_PAGE).fill(0).map(() => `
+            DOM.grid.innerHTML = Array(6).fill(0).map(() => `
                 <div class="skeleton-card">
-                    <div class="skeleton skeleton-thumb"></div>
-                    <div class="skeleton skeleton-title"></div>
-                    <div class="skeleton skeleton-meta"></div>
+                    <div class="skeleton skeleton-thumb" style="aspect-ratio:16/9; border-radius:var(--radius-md);"></div>
+                    <div class="skeleton skeleton-text" style="height:24px; width:90%; border-radius:4px;"></div>
+                    <div class="skeleton skeleton-text short" style="height:20px; width:50%; border-radius:4px;"></div>
                 </div>
             `).join('');
         }
@@ -1496,14 +1356,6 @@ function bindEvents() {
     // Theme toggle
     if (DOM.themeToggle) DOM.themeToggle.addEventListener('click', toggleTheme);
     
-    document.querySelectorAll('.theme-opt').forEach(btn => {
-      btn.addEventListener('click', () => {
-        setTheme(btn.dataset.theme);
-        const menu = document.getElementById('themeMenu');
-        if (menu) menu.classList.add('hidden');
-      });
-    });
-
     // Hero buttons
     if (DOM.heroBtn) DOM.heroBtn.addEventListener('click', () => AppState.hero && openVideo(AppState.hero));
     if (DOM.heroSave) DOM.heroSave.addEventListener('click', () => AppState.hero && toggleWatchLater(AppState.hero));
@@ -1731,58 +1583,12 @@ function bindEvents() {
 // ============================================
 // START APPLICATION
 // ============================================
-// PWA Support & App Lifecycle
-let deferredPrompt;
-const setupPWA = () => {
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/sw.js')
-        .then(reg => console.log('[PWA] Service Worker registered'))
-        .catch(err => console.log('[PWA] Registration failed:', err));
-    });
-  }
-
-  window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-    const installBtn = document.getElementById('installBtn');
-    if (installBtn) {
-      installBtn.classList.remove('hidden');
-      installBtn.addEventListener('click', async () => {
-        if (deferredPrompt) {
-          deferredPrompt.prompt();
-          const { outcome } = await deferredPrompt.userChoice;
-          console.log(`[PWA] Install outcome: ${outcome}`);
-          deferredPrompt = null;
-          installBtn.classList.add('hidden');
-        }
-      });
-    }
-  });
-
-  window.addEventListener('online', () => {
-    if (window.utils && utils.showToast) {
-      utils.showToast('Back online! Syncing data...', 'success');
-    }
-    document.body.classList.remove('offline-mode');
-  });
-
-  window.addEventListener('offline', () => {
-    if (window.utils && utils.showToast) {
-      utils.showToast('You are offline. Some features may be limited.', 'warning');
-    }
-    document.body.classList.add('offline-mode');
-  });
-};
-
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
         init();
         bindEvents();
-        setupPWA();
     });
 } else {
     init();
     bindEvents();
-    setupPWA();
 }
