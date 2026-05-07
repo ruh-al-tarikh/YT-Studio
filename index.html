@@ -52,6 +52,7 @@
   </script>
 </head>
 <body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
   <!-- Animated Background -->
   <div class="animated-bg" aria-hidden="true">
     <div class="bg-gradient bg-gradient-1"></div>
@@ -86,13 +87,15 @@
       </nav>
 
       <div class="navbar-actions">
-        <button id="watchLaterBtn" class="action-btn badge-btn" aria-label="Watch Later">
-          <i class="fas fa-bookmark"></i>
+        <button id="watchLaterBtn" class="action-btn badge-btn" aria-label="View Saved Episodes" title="View Saved Episodes">
+          <i class="fas fa-bookmark" aria-hidden="true"></i>
           <span class="badge" id="watchLaterBadge">0</span>
         </button>
-        <button id="dashboardBtn" class="action-btn" aria-label="Dashboard">
-          <i class="fas fa-chart-line"></i>
+        <button id="dashboardBtn" class="action-btn" aria-label="View Dashboard" title="View Dashboard">
+          <i class="fas fa-chart-line" aria-hidden="true"></i>
         </button>
+        <a href="https://www.youtube.com/@Ruh-Al-Tarikh" target="_blank" rel="noopener noreferrer" class="action-btn" aria-label="Visit YouTube Channel" title="Visit YouTube Channel">
+          <i class="fab fa-youtube" aria-hidden="true"></i>
         <button id="installBtn" class="action-btn hidden" aria-label="Install App" title="Install App">
           <i class="fas fa-download"></i>
         </button>
@@ -118,7 +121,7 @@
     </div>
   </header>
 
-  <main class="main-content">
+  <main class="main-content" id="main-content">
     <!-- Hero Section -->
     <section class="hero" id="hero" aria-label="Featured episode">
       <div class="hero-background" id="heroBg"></div>
@@ -133,6 +136,12 @@
             <span class="meta-item" id="hero-date">Recently added</span>
           </div>
           <div class="hero-actions">
+            <button id="heroPlayBtn" class="btn btn-primary btn-lg" aria-label="Watch Featured Episode">
+              <i class="fas fa-play" aria-hidden="true"></i>
+              <span>Watch Now</span>
+            </button>
+            <button id="heroSaveBtn" class="btn btn-secondary btn-lg" aria-label="Save Featured Episode for Later">
+              <i class="fas fa-bookmark" aria-hidden="true"></i>
             <button id="hero-btn" class="btn btn-primary btn-lg">
               <i class="fas fa-play"></i>
               <span>Watch Now</span>
