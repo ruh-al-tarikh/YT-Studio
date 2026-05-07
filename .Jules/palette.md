@@ -20,3 +20,7 @@
 ## 2024-05-04 - YouTube API Data Fetching Optimization
 **Learning:** Using the 'search' endpoint for listing channel videos is quota-intensive and less reliable for production.
 **Action:** Transitioned to 'playlistItems' logic by fetching the channel's 'uploads' playlist ID first. This reduces quota usage and provides more consistent results for live data loading.
+
+## 2024-05-07 - "Scroll to Top" Implementation for Infinite Feeds
+**Learning:** In long-scrolling cinematic archives, providing a quick return to navigation is essential for orientation. Leveraging existing JS logic for missing UI elements (like scrollToTop) ensures feature parity across development cycles.
+**Action:** Always verify if JS event handlers assume the presence of specific DOM elements and implement them if missing to maintain expected UX.
