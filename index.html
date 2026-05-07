@@ -13,6 +13,7 @@
   <meta name="theme-color" content="#1a1410">
   
   <title>Ruh Al Tarikh | Cinematic Islamic Archive</title>
+  <link rel="manifest" href="/manifest.json">
   
   <!-- Preconnects & DNS Prefetch -->
   <link rel="preconnect" href="https://i.ytimg.com">
@@ -92,12 +93,22 @@
         <button id="dashboardBtn" class="action-btn" aria-label="Dashboard">
           <i class="fas fa-chart-line"></i>
         </button>
+        <button id="installBtn" class="action-btn hidden" aria-label="Install App" title="Install App">
+          <i class="fas fa-download"></i>
+        </button>
         <a href="https://www.youtube.com/@Ruh-Al-Tarikh" target="_blank" rel="noopener noreferrer" class="action-btn" aria-label="YouTube Channel">
           <i class="fab fa-youtube"></i>
         </a>
-        <button id="themeToggleBtn" class="action-btn" aria-label="Toggle Theme">
-          <i class="fas fa-moon"></i>
-        </button>
+        <div class="theme-switcher relative">
+          <button id="themeToggleBtn" class="action-btn" aria-label="Toggle Theme" title="Toggle Theme">
+            <i class="fas fa-moon"></i>
+          </button>
+          <div id="themeMenu" class="hidden absolute top-full right-0 mt-2 bg-bg-secondary border border-white/10 rounded-lg shadow-xl z-50 py-2 min-width-[150px]">
+            <button class="theme-opt w-full text-left px-4 py-2 hover:bg-white/5 text-sm" data-theme="dark">Studio Dark</button>
+            <button class="theme-opt w-full text-left px-4 py-2 hover:bg-white/5 text-sm" data-theme="light">Minimal Light</button>
+            <button class="theme-opt w-full text-left px-4 py-2 hover:bg-white/5 text-sm" data-theme="neon">Creator Neon</button>
+          </div>
+        </div>
         <button id="menuToggleBtn" class="menu-toggle" aria-label="Menu">
           <span></span>
           <span></span>
@@ -158,12 +169,12 @@
 
         <div class="filter-wrapper">
           <div class="filter-label">Filter by:</div>
-          <div class="filter-tags filter-chips">
-            <button class="filter-tag chip active" data-filter="all" data-cat="all">All Episodes</button>
-            <button class="filter-tag chip" data-filter="history" data-cat="history">History</button>
-            <button class="filter-tag chip" data-filter="quran" data-cat="quran">Quranic Studies</button>
-            <button class="filter-tag chip" data-filter="prophecy" data-cat="prophecy">Prophecy</button>
-            <button class="filter-tag chip" data-filter="discussion" data-cat="discussion">Discussion</button>
+          <div class="filter-tags filter-chips" role="group" aria-label="Filter episodes by category">
+            <button class="filter-tag chip active" data-filter="all" data-cat="all" aria-pressed="true">All Episodes</button>
+            <button class="filter-tag chip" data-filter="history" data-cat="history" aria-pressed="false">History</button>
+            <button class="filter-tag chip" data-filter="quran" data-cat="quran" aria-pressed="false">Quranic Studies</button>
+            <button class="filter-tag chip" data-filter="prophecy" data-cat="prophecy" aria-pressed="false">Prophecy</button>
+            <button class="filter-tag chip" data-filter="discussion" data-cat="discussion" aria-pressed="false">Discussion</button>
           </div>
         </div>
       </div>
@@ -336,7 +347,65 @@
         </div>
       </div>
 
-      <div class="dashboard-categories">
+      <div class="dashboard-analytics mt-6">
+        <h3 class="font-cinzel text-lg mb-3">Creator Analytics</h3>
+        <div class="analytics-chart-container glass-card p-4 rounded-xl" style="height: 200px; position: relative;">
+          <canvas id="analyticsChart"></canvas>
+        </div>
+      </div>
+
+      <!-- AI Creator Assistant -->
+      <div id="ai-assistant-panel" class="mt-8 p-6 glass-card rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/5 to-transparent">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-cinzel text-xl font-bold premium-gradient-text flex items-center gap-2">
+            <i class="fas fa-wand-magic-sparkles text-primary"></i> AI Creator Assistant
+          </h3>
+          <span class="badge badge-primary text-[10px] px-2 py-0.5">BETA</span>
+        </div>
+
+        <div class="space-y-6">
+          <!-- Title Scorer -->
+          <div class="ai-tool-group">
+            <label class="text-sm text-soft block mb-2 font-medium">Video Title Scorer</label>
+            <div class="flex gap-2 mb-2">
+              <input type="text" id="ai-title-input" class="bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm w-full" placeholder="Enter title to score...">
+              <button id="ai-score-title" class="btn btn-primary px-4 py-2 text-xs">Score</button>
+            </div>
+            <div id="ai-score-result" class="hidden p-3 bg-black/40 rounded-xl border border-white/5">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-xs text-soft">Optimized Title Score</span>
+                <span id="ai-score-value" class="text-sm font-bold text-accent">85/100</span>
+              </div>
+              <div class="w-full bg-white/5 h-1.5 rounded-full overflow-hidden">
+                <div id="ai-score-bar" class="bg-accent h-full w-[85%]"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Viral Hook Generator -->
+          <div class="ai-tool-group">
+            <label class="text-sm text-soft block mb-2 font-medium">Viral Hook Generator</label>
+            <button id="ai-generate-hook" class="btn btn-secondary w-full text-xs py-2 bg-white/5 hover:bg-white/10 border border-white/10">
+              <i class="fas fa-bolt mr-2 text-primary"></i> Generate Viral Hook
+            </button>
+            <div id="ai-hook-result" class="hidden mt-3 p-3 bg-white/5 rounded-xl border border-white/10 italic text-sm text-text-secondary leading-relaxed">
+              <!-- Result here -->
+            </div>
+          </div>
+
+          <!-- Topic Discovery -->
+          <div class="ai-tool-group">
+            <label class="text-sm text-soft block mb-2 font-medium">Topic Discovery</label>
+            <div id="ai-topics" class="flex flex-wrap gap-2">
+              <span class="text-[10px] bg-primary/10 text-primary px-2 py-1 rounded-full border border-primary/20 cursor-pointer hover:bg-primary/20 transition-colors">Ottoman Siege</span>
+              <span class="text-[10px] bg-white/5 text-soft px-2 py-1 rounded-full border border-white/10 cursor-pointer hover:bg-white/10 transition-colors">Andalusian Fall</span>
+              <span class="text-[10px] bg-white/5 text-soft px-2 py-1 rounded-full border border-white/10 cursor-pointer hover:bg-white/10 transition-colors">Modern Prophecy</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dashboard-categories mt-6">
         <h3>Category Distribution</h3>
         <div id="dashboardCategories" class="category-list">
           <!-- Categories rendered here -->

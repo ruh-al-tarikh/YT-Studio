@@ -12,11 +12,6 @@ export default defineConfig({
       input: {
         main: path.resolve(__dirname, 'index.html'),
       },
-      output: {
-        manualChunks: {
-          vendor: ['js/app.js'],
-        },
-      },
     },
   },
   server: {
@@ -40,9 +35,6 @@ export default defineConfig({
       '@js': path.resolve(__dirname, 'js'),
       '@css': path.resolve(__dirname, 'css'),
     },
-  },
-  optimizeDeps: {
-    exclude: [],
   },
   esbuild: {
     supported: {
