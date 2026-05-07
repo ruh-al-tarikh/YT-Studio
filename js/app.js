@@ -293,11 +293,11 @@ async function loadVideos() {
     }
 
     try {
-        // Try to fetch from channel ID if available
+        // Use the correct worker endpoint: /api/channel
         const channelId = Utils.getLS(CONFIG.STORAGE.CHANNEL_KEY);
-        let url = CONFIG.API.YOUTUBE_WORKER;
+        let url = `${CONFIG.API.YOUTUBE_WORKER}/api/channel`;
         if (channelId) {
-            url += `/api/channel/videos?channelId=${channelId}`;
+            url += `?channelId=${channelId}`;
         }
 
         const response = await Utils.fetchWithRetry(url);
