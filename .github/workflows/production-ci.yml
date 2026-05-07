@@ -55,7 +55,6 @@ jobs:
       - name: Check for essential configs
         run: |
           ls wrangler.jsonc
-          ls tailwind.config.js
 
   performance:
     needs: validate
@@ -63,6 +62,16 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: '10'
 
       - name: Build for Lighthouse
         run: |
