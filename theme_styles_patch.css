@@ -1,0 +1,43 @@
+<<<<<<< SEARCH
+body {
+  font-family: var(--font-sans);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.6;
+  transition: background-color var(--transition-base), color var(--transition-base);
+  overflow-x: hidden;
+}
+=======
+body {
+  font-family: var(--font-sans);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.6;
+  transition: background-color var(--transition-base), color var(--transition-base);
+  overflow-x: hidden;
+}
+
+/* Theme Engine & Presets */
+body.theme-neon {
+  --primary: #00ffcc;
+  --primary-dark: #00ccaa;
+  --bg-primary: #0a0a1a;
+  --bg-secondary: #12122a;
+  --accent: #ff00ff;
+}
+
+body.theme-neon .premium-gradient-text {
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+.theme-switcher:hover #themeMenu {
+  display: block;
+}
+
+.theme-opt.active {
+  color: var(--primary);
+  font-weight: bold;
+}
+>>>>>>> REPLACE

@@ -1,16 +1,31 @@
 {
   "name": "Ruh Al Tarikh Creator Studio",
   "short_name": "RuhStudio",
-  "description": "Scholarly Workspace for Islamic History Documentary Filmmakers.",
+  "description": "Professional Creator Dashboard for Cinematic Islamic History.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#fdfaf3",
-  "theme_color": "#c5a059",
+  "background_color": "#141414",
+  "theme_color": "#e50914",
+  "orientation": "portrait",
   "icons": [
     {
-      "src": "https://yt-studio.vercel.app/assets/og-image.jpg",
+      "src": "https://i.ytimg.com/vi/Zzcdtm7Il9U/maxresdefault.jpg",
+      "sizes": "1280x720",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' fill='%23141414'/><text x='50%' y='65%' font-family='serif' font-size='300' text-anchor='middle' fill='%23e50914'>R</text></svg>",
       "sizes": "512x512",
-      "type": "image/jpg"
+      "type": "image/svg+xml"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "https://i.ytimg.com/vi/Zzcdtm7Il9U/maxresdefault.jpg",
+      "sizes": "1280x720",
+      "type": "image/jpeg",
+      "form_factor": "wide"
     }
   ]
 }
