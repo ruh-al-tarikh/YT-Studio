@@ -55,3 +55,6 @@ firebase.json
 js/*.backup
 *.json
 .secret_key
+.agent/
+.genkit/
+genyt/
