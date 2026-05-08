@@ -24,3 +24,7 @@
 ## 2024-05-07 - "Scroll to Top" Implementation for Infinite Feeds
 **Learning:** In long-scrolling cinematic archives, providing a quick return to navigation is essential for orientation. Leveraging existing JS logic for missing UI elements (like scrollToTop) ensures feature parity across development cycles.
 **Action:** Always verify if JS event handlers assume the presence of specific DOM elements and implement them if missing to maintain expected UX.
+
+## 2024-05-20 - Accessible Custom Chips without Layout Shifts
+**Learning:** Converting non-semantic interactive elements (like custom-styled spans) to buttons can introduce unintended layout shifts due to browser-default button styles (padding, border, appearance). Using role="button" with tabindex="0" and explicit keydown listeners provides the same accessibility benefits while preserving the intended visual design.
+**Action:** Use role="button" + tabindex="0" + keydown listeners for complex custom-styled interactive elements that aren't easily replaced by standard buttons without layout regressions.

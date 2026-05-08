@@ -829,6 +829,7 @@ const initAIAssistant = () => {
                 Utils.showToast(`Selected: ${topic}`, 'info');
             }
         });
+        chip.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); chip.click(); } });
     });
 };
 
