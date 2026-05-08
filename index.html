@@ -41,11 +41,11 @@
   <script>
     // Set API configuration BEFORE app loads
     window.__API_CONFIG__ = {
-      YOUTUBE_WORKER: 'https://yt-studio-youtube-api-prod.ruhdevopsytstudio.workers.dev',
+      YOUTUBE_WORKER: 'https://ytstudio.ruhdevopsytstudio.workers.dev',
       API_ENDPOINTS: {
-        videos: 'https://yt-studio-youtube-api-prod.ruhdevopsytstudio.workers.dev/api/videos',
-        channel: 'https://yt-studio-youtube-api-prod.ruhdevopsytstudio.workers.dev/api/channel',
-        search: 'https://yt-studio-youtube-api-prod.ruhdevopsytstudio.workers.dev/api/search'
+        videos: 'https://ytstudio.ruhdevopsytstudio.workers.dev/api/videos',
+        channel: 'https://ytstudio.ruhdevopsytstudio.workers.dev/api/channel',
+        search: 'https://ytstudio.ruhdevopsytstudio.workers.dev/api/search'
       }
     };
     
@@ -534,9 +534,9 @@
           <div class="ai-tool-group">
             <label class="text-sm text-soft block mb-2 font-medium">Topic Discovery</label>
             <div id="ai-topics" class="flex flex-wrap gap-2">
-              <span class="text-[10px] bg-primary/10 text-primary px-2 py-1 rounded-full border border-primary/20 cursor-pointer hover:bg-primary/20 transition-colors">Ottoman Siege</span>
-              <span class="text-[10px] bg-white/5 text-soft px-2 py-1 rounded-full border border-white/10 cursor-pointer hover:bg-white/10 transition-colors">Andalusian Fall</span>
-              <span class="text-[10px] bg-white/5 text-soft px-2 py-1 rounded-full border border-white/10 cursor-pointer hover:bg-white/10 transition-colors">Modern Prophecy</span>
+              <span role="button" tabindex="0" aria-label="Select topic: Ottoman Siege" class="text-[10px] bg-primary/10 text-primary px-2 py-1 rounded-full border border-primary/20 cursor-pointer hover:bg-primary/20 transition-colors">Ottoman Siege</span>
+              <span role="button" tabindex="0" aria-label="Select topic: Andalusian Fall" class="text-[10px] bg-white/5 text-soft px-2 py-1 rounded-full border border-white/10 cursor-pointer hover:bg-white/10 transition-colors">Andalusian Fall</span>
+              <span role="button" tabindex="0" aria-label="Select topic: Modern Prophecy" class="text-[10px] bg-white/5 text-soft px-2 py-1 rounded-full border border-white/10 cursor-pointer hover:bg-white/10 transition-colors">Modern Prophecy</span>
             </div>
           </div>
         </div>

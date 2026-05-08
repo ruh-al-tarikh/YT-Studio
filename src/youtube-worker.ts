@@ -84,7 +84,7 @@ export default {
       if (path === '/' || path === '/health') {
         return respondJSON({
             status: 'healthy',
-            worker: 'yt-studio-youtube-api-prod',
+            worker: 'ytstudio',
             timestamp: new Date().toISOString(),
             channel: CHANNEL_ID,
             hasSecretBinding,
@@ -113,14 +113,14 @@ export default {
               isDemo: false,
               hasSecretBinding,
               channel: {
-                id: channel.id,
-                title: channel.snippet.title,
-                description: channel.snippet.description,
-                thumbnail: channel.snippet.thumbnails?.high?.url,
-                subscribers: channel.statistics.subscriberCount || 'Hidden',
-                views: channel.statistics.viewCount || '0',
-                videos: parseInt(channel.statistics.videoCount || '0', 10),
-                url: 'https://www.youtube.com/channel/' + channel.id
+                id: channel.id || CHANNEL_ID,
+                title: channel.snippet?.title || 'Ruh Al Tarikh',
+                description: channel.snippet?.description || '',
+                thumbnail: channel.snippet?.thumbnails?.high?.url || channel.snippet?.thumbnails?.default?.url || '',
+                subscribers: channel.statistics?.subscriberCount || 'Hidden',
+                views: channel.statistics?.viewCount || '0',
+                videos: parseInt(channel.statistics?.videoCount || '0', 10),
+                url: 'https://www.youtube.com/channel/' + (channel.id || CHANNEL_ID)
               }
           });
         } catch (error) {
@@ -150,7 +150,8 @@ export default {
           if (channelData.error) throw new Error(channelData.error.message);
           if (!channelData.items || !channelData.items[0]) throw new Error('Channel not found');
 
-          const uploadsPlaylistId = channelData.items[0].contentDetails.relatedPlaylists.uploads;
+          const uploadsPlaylistId = channelData.items[0].contentDetails?.relatedPlaylists?.uploads;
+          if (!uploadsPlaylistId) throw new Error('Uploads playlist not found');
 
           const videosResp = await fetch(
             'https://www.googleapis.com/youtube/v3/playlistItems?part=snippet,contentDetails&playlistId=' + uploadsPlaylistId + '&maxResults=' + maxResults + '&pageToken=' + pageToken + '&key=' + apiKey
@@ -160,14 +161,14 @@ export default {
           if (videosData.error) throw new Error(videosData.error.message);
           if (!videosData.items) throw new Error('No videos found');
 
-          const videos: Video[] = videosData.items.map((item: any) => ({
-            id: item.contentDetails.videoId,
-            videoId: item.contentDetails.videoId,
-            title: item.snippet.title,
-            description: item.snippet.description,
-            thumbnail: item.snippet.thumbnails?.high?.url || item.snippet.thumbnails?.default?.url,
-            publishedAt: item.snippet.publishedAt,
-            category: detectCategory(item.snippet.title)
+          const videos: Video[] = (videosData.items || []).map((item: any) => ({
+            id: item.contentDetails?.videoId || '',
+            videoId: item.contentDetails?.videoId || '',
+            title: item.snippet?.title || 'Untitled',
+            description: item.snippet?.description || '',
+            thumbnail: item.snippet?.thumbnails?.high?.url || item.snippet?.thumbnails?.default?.url || '',
+            publishedAt: item.snippet?.publishedAt || new Date().toISOString(),
+            category: detectCategory(item.snippet?.title || '')
           }));
 
           return respondJSON({
@@ -179,9 +180,10 @@ export default {
               hasSecretBinding
           });
         } catch (error) {
+          const limit = parseInt(maxResults, 10);
           return respondJSON({
               isDemo: true,
-              videos: DEMO_VIDEOS.slice(0, minVal(parseInt(maxResults, 10), DEMO_VIDEOS.length)),
+              videos: DEMO_VIDEOS.slice(0, isNaN(limit) ? 12 : minVal(limit, DEMO_VIDEOS.length)),
               count: DEMO_VIDEOS.length,
               error: String(error),
               hasSecretBinding
@@ -201,11 +203,11 @@ export default {
           if (searchData.error) throw new Error(searchData.error.message);
 
           const results = (searchData.items || []).map((item: any) => ({
-            id: item.id.videoId,
-            title: item.snippet.title,
-            description: item.snippet.description,
-            thumbnail: item.snippet.thumbnails?.high?.url,
-            publishedAt: item.snippet.publishedAt
+            id: item.id?.videoId || '',
+            title: item.snippet?.title || 'Untitled',
+            description: item.snippet?.description || '',
+            thumbnail: item.snippet?.thumbnails?.high?.url || item.snippet?.thumbnails?.default?.url || '',
+            publishedAt: item.snippet?.publishedAt || new Date().toISOString()
           }));
 
           return respondJSON({ isDemo: false, results, hasSecretBinding });

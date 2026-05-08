@@ -1,12 +1,12 @@
 {
-  "name": "yt-studio-youtube-api",
+  "name": "ytstudio",
   "main": "src/youtube-worker.ts",
   "compatibility_date": "2025-01-01",
   "compatibility_flags": ["nodejs_compat"],
   "account_id": "e7b328621ba22501c4f8d875165369ca",
   "env": {
     "production": {
-      "name": "yt-studio-youtube-api-prod",
+      "name": "ytstudio",
       "vars": {
         "ENVIRONMENT": "production",
         "CHANNEL_ID": "UCrjJP_SHUeCmqpTSHJCXkdA"
