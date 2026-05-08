@@ -32,5 +32,8 @@
     "tailwindcss": "^4.2.4",
     "vite": "^8.0.11",
     "vitest": "^4.1.5"
+  },
+  "dependencies": {
+    "@firebase/functions": "^0.13.4"
   }
 }
