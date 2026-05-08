@@ -22,35 +22,35 @@ interface Video {
 
 const DEMO_VIDEOS: Video[] = [
   {
-    id: "Zzcdtm7Il9U",
-    videoId: "Zzcdtm7Il9U",
-    title: "The hidden wall of Dhul-Qarnayn explained",
-    description: "Deep dive into the archeological and scriptural evidence of the wall.",
-    thumbnail: "https://i.ytimg.com/vi/Zzcdtm7Il9U/hqdefault.jpg",
-    publishedAt: "2024-01-15T00:00:00Z",
-    category: "history"
+    id: 'Zzcdtm7Il9U',
+    videoId: 'Zzcdtm7Il9U',
+    title: 'The hidden wall of Dhul-Qarnayn explained',
+    description: 'Deep dive into the archeological and scriptural evidence of the wall.',
+    thumbnail: 'https://i.ytimg.com/vi/Zzcdtm7Il9U/hqdefault.jpg',
+    publishedAt: '2024-01-15T10:00:00Z',
+    category: 'history'
   },
   {
-    id: "dQw4w9WgXcQ",
-    videoId: "dQw4w9WgXcQ",
-    title: "Islamic History: The Umayyad Dynasty",
-    description: "Tracing the rise and fall of the first major Islamic caliphate.",
-    thumbnail: "https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg",
-    publishedAt: "2024-01-10T00:00:00Z",
-    category: "history"
+    id: 'dQw4w9WgXcQ',
+    videoId: 'dQw4w9WgXcQ',
+    title: 'Islamic History: The Umayyad Dynasty',
+    description: 'Tracing the rise and fall of the first major Islamic caliphate.',
+    thumbnail: 'https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg',
+    publishedAt: '2024-01-10T00:00:00Z',
+    category: 'history'
   },
   {
-    id: "jNQXAC9IVRw",
-    videoId: "jNQXAC9IVRw",
-    title: "Prophecy and End Times in Islamic Tradition",
-    description: "Examine the prophetic narratives of the Quran and their interpretations.",
-    thumbnail: "https://i.ytimg.com/vi/jNQXAC9IVRw/hqdefault.jpg",
-    publishedAt: "2024-01-08T00:00:00Z",
-    category: "prophecy"
+    id: 'jNQXAC9IVRw',
+    videoId: 'jNQXAC9IVRw',
+    title: 'Prophecy and End Times in Islamic Tradition',
+    description: 'Examine the prophetic narratives of the Quran and their interpretations.',
+    thumbnail: 'https://i.ytimg.com/vi/jNQXAC9IVRw/hqdefault.jpg',
+    publishedAt: '2024-01-08T00:00:00Z',
+    category: 'prophecy'
   }
 ];
 
-const CHANNEL_ID = "UCrjJP_SHUeCmqpTSHJCXkdA";
+const CHANNEL_ID = 'UCrjJP_SHUeCmqpTSHJCXkdA';
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
@@ -72,7 +72,7 @@ export default {
         status,
         headers: {
           ...corsHeaders,
-          "Content-Type": "application/json"
+          'Content-Type': 'application/json'
         }
       });
     };
@@ -100,7 +100,7 @@ export default {
 
       if (path === '/api/channel') {
         try {
-          const channelUrl = `https://www.googleapis.com/youtube/v3/channels?part=statistics,snippet&id=${CHANNEL_ID}&key=${apiKey}`;
+          const channelUrl = 'https://www.googleapis.com/youtube/v3/channels?part=statistics,snippet&id=' + CHANNEL_ID + '&key=' + apiKey;
           const response = await fetch(channelUrl);
           const data = await response.json() as any;
 
@@ -120,7 +120,7 @@ export default {
                 subscribers: channel.statistics.subscriberCount || 'Hidden',
                 views: channel.statistics.viewCount || '0',
                 videos: parseInt(channel.statistics.videoCount || '0', 10),
-                url: `https://www.youtube.com/channel/${channel.id}`
+                url: 'https://www.youtube.com/channel/' + channel.id
               }
           });
         } catch (error) {
@@ -131,7 +131,7 @@ export default {
               channel: {
                 id: CHANNEL_ID,
                 title: 'Ruh Al Tarikh - Cinematic Islamic Archive',
-                url: `https://www.youtube.com/channel/${CHANNEL_ID}`
+                url: 'https://www.youtube.com/channel/' + CHANNEL_ID
               }
           });
         }
@@ -143,7 +143,7 @@ export default {
 
         try {
           const channelResp = await fetch(
-            `https://www.googleapis.com/youtube/v3/channels?part=contentDetails&id=${CHANNEL_ID}&key=${apiKey}`
+            'https://www.googleapis.com/youtube/v3/channels?part=contentDetails&id=' + CHANNEL_ID + '&key=' + apiKey
           );
           const channelData = await channelResp.json() as any;
 
@@ -153,7 +153,7 @@ export default {
           const uploadsPlaylistId = channelData.items[0].contentDetails.relatedPlaylists.uploads;
 
           const videosResp = await fetch(
-            `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet,contentDetails&playlistId=${uploadsPlaylistId}&maxResults=${maxResults}&pageToken=${pageToken}&key=${apiKey}`
+            'https://www.googleapis.com/youtube/v3/playlistItems?part=snippet,contentDetails&playlistId=' + uploadsPlaylistId + '&maxResults=' + maxResults + '&pageToken=' + pageToken + '&key=' + apiKey
           );
           const videosData = await videosResp.json() as any;
 
@@ -181,7 +181,7 @@ export default {
         } catch (error) {
           return respondJSON({
               isDemo: true,
-              videos: DEMO_VIDEOS.slice(0, Math.min(parseInt(maxResults, 10), DEMO_VIDEOS.length)),
+              videos: DEMO_VIDEOS.slice(0, minVal(parseInt(maxResults, 10), DEMO_VIDEOS.length)),
               count: DEMO_VIDEOS.length,
               error: String(error),
               hasSecretBinding
@@ -194,7 +194,7 @@ export default {
         if (!query) return respondJSON({ error: 'Query parameter required', results: [] }, 400);
 
         try {
-          const searchUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&channelId=${CHANNEL_ID}&q=${encodeURIComponent(query)}&maxResults=10&key=${apiKey}`;
+          const searchUrl = 'https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&channelId=' + CHANNEL_ID + '&q=' + encodeURIComponent(query) + '&maxResults=10&key=' + apiKey;
           const searchResp = await fetch(searchUrl);
           const searchData = await searchResp.json() as any;
 
@@ -228,6 +228,10 @@ export default {
     }
   }
 };
+
+function minVal(a: number, b: number): number {
+    return a < b ? a : b;
+}
 
 function detectCategory(title: string): string {
   const titleLower = title.toLowerCase();
