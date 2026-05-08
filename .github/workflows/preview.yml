@@ -1,6 +1,8 @@
 name: Deploy Preview
 
 on:
+  pull_request:
+    types: [opened, synchronize]
   workflow_dispatch:
     inputs:
       branch:
@@ -8,13 +10,6 @@ on:
         required: false
         default: 'main'
         type: string
-      channel:
-        description: 'Preview channel name'
-        required: false
-        default: 'manual-preview'
-        type: string
-  pull_request:
-    types: [opened, synchronize]
 
 jobs:
   preview:
@@ -34,7 +29,21 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 10
+          version: '10'
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
 
       - name: Install dependencies
         run: pnpm install
@@ -42,41 +51,9 @@ jobs:
       - name: Build project
         run: pnpm run build
 
-      - name: Create firebase.json
-        run: |
-          cat > firebase.json << 'EOF'
-          {
-            "hosting": {
-              "public": "dist",
-              "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
-              "cleanUrls": true,
-              "rewrites": [{ "source": "**", "destination": "/index.html" }]
-            }
-          }
-          EOF
-
-      - name: Install Firebase CLI
-        run: npm install -g firebase-tools
-
       - name: Deploy to Firebase Preview Channel
-        run: |
-          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
-            CHANNEL_NAME="${{ github.event.inputs.channel }}"
-          else
-            CHANNEL_NAME="pr-${{ github.event.number }}"
-          fi
-
-          echo "📦 Deploying to channel: $CHANNEL_NAME"
-          firebase hosting:channel:deploy "$CHANNEL_NAME" --expires 7d --project ytstudio-pr
-        env:
-          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
-
-      - name: Output Preview URL
-        run: |
-          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
-            CHANNEL_NAME="${{ github.event.inputs.channel }}"
-          else
-            CHANNEL_NAME="pr-${{ github.event.number }}"
-          fi
-          echo "✅ Preview deployed successfully!"
-          echo "🔗 Preview URL: https://ytstudio-pr--$CHANNEL_NAME.web.app"
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_YTSTUDIO_PR }}
+          projectId: ytstudio-pr

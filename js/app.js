@@ -16,7 +16,7 @@ import { initIslamic } from './islamic.js';
 const CONFIG = {
     // API Endpoints
     API: {
-        YOUTUBE_WORKER: 'https://yt-studio-youtube-api.ruhdevopsytstudio.workers.dev',
+        YOUTUBE_WORKER: window.__API_CONFIG__?.YOUTUBE_WORKER || 'https://yt-studio-youtube-api.ruhdevopsytstudio.workers.dev',
         FALLBACK_DATA: '/data/demo.json'
     },
 
@@ -81,6 +81,8 @@ const DOM = {
 
     // Search
     search: document.getElementById('searchInput'),
+    searchToggle: document.getElementById('searchToggleBtn'),
+    searchSection: document.getElementById('searchSection'),
     clearSearch: document.getElementById('clearSearch'),
     resultsMeta: document.getElementById('results-meta'),
 
@@ -94,6 +96,7 @@ const DOM = {
 
     // Theme & UI
     themeToggle: document.getElementById('themeToggleBtn'),
+    menuToggle: document.getElementById('menuToggleBtn'),
     scrollToTop: document.getElementById('scrollToTop'),
 
     // Watch Later
@@ -286,16 +289,19 @@ async function fetchYouTubeChannelData() {
 }
 
 async function loadVideos() {
+    if (DOM.loading) DOM.loading.style.display = 'block';
+
     // Check cache first
     const cached = Utils.getLS(CONFIG.STORAGE.CACHE_KEY);
     if (cached && cached.data && cached.data.length && Date.now() - cached.time < CONFIG.STORAGE.CACHE_EXPIRY) {
+        if (DOM.loading) DOM.loading.style.display = 'none';
         return cached.data;
     }
 
     try {
-        // Use the correct worker endpoint: /api/channel
+        // Use the correct worker endpoint: /api/videos
         const channelId = Utils.getLS(CONFIG.STORAGE.CHANNEL_KEY);
-        let url = `${CONFIG.API.YOUTUBE_WORKER}/api/channel`;
+        let url = `${CONFIG.API.YOUTUBE_WORKER}/api/videos`;
         if (channelId) {
             url += `?channelId=${channelId}`;
         }
@@ -319,9 +325,11 @@ async function loadVideos() {
             Utils.saveLS(CONFIG.STORAGE.CACHE_KEY, { data: videos, time: Date.now() });
         }
 
+        if (DOM.loading) DOM.loading.style.display = 'none';
         return videos;
 
     } catch (error) {
+        if (DOM.loading) DOM.loading.style.display = 'none';
         console.error('Worker fetch failed, using fallback:', error);
         try {
             const fallback = await fetch(CONFIG.API.FALLBACK_DATA);
@@ -1137,6 +1145,23 @@ function setupRecommendedSection() {
 function bindEvents() {
     // Theme toggle
     if (DOM.themeToggle) DOM.themeToggle.addEventListener('click', toggleTheme);
+
+    // Mobile Menu Toggle
+    if (DOM.menuToggle) {
+        DOM.menuToggle.addEventListener('click', () => {
+            document.body.classList.toggle('mobile-nav-active');
+        });
+    }
+
+    // Search Section Toggle
+    if (DOM.searchToggle && DOM.searchSection) {
+        DOM.searchToggle.addEventListener('click', () => {
+            DOM.searchSection.classList.toggle('active');
+            if (DOM.searchSection.classList.contains('active')) {
+                DOM.search.focus();
+            }
+        });
+    }
 
     document.querySelectorAll('.theme-opt').forEach(btn => {
         btn.addEventListener('click', () => {
