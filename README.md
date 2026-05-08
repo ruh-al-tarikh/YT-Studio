@@ -207,7 +207,7 @@ Sample Response
 | `J`       | Previous episode |
 | `K`       | Next episode     |
 | `Esc`     | Close modals     |
-| `↑ ↓ ← →` | Navigate grid    |  
+| `↑ ↓ ← →`| Navigate grid    |  
 
 
 🌐 Browser Support
