@@ -7,6 +7,13 @@ settings:
 importers:
 
   .:
+    dependencies:
+      '@firebase/functions':
+        specifier: ^0.13.4
+        version: 0.13.4(@firebase/app@0.14.12)
+      '@vercel/functions':
+        specifier: ^3.5.0
+        version: 3.5.0
     devDependencies:
       '@cloudflare/workers-types':
         specifier: ^4.20260508.1
@@ -273,6 +280,37 @@ packages:
       '@noble/hashes':
         optional: true
 
+  '@firebase/app-check-interop-types@0.3.4':
+    resolution: {integrity: sha512-zz3i6e13B8BfWiLy8MABtTh8aGIACgKbf9UVnyHcWs+yQzJXgQcl8A46b0zfaiJHdQ+niF0ouAfcpuf+3LMPQg==}
+
+  '@firebase/app@0.14.12':
+    resolution: {integrity: sha512-FT+HoNp1NdaZ/N26hCwV3WbxS1m6gTn3p2QRBQ3KH7YqyCQqJx0iT7126RgVk68/Rq+9DeL/zCFnHZ0C4u1nLQ==}
+    engines: {node: '>=20.0.0'}
+
+  '@firebase/auth-interop-types@0.2.5':
+    resolution: {integrity: sha512-1Li/YuBDBAXcKv7BzY4U28gontUmAaw53sYiqbaVOMCFb2lFKK/c3CGMUWqtwe7+TXrl3poWnTCL5umYBg85Eg==}
+
+  '@firebase/component@0.7.3':
+    resolution: {integrity: sha512-wFofIaa2879ogD/WvkjYXJxRmfnL0scen6ORgaC3na1FNOR9ASIUANQdhqQcmWu/h77/pVHY7ch5flewa5Bcew==}
+    engines: {node: '>=20.0.0'}
+
+  '@firebase/functions@0.13.4':
+    resolution: {integrity: sha512-oB5rpm2Emxn2+IS1gRelAeT/5tSZMwM/KhqC5LnJsmTNnS1ZDhD7ZMZNgCI8vchTW6PbaXIwEnpUryGuIQsNbg==}
+    engines: {node: '>=20.0.0'}
+    peerDependencies:
+      '@firebase/app': 0.x
+
+  '@firebase/logger@0.5.1':
+    resolution: {integrity: sha512-vZKLsqE1ABOy8OjQiE7cUTFn4gvaqlk88yp8N94Pk/sDpq61YqZGqmVFZTvOyflTwuYFcWirBdYGoJgbDaXKYQ==}
+    engines: {node: '>=20.0.0'}
+
+  '@firebase/messaging-interop-types@0.2.4':
+    resolution: {integrity: sha512-wrzITQq+xw5LtygX7O0fu43/k9ABQ4x5H9/sR5m1SbNnhIRI5xd3+raSNJaJkYC4BUhM9A4ZNSnyR2sjhxnb2Q==}
+
+  '@firebase/util@1.15.1':
+    resolution: {integrity: sha512-LUdM4Wg7YM9Pq/49nGYySJA0CSQEKnGffFzWV8+6gXN7mGxn+FL1IqvFbuZUtAQcfZgHYDwCE1wwlK7rB7gl2g==}
+    engines: {node: '>=20.0.0'}
+
   '@jridgewell/sourcemap-codec@1.5.5':
     resolution: {integrity: sha512-cYQ9310grqxueWbl+WuIUIaiUaDcj7WOq5fVhEljNVgRfOUhY9fy2zTvfoqWsnebh8Sl70VScFbICvJnLKB0Og==}
 
@@ -400,6 +438,19 @@ packages:
 
   '@types/estree@1.0.9':
     resolution: {integrity: sha512-GhdPgy1el4/ImP05X05Uw4cw2/M93BCUmnEvWZNStlCzEKME4Fkk+YpoA5OiHNQmoS7Cafb8Xa3Pya8m1Qrzeg==}
+
+  '@vercel/functions@3.5.0':
+    resolution: {integrity: sha512-+RokZ+4gkYyOsKBuJ29cQ8iSZG123LLJbZfPry20kkTgrN9U0277La4feP4DnWVo3sGoYa4plCEKY9XKUYoX9g==}
+    engines: {node: '>= 20'}
+    peerDependencies:
+      '@aws-sdk/credential-provider-web-identity': '*'
+    peerDependenciesMeta:
+      '@aws-sdk/credential-provider-web-identity':
+        optional: true
+
+  '@vercel/oidc@3.4.0':
+    resolution: {integrity: sha512-p0sKfHkfRmMaqqDwNL4tjnX9TgRrLMlEtUjIxfrEns8pOxz1R9ztqOVI+ehqiq93/2/HnfPe/UBZkfAZwnx0UA==}
+    engines: {node: '>= 20'}
 
   '@vitejs/plugin-react@6.0.1':
     resolution: {integrity: sha512-l9X/E3cDb+xY3SWzlG1MOGt2usfEHGMNIaegaUGFsLkb3RCn/k8/TOXBcab+OndDI4TBtktT8/9BwwW8Vi9KUQ==}
@@ -543,6 +594,9 @@ packages:
   html-encoding-sniffer@6.0.0:
     resolution: {integrity: sha512-CV9TW3Y3f8/wT0BRFc1/KAVQ3TUHiXmaAb6VW9vtiMFf7SLoMd1PdAc4W3KFOFETBJUb90KatHqlsZMWV+R9Gg==}
     engines: {node: ^20.19.0 || ^22.12.0 || >=24.0.0}
+
+  idb@7.1.1:
+    resolution: {integrity: sha512-gchesWBzyvGHRO9W8tzUWFDycow5gwjvFKfyV9FF32Y7F50yZMp7mP+T2mJIWFx49zicqyC4uefHM17o6xKIVQ==}
 
   is-potential-custom-element-name@1.0.1:
     resolution: {integrity: sha512-bCYeRA2rVibKZd+s2625gGnGF/t7DSqDs4dP7CrLA1m7jKWz6pps0LpYLJN8Q64HtmPKJ1hrN3nzPNKFEKOUiQ==}
@@ -1020,6 +1074,43 @@ snapshots:
 
   '@exodus/bytes@1.15.0': {}
 
+  '@firebase/app-check-interop-types@0.3.4': {}
+
+  '@firebase/app@0.14.12':
+    dependencies:
+      '@firebase/component': 0.7.3
+      '@firebase/logger': 0.5.1
+      '@firebase/util': 1.15.1
+      idb: 7.1.1
+      tslib: 2.8.1
+
+  '@firebase/auth-interop-types@0.2.5': {}
+
+  '@firebase/component@0.7.3':
+    dependencies:
+      '@firebase/util': 1.15.1
+      tslib: 2.8.1
+
+  '@firebase/functions@0.13.4(@firebase/app@0.14.12)':
+    dependencies:
+      '@firebase/app': 0.14.12
+      '@firebase/app-check-interop-types': 0.3.4
+      '@firebase/auth-interop-types': 0.2.5
+      '@firebase/component': 0.7.3
+      '@firebase/messaging-interop-types': 0.2.4
+      '@firebase/util': 1.15.1
+      tslib: 2.8.1
+
+  '@firebase/logger@0.5.1':
+    dependencies:
+      tslib: 2.8.1
+
+  '@firebase/messaging-interop-types@0.2.4': {}
+
+  '@firebase/util@1.15.1':
+    dependencies:
+      tslib: 2.8.1
+
   '@jridgewell/sourcemap-codec@1.5.5': {}
 
   '@napi-rs/wasm-runtime@1.1.4(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)':
@@ -1099,6 +1190,12 @@ snapshots:
   '@types/deep-eql@4.0.2': {}
 
   '@types/estree@1.0.9': {}
+
+  '@vercel/functions@3.5.0':
+    dependencies:
+      '@vercel/oidc': 3.4.0
+
+  '@vercel/oidc@3.4.0': {}
 
   '@vitejs/plugin-react@6.0.1(vite@8.0.11(esbuild@0.28.0))':
     dependencies:
@@ -1253,6 +1350,8 @@ snapshots:
       '@exodus/bytes': 1.15.0
     transitivePeerDependencies:
       - '@noble/hashes'
+
+  idb@7.1.1: {}
 
   is-potential-custom-element-name@1.0.1: {}
 
@@ -1437,8 +1536,7 @@ snapshots:
     dependencies:
       punycode: 2.3.1
 
-  tslib@2.8.1:
-    optional: true
+  tslib@2.8.1: {}
 
   undici@7.25.0: {}
 
