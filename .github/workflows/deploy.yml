@@ -1,25 +1,20 @@
-name: Deploy to Cloudflare Workers & Docker Registry
+name: Deploy to Cloudflare Workers
 
 on:
   push:
     branches: [ main ]
-  pull_request:
-    branches: [ main ]
   workflow_dispatch:
 
 env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
   NODE_VERSION: '22'
   PNPM_VERSION: '10'
 
 jobs:
-  # Build and validate frontend
-  build-frontend:
+  deploy-worker:
     runs-on: ubuntu-latest
-    outputs:
-      build-exists: ${{ steps.check-build.outputs.exists }}
+    permissions:
+      contents: read
+      deployments: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -34,62 +29,23 @@ jobs:
         with:
           version: ${{ env.PNPM_VERSION }}
 
-      - name: Get pnpm store directory
-        id: pnpm-cache
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
-
-      - name: Setup pnpm cache
-        uses: actions/cache@v4
-        with:
-          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
-
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build frontend
-        id: build
-        run: |
-          pnpm run build || echo "No build script found"
-          # Check if dist directory exists
-          if [ -d "dist" ] || [ -d "build" ]; then
-            echo "✅ Build successful"
-            echo "build_exists=true" >> $GITHUB_OUTPUT
-          else
-            echo "⚠️ No build output found"
-            echo "build_exists=false" >> $GITHUB_OUTPUT
-          fi
+      - name: Install Wrangler
+        run: npm install -g wrangler
 
-      - name: Check build output
-        id: check-build
-        run: |
-          if [ -d "dist" ]; then
-            echo "exists=true" >> $GITHUB_OUTPUT
-            echo "path=dist" >> $GITHUB_OUTPUT
-          elif [ -d "build" ]; then
-            echo "exists=true" >> $GITHUB_OUTPUT
-            echo "path=build" >> $GITHUB_OUTPUT
-          else
-            echo "exists=false" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Upload build artifacts
-        if: steps.check-build.outputs.exists == 'true'
-        uses: actions/upload-artifact@v4
+      - name: Deploy to Cloudflare Workers
+        uses: cloudflare/wrangler-action@v3
         with:
-          name: frontend-build
-          path: ${{ steps.check-build.outputs.path }}
-          retention-days: 1
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: deploy
 
-  # Build Docker image
   build-docker:
     runs-on: ubuntu-latest
-    needs: build-frontend
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: deploy-worker
+    if: github.ref == 'refs/heads/main'
     permissions:
       contents: read
       packages: write
@@ -97,144 +53,16 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
       - name: Log in to Container Registry
         uses: docker/login-action@v3
         with:
-          registry: ${{ env.REGISTRY }}
+          registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Extract metadata
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          tags: |
-            type=ref,event=branch
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=sha
-            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
-
       - name: Build and push Docker image
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: .
-          file: ./Dockerfile
-          push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-  # Deploy Cloudflare Worker
-  deploy-worker:
-    runs-on: ubuntu-latest
-    needs: build-frontend
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    permissions:
-      contents: read
-      deployments: write
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: ${{ env.PNPM_VERSION }}
-
-      - name: Get pnpm store directory
-        id: pnpm-cache
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
-
-      - name: Setup pnpm cache
-        uses: actions/cache@v4
-        with:
-          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Download frontend build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: frontend-build
-          path: ./dist
-        continue-on-error: true
-
-      - name: Install Wrangler
-        run: pnpm add -g wrangler || npm install -g wrangler
-
-      - name: Verify Wrangler installation
-        run: wrangler --version
-
-      - name: Deploy to Cloudflare Workers
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: deploy --config wrangler.jsonc --env production
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-
-  # Deploy to Cloudflare Pages (if you have static frontend)
-  deploy-pages:
-    runs-on: ubuntu-latest
-    needs: build-frontend
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.build-frontend.outputs.build-exists == 'true'
-    permissions:
-      contents: read
-      deployments: write
-    steps:
-      - name: Download frontend build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: frontend-build
-          path: ./dist
-
-      - name: Deploy to Cloudflare Pages
-        uses: cloudflare/pages-action@v1
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          projectName: yt-studio-automation
-          directory: ./dist
-          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
-
-  # Summary job
-  deploy-summary:
-    runs-on: ubuntu-latest
-    needs: [build-docker, deploy-worker, deploy-pages]
-    if: always() && github.event_name == 'push' && github.ref == 'refs/heads/main'
-    steps:
-      - name: Deployment Summary
-        run: |
-          echo "## Deployment Results" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "| Component | Status |" >> $GITHUB_STEP_SUMMARY
-          echo "|-----------|--------|" >> $GITHUB_STEP_SUMMARY
-          echo "| Docker Build | ${{ needs.build-docker.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Cloudflare Worker | ${{ needs.deploy-worker.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Cloudflare Pages | ${{ needs.deploy-pages.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          
-          if [[ "${{ needs.deploy-worker.result }}" == "success" ]]; then
-            echo "✅ Worker deployed successfully!" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "❌ Worker deployment failed!" >> $GITHUB_STEP_SUMMARY
-          fi
+          push: true
+          tags: ghcr.io/ruhdevops/yt-studio:latest
