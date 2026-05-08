@@ -27,6 +27,7 @@
     "autoprefixer": "^10.5.0",
     "esbuild": "^0.28.0",
     "jsdom": "^29.1.1",
+    "playwright": "^1.59.1",
     "postcss": "^8.5.14",
     "tailwindcss": "^4.2.4",
     "vite": "^8.0.11",

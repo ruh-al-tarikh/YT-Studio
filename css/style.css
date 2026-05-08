@@ -5,11 +5,11 @@
 
 :root {
   /* Primary Colors - Premium Studio */
-  --primary: #d4a574;
+  --primary: #e6b980;
   /* Deep Gold / Bronze */
   --primary-dark: #b8860b;
   /* Dark Gold */
-  --primary-light: #e6c5a3;
+  --primary-light: #f5d3ab;
   /* Light Gold / Champagne */
 
   /* Secondary Colors - Obsidian */
@@ -41,13 +41,13 @@
   /* Antique Gray */
 
   /* Background Colors - Layered */
-  --bg-primary: #14100d;
+  --bg-primary: #0a0806;
   /* Deepest background */
-  --bg-secondary: #1c1712;
+  --bg-secondary: #120e0b;
   /* Secondary layer */
-  --bg-tertiary: #2a221b;
+  --bg-tertiary: #1c1712;
   /* Card / Panel layer */
-  --bg-glass: rgba(28, 23, 18, 0.7);
+  --bg-glass: rgba(10, 8, 6, 0.8);
   /* Glassmorphism base */
 
   /* Border & Shadows - Premium */
@@ -306,8 +306,9 @@ body {
  * ============================================ */
 
   .navbar {
-    background: linear-gradient(180deg, rgba(20, 20, 20, 0.95) 0%, rgba(20, 20, 20, 0.7) 100%);
-    backdrop-filter: blur(10px);
+    background: var(--bg-glass);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     padding: var(--spacing-md) var(--spacing-lg);
     position: sticky;
     top: 0;
@@ -899,7 +900,7 @@ body {
   .card:hover {
     transform: translateY(-8px);
     border-color: var(--primary);
-    box-shadow: var(--shadow-lg);
+    box-shadow: 0 0 20px rgba(230, 185, 128, 0.2), var(--shadow-lg);
   }
 
   .card-thumb-wrapper {
@@ -1075,7 +1076,10 @@ body {
 
   .modal-content {
     position: relative;
-    background-color: var(--bg-secondary);
+    background-color: var(--bg-glass);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--border-color);
     border-radius: var(--radius-lg);
     max-width: 900px;
     width: 90%;
@@ -1679,3 +1683,58 @@ body {
     opacity: 1;
     visibility: visible;
   }
+/* Mobile Menu Enhancements */
+.menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: var(--spacing-sm);
+  flex-direction: column;
+  gap: 5px;
+}
+
+.menu-toggle span {
+  display: block;
+  width: 25px;
+  height: 2px;
+  background-color: var(--text-primary);
+  transition: var(--transition-base);
+}
+
+@media (max-width: 768px) {
+  .menu-toggle {
+    display: flex;
+  }
+
+  .navbar-nav {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background: var(--bg-secondary);
+    flex-direction: column;
+    padding: var(--spacing-lg);
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  body.mobile-nav-active .navbar-nav {
+    display: flex;
+  }
+}
+
+.search-section {
+    display: none;
+    transition: var(--transition-base);
+}
+
+.search-section.active {
+    display: block;
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
