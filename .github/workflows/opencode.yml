@@ -56,7 +56,7 @@ jobs:
           contains(github.event.inputs.youtube-command, 'get-stats')
         uses: actions/setup-python@v5
         with:
-          python-version: '10''3.11'
+          python-version: '3.11'
 
       - name: Install YouTube API dependencies
         if: |
