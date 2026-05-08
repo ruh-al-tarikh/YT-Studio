@@ -22,7 +22,7 @@ jobs:
           command: pnpm run build
       - run:
           name: Run tests
-          command: pnpm test
+          command: pnpm test:run
 
 workflows:
   ci:

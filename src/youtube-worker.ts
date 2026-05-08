@@ -18,31 +18,14 @@ interface Video {
   thumbnail: string;
   publishedAt: string;
   category?: string;
-  duration?: string;
-  viewCount?: string;
 }
 
-interface ChannelResponse {
-  status: string;
-  channel?: {
-    id: string;
-    title: string;
-    subscribers?: string;
-    views?: string;
-    videos?: number;
-  };
-  error?: string;
-  isDemo?: boolean;
-  videos?: Video[];
-}
-
-// Demo data for fallback
 const DEMO_VIDEOS: Video[] = [
   {
     id: "Zzcdtm7Il9U",
     videoId: "Zzcdtm7Il9U",
-    title: "The Hidden Wall of Dhul-Qarnayn Explained",
-    description: "Explore the mysterious wall mentioned in the Quran and its historical significance.",
+    title: "The hidden wall of Dhul-Qarnayn explained",
+    description: "Deep dive into the archeological and scriptural evidence of the wall.",
     thumbnail: "https://i.ytimg.com/vi/Zzcdtm7Il9U/hqdefault.jpg",
     publishedAt: "2024-01-15T00:00:00Z",
     category: "history"
@@ -50,11 +33,11 @@ const DEMO_VIDEOS: Video[] = [
   {
     id: "dQw4w9WgXcQ",
     videoId: "dQw4w9WgXcQ",
-    title: "Quranic Interpretation of Ancient Civilizations",
-    description: "Understand how the Quran discusses ancient empires and their lessons.",
+    title: "Islamic History: The Umayyad Dynasty",
+    description: "Tracing the rise and fall of the first major Islamic caliphate.",
     thumbnail: "https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg",
     publishedAt: "2024-01-10T00:00:00Z",
-    category: "quran"
+    category: "history"
   },
   {
     id: "jNQXAC9IVRw",
@@ -64,15 +47,6 @@ const DEMO_VIDEOS: Video[] = [
     thumbnail: "https://i.ytimg.com/vi/jNQXAC9IVRw/hqdefault.jpg",
     publishedAt: "2024-01-08T00:00:00Z",
     category: "prophecy"
-  },
-  {
-    id: "C_-JF7p1_Dw",
-    videoId: "C_-JF7p1_Dw",
-    title: "Science and Religion: A Historical Perspective",
-    description: "Debate on the relationship between scientific discovery and Islamic teachings.",
-    thumbnail: "https://i.ytimg.com/vi/C_-JF7p1_Dw/hqdefault.jpg",
-    publishedAt: "2024-01-05T00:00:00Z",
-    category: "discussion"
   }
 ];
 
@@ -88,13 +62,22 @@ export default {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': 'GET, OPTIONS, POST',
       'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-      'Content-Type': 'application/json'
     };
 
     // Handle CORS preflight
     if (request.method === 'OPTIONS') {
       return new Response(null, { status: 204, headers: corsHeaders });
     }
+
+    const respondJSON = (data: any, status = 200) => {
+      return new Response(JSON.stringify(data), {
+        status,
+        headers: {
+          ...corsHeaders,
+          "Content-Type": "application/json"
+        }
+      });
+    };
 
     try {
       // Retrieve API key - try from env first, then fallback
@@ -103,8 +86,7 @@ export default {
 
       // Health check endpoint
       if (path === '/' || path === '/health') {
-        return new Response(
-          JSON.stringify({
+        return respondJSON({
             status: 'healthy',
             worker: 'yt-studio-youtube-api-prod',
             timestamp: new Date().toISOString(),
@@ -117,65 +99,46 @@ export default {
               videos: '/api/videos',
               search: '/api/search'
             }
-          }),
-          { status: 200, headers: corsHeaders }
-        );
+        });
       }
 
       // Get channel information
       if (path === '/api/channel') {
         try {
-          // Fetch from YouTube API
-          const channelUrl = `https://www.googleapis.com/youtube/v3/channels?part=statistics,snippet&id=${CHANNEL_ID}&key=${apiKey}`;
+          const channelUrl = \`https://www.googleapis.com/youtube/v3/channels?part=statistics,snippet&id=\${CHANNEL_ID}&key=\${apiKey}\`;
           const response = await fetch(channelUrl);
-          const data = await response.json();
+          const data = await response.json() as any;
 
-          if (data.error) {
-            throw new Error(data.error.message);
-          }
-
-          if (!data.items || data.items.length === 0) {
-            throw new Error('Channel not found');
-          }
+          if (data.error) throw new Error(data.error.message);
+          if (!data.items || data.items.length === 0) throw new Error('Channel not found');
 
           const channel = data.items[0];
-          const stats = channel.statistics;
-          const snippet = channel.snippet;
-
-          return new Response(
-            JSON.stringify({
+          return respondJSON({
               status: 'success',
               isDemo: false,
               hasSecretBinding,
               channel: {
                 id: channel.id,
-                title: snippet.title,
-                description: snippet.description,
-                thumbnail: snippet.thumbnails?.high?.url,
-                subscribers: stats.subscriberCount || 'Hidden',
-                views: stats.viewCount || '0',
-                videos: parseInt(stats.videoCount || '0', 10),
-                url: `https://www.youtube.com/channel/${channel.id}`
+                title: channel.snippet.title,
+                description: channel.snippet.description,
+                thumbnail: channel.snippet.thumbnails?.high?.url,
+                subscribers: channel.statistics.subscriberCount || 'Hidden',
+                views: channel.statistics.viewCount || '0',
+                videos: parseInt(channel.statistics.videoCount || '0', 10),
+                url: \`https://www.youtube.com/channel/\${channel.id}\`
               }
-            }),
-            { status: 200, headers: corsHeaders }
-          );
+          });
         } catch (error) {
-          // Fallback to demo
-          console.error('Channel fetch error:', error);
-          return new Response(
-            JSON.stringify({
+          return respondJSON({
               isDemo: true,
               status: 'fallback_to_demo',
               error: String(error),
               channel: {
                 id: CHANNEL_ID,
                 title: 'Ruh Al Tarikh - Cinematic Islamic Archive',
-                url: `https://www.youtube.com/channel/${CHANNEL_ID}`
+                url: \`https://www.youtube.com/channel/\${CHANNEL_ID}\`
               }
-            }),
-            { status: 200, headers: corsHeaders }
-          );
+          });
         }
       }
 
@@ -185,35 +148,23 @@ export default {
         const pageToken = url.searchParams.get('pageToken') || '';
 
         try {
-          // Get uploads playlist ID first
           const channelResp = await fetch(
-            `https://www.googleapis.com/youtube/v3/channels?part=contentDetails&id=${CHANNEL_ID}&key=${apiKey}`
+            \`https://www.googleapis.com/youtube/v3/channels?part=contentDetails&id=\${CHANNEL_ID}&key=\${apiKey}\`
           );
-          const channelData = await channelResp.json();
+          const channelData = await channelResp.json() as any;
 
-          if (channelData.error) {
-            throw new Error(channelData.error.message);
-          }
-
-          if (!channelData.items || !channelData.items[0]) {
-            throw new Error('Channel not found');
-          }
+          if (channelData.error) throw new Error(channelData.error.message);
+          if (!channelData.items || !channelData.items[0]) throw new Error('Channel not found');
 
           const uploadsPlaylistId = channelData.items[0].contentDetails.relatedPlaylists.uploads;
 
-          // Get videos from uploads playlist
           const videosResp = await fetch(
-            `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet,contentDetails&playlistId=${uploadsPlaylistId}&maxResults=${maxResults}&pageToken=${pageToken}&key=${apiKey}`
+            \`https://www.googleapis.com/youtube/v3/playlistItems?part=snippet,contentDetails&playlistId=\${uploadsPlaylistId}&maxResults=\${maxResults}&pageToken=\${pageToken}&key=\${apiKey}\`
           );
-          const videosData = await videosResp.json();
+          const videosData = await videosResp.json() as any;
 
-          if (videosData.error) {
-            throw new Error(videosData.error.message);
-          }
-
-          if (!videosData.items) {
-            throw new Error('No videos found');
-          }
+          if (videosData.error) throw new Error(videosData.error.message);
+          if (!videosData.items) throw new Error('No videos found');
 
           const videos: Video[] = videosData.items.map((item: any) => ({
             id: item.contentDetails.videoId,
@@ -225,61 +176,38 @@ export default {
             category: detectCategory(item.snippet.title)
           }));
 
-          return new Response(
-            JSON.stringify({
+          return respondJSON({
               isDemo: false,
               videos,
               count: videos.length,
               nextPageToken: videosData.nextPageToken || null,
               totalResults: videosData.pageInfo?.totalResults || videos.length,
               hasSecretBinding
-            }),
-            { status: 200, headers: corsHeaders }
-          );
+          });
         } catch (error) {
-          // Fallback to demo
-          console.error('Videos fetch error:', error);
-          return new Response(
-            JSON.stringify({
+          return respondJSON({
               isDemo: true,
               videos: DEMO_VIDEOS.slice(0, Math.min(parseInt(maxResults, 10), DEMO_VIDEOS.length)),
               count: DEMO_VIDEOS.length,
               error: String(error),
               hasSecretBinding
-            }),
-            { status: 200, headers: corsHeaders }
-          );
+          });
         }
       }
 
       // Search endpoint
       if (path === '/api/search') {
         const query = url.searchParams.get('q');
-
-        if (!query) {
-          return new Response(
-            JSON.stringify({ error: 'Query parameter required', results: [] }),
-            { status: 400, headers: corsHeaders }
-          );
-        }
+        if (!query) return respondJSON({ error: 'Query parameter required', results: [] }, 400);
 
         try {
-          const searchUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&channelId=${CHANNEL_ID}&q=${encodeURIComponent(query)}&maxResults=10&key=${apiKey}`;
+          const searchUrl = \`https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&channelId=\${CHANNEL_ID}&q=\${encodeURIComponent(query)}&maxResults=10&key=\${apiKey}\`;
           const searchResp = await fetch(searchUrl);
-          const searchData = await searchResp.json();
+          const searchData = await searchResp.json() as any;
 
-          if (searchData.error) {
-            throw new Error(searchData.error.message);
-          }
+          if (searchData.error) throw new Error(searchData.error.message);
 
-          if (!searchData.items) {
-            return new Response(
-              JSON.stringify({ isDemo: false, results: [], error: 'No results found' }),
-              { status: 200, headers: corsHeaders }
-            );
-          }
-
-          const results = searchData.items.map((item: any) => ({
+          const results = (searchData.items || []).map((item: any) => ({
             id: item.id.videoId,
             title: item.snippet.title,
             description: item.snippet.description,
@@ -287,46 +215,29 @@ export default {
             publishedAt: item.snippet.publishedAt
           }));
 
-          return new Response(
-            JSON.stringify({ isDemo: false, results, hasSecretBinding }),
-            { status: 200, headers: corsHeaders }
-          );
+          return respondJSON({ isDemo: false, results, hasSecretBinding });
         } catch (error) {
-          console.error('Search error:', error);
-          return new Response(
-            JSON.stringify({ error: String(error), isDemo: true, results: [] }),
-            { status: 500, headers: corsHeaders }
-          );
+          return respondJSON({ error: String(error), isDemo: true, results: [] }, 500);
         }
       }
 
-      // 404
-      return new Response(
-        JSON.stringify({
+      return respondJSON({
           error: 'Not found',
           endpoints: ['/', '/api/channel', '/api/videos', '/api/search']
-        }),
-        { status: 404, headers: corsHeaders }
-      );
+      }, 404);
     } catch (error) {
-      console.error('Worker error:', error);
-      return new Response(
-        JSON.stringify({
+      return respondJSON({
           error: 'Internal server error',
           message: String(error),
           isDemo: true,
           videos: DEMO_VIDEOS
-        }),
-        { status: 500, headers: corsHeaders }
-      );
+      }, 500);
     }
   }
 };
 
-// Helper function to detect category from title
 function detectCategory(title: string): string {
   const titleLower = title.toLowerCase();
-  
   const categories = {
     quran: ['quran', 'surah', 'ayah', 'tafsir', 'quranic'],
     prophecy: ['prophecy', 'dajjal', 'gog', 'magog', 'end times'],
@@ -336,10 +247,7 @@ function detectCategory(title: string): string {
   };
 
   for (const [category, terms] of Object.entries(categories)) {
-    if (terms.some(term => titleLower.includes(term))) {
-      return category;
-    }
+    if (terms.some(term => titleLower.includes(term))) return category;
   }
-  
-  return 'history'; // default category
+  return 'history';
 }
