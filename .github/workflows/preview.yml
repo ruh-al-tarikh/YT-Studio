@@ -1,6 +1,8 @@
 name: Deploy Preview
 
 on:
+  pull_request:
+    types: [opened, synchronize]
   workflow_dispatch:
     inputs:
       branch:
@@ -8,13 +10,6 @@ on:
         required: false
         default: 'main'
         type: string
-      channel:
-        description: 'Preview channel name'
-        required: false
-        default: 'manual-preview'
-        type: string
-  pull_request:
-    types: [opened, synchronize]
 
 jobs:
   preview:
@@ -36,6 +31,20 @@ jobs:
         with:
           version: '10'
 
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
       - name: Install dependencies
         run: pnpm install
 
@@ -46,5 +55,5 @@ jobs:
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
-          firebaseServiceAccount: ${{ secrets.FIREBASE_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT || secrets.FIREBASE_TOKEN }}
           projectId: ytstudio-pr

@@ -57,14 +57,12 @@ export default {
     const url = new URL(request.url);
     const path = url.pathname;
 
-    // CORS headers
     const corsHeaders = {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': 'GET, OPTIONS, POST',
       'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     };
 
-    // Handle CORS preflight
     if (request.method === 'OPTIONS') {
       return new Response(null, { status: 204, headers: corsHeaders });
     }
@@ -80,11 +78,9 @@ export default {
     };
 
     try {
-      // Retrieve API key - try from env first, then fallback
       const apiKey = env.YOUTUBE_API_KEY || 'AIzaSyAjd6rE_KTxT9mdkT4XPrEL2vD0fEEc9DA';
       const hasSecretBinding = !!env.YOUTUBE_API_KEY;
 
-      // Health check endpoint
       if (path === '/' || path === '/health') {
         return respondJSON({
             status: 'healthy',
@@ -102,10 +98,9 @@ export default {
         });
       }
 
-      // Get channel information
       if (path === '/api/channel') {
         try {
-          const channelUrl = \`https://www.googleapis.com/youtube/v3/channels?part=statistics,snippet&id=\${CHANNEL_ID}&key=\${apiKey}\`;
+          const channelUrl = `https://www.googleapis.com/youtube/v3/channels?part=statistics,snippet&id=${CHANNEL_ID}&key=${apiKey}`;
           const response = await fetch(channelUrl);
           const data = await response.json() as any;
 
@@ -125,7 +120,7 @@ export default {
                 subscribers: channel.statistics.subscriberCount || 'Hidden',
                 views: channel.statistics.viewCount || '0',
                 videos: parseInt(channel.statistics.videoCount || '0', 10),
-                url: \`https://www.youtube.com/channel/\${channel.id}\`
+                url: `https://www.youtube.com/channel/${channel.id}`
               }
           });
         } catch (error) {
@@ -136,20 +131,19 @@ export default {
               channel: {
                 id: CHANNEL_ID,
                 title: 'Ruh Al Tarikh - Cinematic Islamic Archive',
-                url: \`https://www.youtube.com/channel/\${CHANNEL_ID}\`
+                url: `https://www.youtube.com/channel/${CHANNEL_ID}`
               }
           });
         }
       }
 
-      // Get channel videos
       if (path === '/api/videos') {
         const maxResults = url.searchParams.get('maxResults') || '12';
         const pageToken = url.searchParams.get('pageToken') || '';
 
         try {
           const channelResp = await fetch(
-            \`https://www.googleapis.com/youtube/v3/channels?part=contentDetails&id=\${CHANNEL_ID}&key=\${apiKey}\`
+            `https://www.googleapis.com/youtube/v3/channels?part=contentDetails&id=${CHANNEL_ID}&key=${apiKey}`
           );
           const channelData = await channelResp.json() as any;
 
@@ -159,7 +153,7 @@ export default {
           const uploadsPlaylistId = channelData.items[0].contentDetails.relatedPlaylists.uploads;
 
           const videosResp = await fetch(
-            \`https://www.googleapis.com/youtube/v3/playlistItems?part=snippet,contentDetails&playlistId=\${uploadsPlaylistId}&maxResults=\${maxResults}&pageToken=\${pageToken}&key=\${apiKey}\`
+            `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet,contentDetails&playlistId=${uploadsPlaylistId}&maxResults=${maxResults}&pageToken=${pageToken}&key=${apiKey}`
           );
           const videosData = await videosResp.json() as any;
 
@@ -195,13 +189,12 @@ export default {
         }
       }
 
-      // Search endpoint
       if (path === '/api/search') {
         const query = url.searchParams.get('q');
         if (!query) return respondJSON({ error: 'Query parameter required', results: [] }, 400);
 
         try {
-          const searchUrl = \`https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&channelId=\${CHANNEL_ID}&q=\${encodeURIComponent(query)}&maxResults=10&key=\${apiKey}\`;
+          const searchUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&channelId=${CHANNEL_ID}&q=${encodeURIComponent(query)}&maxResults=10&key=${apiKey}`;
           const searchResp = await fetch(searchUrl);
           const searchData = await searchResp.json() as any;
 
