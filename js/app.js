@@ -166,7 +166,7 @@ const AppState = {
     ytPlayer: null,
     isPlaying: false,
     isMuted: false,
-    currentView: 'list' // list or kanban
+    currentView: 'list', lastFocused: null
 };
 
 // ============================================
@@ -244,12 +244,61 @@ const Utils = {
         }
     },
 
-    showToast(message) {
+    showToast(message, type = "info") {
         if (DOM.toast) {
             DOM.toast.textContent = message;
-            DOM.toast.classList.add('show');
-            setTimeout(() => DOM.toast.classList.remove('show'), 3000);
+            DOM.toast.className = "toast show";
+            if (type !== "info") DOM.toast.classList.add(type);
+            setTimeout(() => DOM.toast.classList.remove("show"), 3000);
         }
+    },
+
+    async copyToClipboard(text, element) {
+        try {
+            await navigator.clipboard.writeText(text);
+            this.showToast("Copied to clipboard!", "success");
+            if (element) {
+                const feedback = document.createElement("span");
+                feedback.className = "copy-feedback";
+                feedback.textContent = "Copied!";
+                element.style.position = "relative";
+                element.appendChild(feedback);
+                setTimeout(() => feedback.classList.add("show"), 10);
+                setTimeout(() => {
+                    feedback.classList.remove("show");
+                    setTimeout(() => feedback.remove(), 200);
+                }, 2000);
+            }
+        } catch (err) {
+            console.error("Failed to copy: ", err);
+            this.showToast("Failed to copy", "error");
+        }
+    },
+
+    trapFocus(element) {
+        AppState.lastFocused = document.activeElement;
+        const focusableEls = element.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+        const firstFocusableEl = focusableEls[0];
+        const lastFocusableEl = focusableEls[focusableEls.length - 1];
+
+        element.addEventListener('keydown', (e) => {
+            const isTabPressed = (e.key === 'Tab' || e.keyCode === 9);
+            if (!isTabPressed) return;
+
+            if (e.shiftKey) {
+                if (document.activeElement === firstFocusableEl) {
+                    lastFocusableEl.focus();
+                    e.preventDefault();
+                }
+            } else {
+                if (document.activeElement === lastFocusableEl) {
+                    firstFocusableEl.focus();
+                    e.preventDefault();
+                }
+            }
+        });
+
+        if (firstFocusableEl) firstFocusableEl.focus();
     }
 };
 
@@ -586,6 +635,7 @@ function openVideo(video) {
 
     DOM.modal.style.display = 'flex';
     DOM.modal.setAttribute('aria-hidden', 'false');
+    Utils.trapFocus(DOM.modal);
     DOM.body.style.overflow = 'hidden';
     DOM.body.classList.add('modal-open');
 
@@ -598,20 +648,15 @@ function openVideo(video) {
 
 function closeVideo() {
     if (!DOM.modal || !DOM.player) return;
-
-    DOM.player.src = '';
-    DOM.modal.style.display = 'none';
-    DOM.modal.setAttribute('aria-hidden', 'true');
-    DOM.body.style.overflow = '';
-    DOM.body.classList.remove('modal-open');
+    DOM.player.src = "";
+    DOM.modal.style.display = "none";
+    DOM.modal.setAttribute("aria-hidden", "true");
+    DOM.body.style.overflow = "";
+    DOM.body.classList.remove("modal-open");
     AppState.current = null;
     clearInterval(AppState.progressTimer);
-
     renderContinueWatching();
-    renderDashboard();
-
-    if (DOM.transcriptPanel) DOM.transcriptPanel.setAttribute('aria-hidden', 'true');
-    if (DOM.sharePanel) DOM.sharePanel.setAttribute('aria-hidden', 'true');
+    if (AppState.lastFocused) { AppState.lastFocused.focus(); AppState.lastFocused = null; }
 }
 
 function navigateVideo(direction) {
@@ -655,16 +700,18 @@ function openWatchLater() {
     renderWatchLater();
     DOM.watchLaterPage.style.display = 'block';
     DOM.watchLaterPage.setAttribute('aria-hidden', 'false');
+    Utils.trapFocus(DOM.watchLaterPage);
     DOM.body.style.overflow = 'hidden';
     DOM.body.classList.add('modal-open');
 }
 
 function closeWatchLater() {
     if (!DOM.watchLaterPage) return;
-    DOM.watchLaterPage.style.display = 'none';
-    DOM.watchLaterPage.setAttribute('aria-hidden', 'true');
-    DOM.body.style.overflow = '';
-    DOM.body.classList.remove('modal-open');
+    DOM.watchLaterPage.style.display = "none";
+    DOM.watchLaterPage.setAttribute("aria-hidden", "true");
+    DOM.body.style.overflow = "";
+    DOM.body.classList.remove("modal-open");
+    if (AppState.lastFocused) { AppState.lastFocused.focus(); AppState.lastFocused = null; }
 }
 
 // ============================================
@@ -792,16 +839,18 @@ function openDashboard() {
     initAIAssistant();
     DOM.dashboardModal.style.display = 'block';
     DOM.dashboardModal.setAttribute('aria-hidden', 'false');
+    Utils.trapFocus(DOM.dashboardModal);
     DOM.body.style.overflow = 'hidden';
     DOM.body.classList.add('modal-open');
 }
 
 function closeDashboard() {
     if (!DOM.dashboardModal) return;
-    DOM.dashboardModal.style.display = 'none';
-    DOM.dashboardModal.setAttribute('aria-hidden', 'true');
-    DOM.body.style.overflow = '';
-    DOM.body.classList.remove('modal-open');
+    DOM.dashboardModal.style.display = "none";
+    DOM.dashboardModal.setAttribute("aria-hidden", "true");
+    DOM.body.style.overflow = "";
+    DOM.body.classList.remove("modal-open");
+    if (AppState.lastFocused) { AppState.lastFocused.focus(); AppState.lastFocused = null; }
 }
 
 // ============================================
@@ -1246,6 +1295,14 @@ function bindEvents() {
     // Dashboard
     if (DOM.dashboardBtn) DOM.dashboardBtn.addEventListener('click', openDashboard);
     if (DOM.closeDashboard) DOM.closeDashboard.addEventListener('click', closeDashboard);
+    if (DOM.closeShare) DOM.closeShare.addEventListener('click', () => { DOM.sharePanel.style.display = 'none'; DOM.sharePanel.setAttribute('aria-hidden', 'true'); DOM.body.style.overflow = ''; DOM.body.classList.remove('modal-open'); if (AppState.lastFocused) { AppState.lastFocused.focus(); AppState.lastFocused = null; } });
+    if (DOM.closeTranscript) DOM.closeTranscript.addEventListener('click', () => { DOM.transcriptPanel.style.display = 'none'; DOM.transcriptPanel.setAttribute('aria-hidden', 'true'); DOM.body.style.overflow = ''; DOM.body.classList.remove('modal-open'); if (AppState.lastFocused) { AppState.lastFocused.focus(); AppState.lastFocused = null; } });
+    const shareEpBtn = document.getElementById('shareEpisode');
+    if (shareEpBtn) shareEpBtn.addEventListener('click', openShare);
+    const transBtn = document.getElementById('toggleTranscript');
+    if (transBtn) transBtn.addEventListener('click', openTranscript);
+    const copyLinkBtn = document.getElementById('copyLinkBtn');
+    if (copyLinkBtn) copyLinkBtn.addEventListener('click', (e) => { const link = document.getElementById('shareLink'); if (link) Utils.copyToClipboard(link.value, e.currentTarget); });
     if (DOM.dashboardModal) {
         DOM.dashboardModal.addEventListener('click', (e) => {
             if (e.target === DOM.dashboardModal) closeDashboard();
@@ -1309,6 +1366,11 @@ function bindEvents() {
             closeVideo();
             closeWatchLater();
             closeDashboard();
+            if (DOM.sharePanel) { DOM.sharePanel.style.display = "none"; DOM.sharePanel.setAttribute("aria-hidden", "true"); }
+            if (DOM.transcriptPanel) { DOM.transcriptPanel.style.display = "none"; DOM.transcriptPanel.setAttribute("aria-hidden", "true"); }
+            DOM.body.style.overflow = "";
+            DOM.body.classList.remove("modal-open");
+            if (AppState.lastFocused) { AppState.lastFocused.focus(); AppState.lastFocused = null; }
         }
 
         // Video navigation (when current video is playing)
@@ -1466,9 +1528,116 @@ if (document.readyState === 'loading') {
         init();
         bindEvents();
         setupPWA();
+        initPullToRefresh();
+        initBottomSheetGestures();
+        document.body.addEventListener("touchstart", () => {}, { passive: true });
     });
 } else {
     init();
     bindEvents();
     setupPWA();
+        initPullToRefresh();
+        initBottomSheetGestures();
+        document.body.addEventListener("touchstart", () => {}, { passive: true });
+}
+
+function openShare() {
+    if (!DOM.sharePanel) return;
+    const shareLink = document.getElementById("shareLink");
+    if (shareLink && AppState.current) {
+        shareLink.value = "https://www.youtube.com/watch?v=" + AppState.current.id;
+    }
+    DOM.sharePanel.style.display = "block";
+    DOM.sharePanel.setAttribute("aria-hidden", "false");
+    DOM.body.style.overflow = "hidden";
+    DOM.body.classList.add("modal-open");
+    Utils.trapFocus(DOM.sharePanel);
+}
+
+function openTranscript() {
+    if (!DOM.transcriptPanel) return;
+    DOM.transcriptPanel.style.display = "block";
+    DOM.transcriptPanel.setAttribute("aria-hidden", "false");
+    DOM.body.style.overflow = "hidden";
+    DOM.body.classList.add("modal-open");
+    Utils.trapFocus(DOM.transcriptPanel);
+}
+
+// Mobile & Polish enhancements
+function initBottomSheetGestures() {
+    const panels = document.querySelectorAll('.side-panel');
+    panels.forEach(panel => {
+        let startY = 0;
+        let currentY = 0;
+        const header = panel.querySelector('.panel-header');
+        if (!header) return;
+        header.addEventListener('touchstart', (e) => { startY = e.touches[0].clientY; }, { passive: true });
+        header.addEventListener('touchmove', (e) => {
+            currentY = e.touches[0].clientY;
+            const diff = currentY - startY;
+            if (diff > 0) panel.style.transform = "translateY(" + diff + "px)";
+        }, { passive: true });
+        header.addEventListener('touchend', (e) => {
+            const diff = currentY - startY;
+            if (diff > 150) {
+                const id = panel.id;
+                if (id === "watchLaterPage") closeWatchLater();
+                else if (id === "dashboardModal") closeDashboard();
+                else if (id === "sharePanel") DOM.closeShare.click();
+                else if (id === "transcriptPanel") DOM.closeTranscript.click();
+            }
+            panel.style.transform = "";
+            startY = 0; currentY = 0;
+        }, { passive: true });
+    });
+}
+
+function initPullToRefresh() {
+    const grid = DOM.grid;
+    if (!grid) return;
+    let pullStartY = 0;
+    let isPulling = false;
+    const threshold = 150;
+    const indicator = document.createElement('div');
+    indicator.className = 'pull-indicator';
+    indicator.innerHTML = '<i class="fas fa-sync fa-spin"></i>';
+    document.body.prepend(indicator);
+    window.addEventListener('touchstart', (e) => { if (window.scrollY === 0) { pullStartY = e.touches[0].clientY; isPulling = true; } }, { passive: true });
+    window.addEventListener('touchmove', (e) => {
+        if (!isPulling) return;
+        const currentY = e.touches[0].clientY;
+        const diff = currentY - pullStartY;
+        if (diff > 0) {
+            indicator.style.opacity = Math.min(diff / threshold, 1);
+            indicator.style.transform = "translateY(" + Math.min(diff, threshold) + "px) rotate(" + (diff * 2) + "deg)";
+        }
+    }, { passive: true });
+    window.addEventListener('touchend', async (e) => {
+        if (!isPulling) return;
+        const currentY = e.changedTouches[0].clientY;
+        const diff = currentY - pullStartY;
+        if (diff > threshold) {
+            if ('vibrate' in navigator) navigator.vibrate(50);
+            Utils.showToast('Refreshing archives...', 'info');
+            indicator.classList.add('refreshing');
+            localStorage.removeItem(CONFIG.STORAGE.CACHE_KEY);
+            AppState.videos = await loadVideos();
+            renderGrid();
+            if ('vibrate' in navigator) navigator.vibrate([30, 30, 30]);
+            Utils.showToast('Archives updated!', 'success');
+        }
+        indicator.style.opacity = '0';
+        indicator.style.transform = 'translateY(-100%)';
+        indicator.classList.remove('refreshing');
+        isPulling = false;
+    }, { passive: true });
+}
+
+// Wrap original copyToClipboard for haptics
+if (Utils.copyToClipboard) {
+    const originalCopy = Utils.copyToClipboard;
+    Utils.copyToClipboard = async function(text, element) {
+        if ('vibrate' in navigator) navigator.vibrate(10);
+        return originalCopy.call(this, text, element);
+    };
 }
