@@ -1,6 +1,7 @@
 import json
+from pathlib import Path
 
-with open('package.json', 'r') as f:
+with Path("package.json").open() as f:
     pkg = json.load(f)
 
 # The CI log mentioned:
@@ -21,6 +22,6 @@ pkg['dependencies']['trigger-circleci-pipeline'] = '^1.12.1'
 pkg['dependencies']['circletui'] = '^1.0.3'
 pkg['dependencies']['@circleci/circleci-config-sdk'] = '^0.12.5'
 
-with open('package.json', 'w') as f:
+with Path("package.json").open("w") as f:
     json.dump(pkg, f, indent=2)
-    f.write('\n')
+    f.write("\n")
