@@ -1,3 +1,9 @@
+packages:
+  - 'app'
+  - 'functions'
+  - 'yt-proxy'
+  - 'my-sandbox-app'
+
 allowBuilds:
   '@firebase/util': true
   esbuild: true
