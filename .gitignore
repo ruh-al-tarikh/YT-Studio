@@ -58,3 +58,5 @@ js/*.backup
 .agent/
 .genkit/
 genyt/
+*.bak.*
+*.bak.*
