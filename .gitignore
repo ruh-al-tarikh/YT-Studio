@@ -52,3 +52,22 @@ deployment-url.txt
 firebase-debug.log*
 firebase.json
 .firebaserc
+# Temporary files
+.agent/
+.genkit/
+.quality-gc.json
+.secret_key
+key.json
+token_youtube.json
+
+# Build outputs
+functions/lib/
+my-sandbox-app/
+genyt/
+vercel.json
+
+# Local configs
+package-lock.json
+package-scripts.json
+database.rules.json
+ytfixer/
