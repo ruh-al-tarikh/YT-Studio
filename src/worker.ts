@@ -1,12 +1,3 @@
-
-interface PlaylistItem {
-  snippet: {
-    resourceId: {
-      videoId: string;
-    };
-  };
-}
-
 export interface Env {
   MY_DB?: D1Database;
   YOUTUBE_API_KEY?: string;
@@ -100,7 +91,7 @@ export default {
       return new Response(null, { headers: corsHeaders });
     }
 
-    const respondJSON = <T>(data: T, status = 200, extraHeaders = {}) => {
+    const respondJSON = (data: any, status = 200, extraHeaders = {}) => {
       return new Response(JSON.stringify(data), {
         status,
         headers: {
@@ -126,7 +117,7 @@ export default {
           `https://www.googleapis.com/youtube/v3/channels?part=contentDetails&id=${channelId}&key=${apiKey}`
         );
 
-        const channelData = await channelRes.json() as unknown;
+        const channelData = await channelRes.json() as any;
         if (!channelRes.ok) {
            throw new Error(channelData.error?.message || "Failed to fetch channel details");
         }
@@ -142,12 +133,12 @@ export default {
           `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=${uploadsPlaylistId}&key=${apiKey}`
         );
 
-        const playlistData = await playlistRes.json() as unknown;
+        const playlistData = await playlistRes.json() as any;
         if (!playlistRes.ok) {
           throw new Error(playlistData.error?.message || "Failed to fetch playlist items");
         }
 
-        const videos = (playlistData.items || []).map((item: PlaylistItem) => ({
+        const videos = (playlistData.items || []).map((item: any) => ({
           id: item.snippet.resourceId.videoId,
           title: item.snippet.title,
           thumbnail: item.snippet.thumbnails.high?.url || item.snippet.thumbnails.default?.url,
@@ -158,13 +149,13 @@ export default {
 
         return respondJSON({ success: true, isDemo: false, videos }, 200, { "Cache-Control": "public, max-age=600" });
 
-      } catch (err: unknown) {
-        console.error("[Worker] YouTube API Error:", (err instanceof Error ? (err instanceof Error ? err.message : String(err)) : String(err)));
+      } catch (err: any) {
+        console.error("[Worker] YouTube API Error:", err.message);
         return respondJSON({
           success: true,
           isDemo: true,
           videos: MOCK_VIDEOS,
-          error: (err instanceof Error ? (err instanceof Error ? err.message : String(err)) : String(err))
+          error: err.message
         }, 200, { "Cache-Control": "public, max-age=600" });
       }
     }
@@ -176,7 +167,7 @@ export default {
             try {
                 const ytUrl = `https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics,brandingSettings&id=${encodeURIComponent(channelId)}&key=${apiKey}`;
                 const res = await fetch(ytUrl);
-                const data = await res.json() as unknown;
+                const data = await res.json() as any;
                 if (res.ok) {
                     if (data.items && data.items.length > 0) {
                         const channel = data.items[0];
@@ -211,7 +202,7 @@ export default {
         try {
           const ytUrl = `https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails,statistics&id=${encodeURIComponent(videoId)}&key=${apiKey}`;
           const res = await fetch(ytUrl);
-          const data = await res.json() as unknown;
+          const data = await res.json() as any;
           if (res.ok) {
             return respondJSON({ success: true, videoId, data }, 200, { "Cache-Control": "public, max-age=600" });
           } else {
