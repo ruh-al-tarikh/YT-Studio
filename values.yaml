@@ -1,0 +1,4 @@
+tokenSecret:
+  token: " "
+managedNamespaces:
+  - default

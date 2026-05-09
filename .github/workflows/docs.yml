@@ -1,0 +1,42 @@
+# .github/workflows/docs.yml
+name: Build Documentation
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/**'
+      - 'src/**'
+      - '**.py'
+
+jobs:
+  BuildDocs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      
+      - name: Install dependencies
+        run: |
+          pip install sphinx sphinx-rtd-theme
+      
+      # Use pyTooling's Sphinx workflow
+      - name: Build Sphinx Documentation
+        uses: pyTooling/Actions/.github/workflows/SphinxDocumentation.yml@r6
+        with:
+          docs_dir: ./docs
+          build_dir: ./docs/_build
+          html_output: true
+          latex_output: true
+  
+  PublishDocs:
+    needs: BuildDocs
+    uses: pyTooling/Actions/.github/workflows/PublishToGitHubPages.yml@r6
+    with:
+      pages_dir: ./docs/_build/html
+    secrets:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,17 @@
+# .github/workflows/nightly-release.yml
+name: Nightly Release
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # Daily at midnight
+  workflow_dispatch:  # Manual trigger
+
+jobs:
+  NightlyRelease:
+    uses: pyTooling/Actions/.github/workflows/NightlyRelease.yml@r6
+    with:
+      release_name_prefix: "nightly"
+      release_draft: false
+      release_prerelease: true
+    secrets:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
