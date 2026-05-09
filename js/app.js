@@ -404,13 +404,18 @@ async function loadVideos() {
 // ============================================
 // RENDER FUNCTIONS
 // ============================================
-function renderCard(video) {
+function renderCard(video, index = 0) {
     const isSaved = AppState.watchLater.some(v => v.id === video.id);
     const thumbnail = video.thumbnail || `https://i.ytimg.com/vi/${video.id}/hqdefault.jpg`;
     const progress = getProgress(video.id);
 
     return `
-        <div class="card" data-id="${video.id}" role="button" tabindex="0" aria-label="Watch ${Utils.sanitize(video.title)}">
+        <div class="card animate-in"
+             style="--index: ${index}"
+             data-id="${video.id}"
+             role="button"
+             tabindex="0"
+             aria-label="Watch ${Utils.sanitize(video.title)}">
             <div class="card-thumb-wrapper">
                 <img data-src="${thumbnail}" 
                      src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=" 
@@ -486,7 +491,7 @@ function renderGrid() {
                 </div>
             `;
         } else {
-            DOM.grid.innerHTML = displayVideos.map(renderCard).join('');
+            DOM.grid.innerHTML = displayVideos.map((v, i) => renderCard(v, i)).join('');
 
             // Infinite scroll
             if (displayVideos.length < AppState.filtered.length) {
@@ -542,7 +547,7 @@ function renderContinueWatching() {
 
     if (continueVideos.length) {
         DOM.continueBlock.style.display = 'block';
-        DOM.continueRow.innerHTML = continueVideos.map(renderCard).join('');
+        DOM.continueRow.innerHTML = continueVideos.map((v, i) => renderCard(v, i)).join('');
         if (DOM.emptyHistory) DOM.emptyHistory.style.display = 'none';
     } else {
         DOM.continueBlock.style.display = 'none';
@@ -1184,7 +1189,7 @@ function setupRecommendedSection() {
 
     if (recommended.length) {
         if (DOM.recommendedBlockSec) DOM.recommendedBlockSec.style.display = 'block';
-        DOM.recommendedRow.innerHTML = recommended.map(renderCard).join('');
+        DOM.recommendedRow.innerHTML = recommended.map((v, i) => renderCard(v, i)).join('');
         lazyLoadImages();
     }
 }
