@@ -1407,8 +1407,9 @@ function bindEvents() {
         DOM.modeBtns.forEach(btn => {
             btn.addEventListener('click', () => {
                 const mode = btn.dataset.mode;
-                DOM.modeBtns.forEach(b => b.classList.remove('active'));
+                DOM.modeBtns.forEach(b => { b.classList.remove('active'); b.setAttribute('aria-pressed', 'false'); });
                 btn.classList.add('active');
+                btn.setAttribute('aria-pressed', 'true');
                 switchMode(mode);
             });
         });
@@ -1420,6 +1421,7 @@ function bindEvents() {
             btn.addEventListener('click', () => {
                 DOM.studioNavBtns.forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
+                btn.setAttribute('aria-pressed', 'true');
                 const tab = btn.dataset.tab;
                 if (DOM.studioViews) {
                     DOM.studioViews.forEach(v => v.style.display = 'none');
@@ -1455,6 +1457,7 @@ function bindEvents() {
                 DOM.studioNavBtns.forEach(btn => {
                     btn.classList.remove('active');
                     if (btn.dataset.tab === 'projects') btn.classList.add('active');
+                btn.setAttribute('aria-pressed', 'true');
                 });
             }
         });
@@ -1466,6 +1469,7 @@ function bindEvents() {
             btn.addEventListener('click', () => {
                 DOM.projectTabBtns.forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
+                btn.setAttribute('aria-pressed', 'true');
                 const tabId = btn.dataset.ptab;
                 if (DOM.ptabContents) {
                     DOM.ptabContents.forEach(content => content.classList.remove('active'));
