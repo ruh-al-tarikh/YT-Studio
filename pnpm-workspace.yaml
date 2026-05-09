@@ -1,5 +1,6 @@
 allowBuilds:
   '@firebase/util': set this to true or false
+  '@firebase/util': true
   esbuild: true
   sharp: true
   workerd: true
