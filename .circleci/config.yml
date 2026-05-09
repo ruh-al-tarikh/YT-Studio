@@ -7,49 +7,45 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Install Python tools
-          command: |
-            pip install --user ruff mypy pytest pytest-cov
-            echo 'export PATH="$HOME/.local/bin:$PATH"' >> $BASH_ENV
+          name: Install UV
+          command: curl -LsSf https://astral.sh/uv/install.sh | sh
       - run:
-          name: Run Ruff linter and formatter
-          command: |
-            ruff check . --fix
-            ruff format .
+          name: Install dependencies
+          command: uv pip install -r requirements-dev.txt
       - run:
-          name: Run MyPy type checker
-          command: mypy . || echo "MyPy found issues but continuing"
+          name: Run Ruff
+          command: ruff check . --fix && ruff format .
       - run:
-          name: Run pytest
-          command: pytest || echo "No tests found"
+          name: Run MyPy
+          command: mypy .
+      - run:
+          name: Run tests
+          command: pytest
 
   node-checks:
     docker:
-      - image: cimg/node:20.18
+      - image: cimg/node:20
     steps:
       - checkout
       - run:
+          name: Install pnpm
+          command: npm install -g pnpm
+      - run:
           name: Install dependencies
-          command: |
-            npm install -g pnpm
-            pnpm install --frozen-lockfile
+          command: pnpm install --frozen-lockfile
       - run:
-          name: Run linting
-          command: |
-            cd functions
-            npm run lint -- --max-warnings 0
+          name: Run lint
+          command: pnpm lint
       - run:
-          name: TypeScript type check
-          command: |
-            cd functions
-            npx tsc --noEmit
+          name: Run type check
+          command: pnpm type-check
       - run:
-          name: Quality GC check
-          command: npx quality-gc run || echo "Quality GC issues found"
+          name: Run tests
+          command: pnpm test
 
 workflows:
   version: 2
-  validate:
+  main:
     jobs:
       - python-checks
       - node-checks
