@@ -1,25 +1,3 @@
-
-interface VideoItem {
-  contentDetails?: {
-    videoId?: string;
-  };
-  id?: {
-    videoId?: string;
-  };
-  snippet?: {
-    title?: string;
-    description?: string;
-    thumbnails?: {
-      default?: { url?: string; width?: number; height?: number };
-      medium?: { url?: string; width?: number; height?: number };
-      high?: { url?: string; width?: number; height?: number };
-    };
-    channelId?: string;
-    channelTitle?: string;
-    publishedAt?: string;
-  };
-}
-
 /**
  * YouTube API V3 Worker - Cloudflare Worker
  * Fetches data from YouTube Channel: UCrjJP_SHUeCmqpTSHJCXkdA (Ruh Al Tarikh)
@@ -72,11 +50,12 @@ const DEMO_VIDEOS: Video[] = [
   }
 ];
 
-const CHANNEL_ID = 'UCrjJP_SHUeCmqpTSHJCXkdA';
+const DEFAULT_CHANNEL_ID = 'UCrjJP_SHUeCmqpTSHJCXkdA';
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
+    const channelId = env.CHANNEL_ID || DEFAULT_CHANNEL_ID;
     const path = url.pathname;
 
     const corsHeaders = {
@@ -89,7 +68,7 @@ export default {
       return new Response(null, { status: 204, headers: corsHeaders });
     }
 
-    const respondJSON = <T>(data: T, status = 200) => {
+    const respondJSON = (data: any, status = 200) => {
       return new Response(JSON.stringify(data), {
         status,
         headers: {
@@ -100,7 +79,8 @@ export default {
     };
 
     try {
-      const apiKey = env.YOUTUBE_API_KEY || 'AIzaSyAjd6rE_KTxT9mdkT4XPrEL2vD0fEEc9DA';
+      const apiKey = env.YOUTUBE_API_KEY || '';
+      if (path.startsWith('/api/') && !apiKey) throw new Error('YOUTUBE_API_KEY is missing');
       const hasSecretBinding = !!env.YOUTUBE_API_KEY;
 
       if (path === '/' || path === '/health') {
@@ -108,7 +88,7 @@ export default {
             status: 'healthy',
             worker: 'ytstudio',
             timestamp: new Date().toISOString(),
-            channel: CHANNEL_ID,
+            channel: channelId,
             hasSecretBinding,
             environment: env.ENVIRONMENT || 'development',
             endpoints: {
@@ -122,9 +102,9 @@ export default {
 
       if (path === '/api/channel') {
         try {
-          const channelUrl = 'https://www.googleapis.com/youtube/v3/channels?part=statistics,snippet&id=' + CHANNEL_ID + '&key=' + apiKey;
+          const channelUrl = 'https://www.googleapis.com/youtube/v3/channels?part=statistics,snippet&id=' + channelId + '&key=' + apiKey;
           const response = await fetch(channelUrl);
-          const data = await response.json() as unknown;
+          const data = await response.json() as any;
 
           if (data.error) throw new Error(data.error.message);
           if (!data.items || data.items.length === 0) throw new Error('Channel not found');
@@ -135,14 +115,14 @@ export default {
               isDemo: false,
               hasSecretBinding,
               channel: {
-                id: channel.id || CHANNEL_ID,
-                title: channel.snippet?.title || 'Ruh Al Tarikh',
+                id: channel.id || channelId,
+                title: channel.snippet?.title || 'Archive',
                 description: channel.snippet?.description || '',
                 thumbnail: channel.snippet?.thumbnails?.high?.url || channel.snippet?.thumbnails?.default?.url || '',
                 subscribers: channel.statistics?.subscriberCount || 'Hidden',
                 views: channel.statistics?.viewCount || '0',
                 videos: parseInt(channel.statistics?.videoCount || '0', 10),
-                url: 'https://www.youtube.com/channel/' + (channel.id || CHANNEL_ID)
+                url: 'https://www.youtube.com/channel/' + (channel.id || channelId)
               }
           });
         } catch (error) {
@@ -151,9 +131,9 @@ export default {
               status: 'fallback_to_demo',
               error: String(error),
               channel: {
-                id: CHANNEL_ID,
+                id: channelId,
                 title: 'Ruh Al Tarikh - Cinematic Islamic Archive',
-                url: 'https://www.youtube.com/channel/' + CHANNEL_ID
+                url: 'https://www.youtube.com/channel/' + channelId
               }
           });
         }
@@ -165,9 +145,9 @@ export default {
 
         try {
           const channelResp = await fetch(
-            'https://www.googleapis.com/youtube/v3/channels?part=contentDetails&id=' + CHANNEL_ID + '&key=' + apiKey
+            'https://www.googleapis.com/youtube/v3/channels?part=contentDetails&id=' + channelId + '&key=' + apiKey
           );
-          const channelData = await channelResp.json() as unknown;
+          const channelData = await channelResp.json() as any;
 
           if (channelData.error) throw new Error(channelData.error.message);
           if (!channelData.items || !channelData.items[0]) throw new Error('Channel not found');
@@ -178,12 +158,12 @@ export default {
           const videosResp = await fetch(
             'https://www.googleapis.com/youtube/v3/playlistItems?part=snippet,contentDetails&playlistId=' + uploadsPlaylistId + '&maxResults=' + maxResults + '&pageToken=' + pageToken + '&key=' + apiKey
           );
-          const videosData = await videosResp.json() as unknown;
+          const videosData = await videosResp.json() as any;
 
           if (videosData.error) throw new Error(videosData.error.message);
           if (!videosData.items) throw new Error('No videos found');
 
-          const videos: Video[] = (videosData.items || []).map((item: VideoItem) => ({
+          const videos: Video[] = (videosData.items || []).map((item: any) => ({
             id: item.contentDetails?.videoId || '',
             videoId: item.contentDetails?.videoId || '',
             title: item.snippet?.title || 'Untitled',
@@ -218,13 +198,13 @@ export default {
         if (!query) return respondJSON({ error: 'Query parameter required', results: [] }, 400);
 
         try {
-          const searchUrl = 'https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&channelId=' + CHANNEL_ID + '&q=' + encodeURIComponent(query) + '&maxResults=10&key=' + apiKey;
+          const searchUrl = 'https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&channelId=' + channelId + '&q=' + encodeURIComponent(query) + '&maxResults=10&key=' + apiKey;
           const searchResp = await fetch(searchUrl);
-          const searchData = await searchResp.json() as unknown;
+          const searchData = await searchResp.json() as any;
 
           if (searchData.error) throw new Error(searchData.error.message);
 
-          const results = (searchData.items || []).map((item: VideoItem) => ({
+          const results = (searchData.items || []).map((item: any) => ({
             id: item.id?.videoId || '',
             title: item.snippet?.title || 'Untitled',
             description: item.snippet?.description || '',

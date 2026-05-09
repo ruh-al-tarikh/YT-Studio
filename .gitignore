@@ -58,7 +58,3 @@ js/*.backup
 .agent/
 .genkit/
 genyt/
-pnpm-workspace.yaml
-pnpm-workspace.yml
-*.bak
-*.bak.*
