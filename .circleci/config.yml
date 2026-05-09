@@ -14,7 +14,7 @@ commands:
       - run:
           name: Install pnpm
           command: |
-            npm install -g pnpm
+            sudo npm install -g pnpm
       - run:
           name: Install dependencies
           command: |
