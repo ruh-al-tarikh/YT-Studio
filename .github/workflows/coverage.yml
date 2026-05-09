@@ -1,0 +1,17 @@
+# .github/workflows/coverage.yml
+name: Code Coverage
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  CoverageCollection:
+    uses: pyTooling/Actions/.github/workflows/CoverageCollection.yml@r6
+    with:
+      pytest_coverage_report: html,xml
+      publish_to_codecov: true
+      codecov_token: ${{ secrets.CODECOV_TOKEN }}
+      publish_to_codacy: true
+      codacy_token: ${{ secrets.CODACY_TOKEN }}
