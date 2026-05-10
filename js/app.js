@@ -100,6 +100,7 @@ const DOM = {
     scrollToTop: document.getElementById('scrollToTop'),
 
     // Watch Later
+    watchLaterBtn: document.getElementById('watchLaterBtn'),
     watchLaterBadge: document.getElementById('watchLaterBadge'),
     watchLaterCount: document.getElementById('watchLaterCount'),
     watchLaterPage: document.getElementById('watchLaterPage'),
@@ -705,6 +706,7 @@ function openWatchLater() {
     renderWatchLater();
     DOM.watchLaterPage.style.display = 'block';
     DOM.watchLaterPage.setAttribute('aria-hidden', 'false');
+    if (DOM.watchLaterBtn) DOM.watchLaterBtn.setAttribute('aria-expanded', 'true');
     Utils.trapFocus(DOM.watchLaterPage);
     DOM.body.style.overflow = 'hidden';
     DOM.body.classList.add('modal-open');
@@ -714,6 +716,7 @@ function closeWatchLater() {
     if (!DOM.watchLaterPage) return;
     DOM.watchLaterPage.style.display = "none";
     DOM.watchLaterPage.setAttribute("aria-hidden", "true");
+    if (DOM.watchLaterBtn) DOM.watchLaterBtn.setAttribute('aria-expanded', 'false');
     DOM.body.style.overflow = "";
     DOM.body.classList.remove("modal-open");
     if (AppState.lastFocused) { AppState.lastFocused.focus(); AppState.lastFocused = null; }
@@ -1204,15 +1207,17 @@ function bindEvents() {
     // Mobile Menu Toggle
     if (DOM.menuToggle) {
         DOM.menuToggle.addEventListener('click', () => {
-            document.body.classList.toggle('mobile-nav-active');
+            const isActive = document.body.classList.toggle('mobile-nav-active');
+            DOM.menuToggle.setAttribute('aria-expanded', isActive ? 'true' : 'false');
         });
     }
 
     // Search Section Toggle
     if (DOM.searchToggle && DOM.searchSection) {
         DOM.searchToggle.addEventListener('click', () => {
-            DOM.searchSection.classList.toggle('active');
-            if (DOM.searchSection.classList.contains('active')) {
+            const isActive = DOM.searchSection.classList.toggle('active');
+            DOM.searchToggle.setAttribute('aria-expanded', isActive ? 'true' : 'false');
+            if (isActive) {
                 DOM.search.focus();
             }
         });
@@ -1273,7 +1278,7 @@ function bindEvents() {
     }
 
     // Watch Later
-    if (DOM.watchLaterBadge) DOM.watchLaterBadge.addEventListener('click', openWatchLater);
+    if (DOM.watchLaterBtn) DOM.watchLaterBtn.addEventListener('click', openWatchLater);
     if (DOM.closeWatchLater) DOM.closeWatchLater.addEventListener('click', closeWatchLater);
     if (DOM.watchLaterPage) {
         DOM.watchLaterPage.addEventListener('click', (e) => {
@@ -1353,13 +1358,19 @@ function bindEvents() {
 
     // Keyboard shortcuts
     document.addEventListener('keydown', (e) => {
-        // Don't interfere with input fields
+        const key = e.key.toLowerCase();
+
+        // Handle Escape for input fields
         if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
-            if (e.key === 'Escape') e.target.blur();
+            if (key === 'escape') {
+                e.target.blur();
+                if (e.target === DOM.search && DOM.searchSection && DOM.searchSection.classList.contains('active')) {
+                    DOM.searchSection.classList.remove('active');
+                    if (DOM.searchToggle) DOM.searchToggle.setAttribute('aria-expanded', 'false');
+                }
+            }
             return;
         }
-
-        const key = e.key.toLowerCase();
 
         // Search focus
         if (key === '/' && DOM.search) {
@@ -1372,6 +1383,14 @@ function bindEvents() {
             closeVideo();
             closeWatchLater();
             closeDashboard();
+            if (DOM.searchToggle && DOM.searchSection && DOM.searchSection.classList.contains('active')) {
+                DOM.searchSection.classList.remove('active');
+                DOM.searchToggle.setAttribute('aria-expanded', 'false');
+            }
+            if (document.body.classList.contains('mobile-nav-active')) {
+                document.body.classList.remove('mobile-nav-active');
+                if (DOM.menuToggle) DOM.menuToggle.setAttribute('aria-expanded', 'false');
+            }
             if (DOM.sharePanel) { DOM.sharePanel.style.display = "none"; DOM.sharePanel.setAttribute("aria-hidden", "true"); }
             if (DOM.transcriptPanel) { DOM.transcriptPanel.style.display = "none"; DOM.transcriptPanel.setAttribute("aria-hidden", "true"); }
             DOM.body.style.overflow = "";
