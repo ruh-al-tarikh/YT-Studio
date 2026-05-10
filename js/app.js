@@ -66,6 +66,7 @@ const DOM = {
     body: document.body,
     grid: document.getElementById('grid'),
     modal: document.getElementById('modal'),
+    modalSaveBtn: document.getElementById('modalSaveBtn'),
     player: document.getElementById('player'),
     closeModal: document.getElementById('close'),
     toast: document.getElementById('toast'),
@@ -96,6 +97,7 @@ const DOM = {
 
     // Theme & UI
     themeToggle: document.getElementById('themeToggleBtn'),
+    themeMenu: document.getElementById('themeMenu'),
     menuToggle: document.getElementById('menuToggleBtn'),
     scrollToTop: document.getElementById('scrollToTop'),
 
@@ -644,6 +646,17 @@ function openVideo(video) {
 
     if (DOM.transcriptPanel) DOM.transcriptPanel.setAttribute('aria-hidden', 'true');
     if (DOM.sharePanel) DOM.sharePanel.setAttribute('aria-hidden', 'true');
+
+    // Update modal save button state
+    if (DOM.modalSaveBtn) {
+        const isSaved = AppState.watchLater.some(v => v.id === video.id);
+        DOM.modalSaveBtn.classList.toggle('active', isSaved);
+        const icon = DOM.modalSaveBtn.querySelector('i');
+        if (icon) {
+            icon.className = isSaved ? 'fas fa-bookmark' : 'far fa-bookmark';
+        }
+        DOM.modalSaveBtn.setAttribute('aria-label', isSaved ? 'Remove from Watch Later' : 'Save for later');
+    }
 }
 
 function closeVideo() {
@@ -693,6 +706,17 @@ function toggleWatchLater(video) {
     if (AppState.hero && AppState.hero.id === video.id) renderHero(AppState.hero);
     renderGrid();
     if (DOM.watchLaterContainer) renderWatchLater();
+
+    // Sync modal save button if open
+    if (DOM.modalSaveBtn && AppState.current && AppState.current.id === video.id) {
+        const isSaved = AppState.watchLater.some(v => v.id === video.id);
+        DOM.modalSaveBtn.classList.toggle('active', isSaved);
+        const icon = DOM.modalSaveBtn.querySelector('i');
+        if (icon) {
+            icon.className = isSaved ? 'fas fa-bookmark' : 'far fa-bookmark';
+        }
+        DOM.modalSaveBtn.setAttribute('aria-label', isSaved ? 'Remove from Watch Later' : 'Save for later');
+    }
 }
 
 function openWatchLater() {
@@ -1193,8 +1217,23 @@ function setupRecommendedSection() {
 // EVENT LISTENERS
 // ============================================
 function bindEvents() {
-    // Theme toggle
-    if (DOM.themeToggle) DOM.themeToggle.addEventListener('click', toggleTheme);
+    // Theme toggle & Menu
+    if (DOM.themeToggle && DOM.themeMenu) {
+        DOM.themeToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isExpanded = DOM.themeToggle.getAttribute('aria-expanded') === 'true';
+            DOM.themeToggle.setAttribute('aria-expanded', !isExpanded);
+            DOM.themeMenu.classList.toggle('hidden');
+        });
+
+        // Close theme menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!DOM.themeToggle.contains(e.target) && !DOM.themeMenu.contains(e.target)) {
+                DOM.themeMenu.classList.add('hidden');
+                DOM.themeToggle.setAttribute('aria-expanded', 'false');
+            }
+        });
+    }
 
     // Mobile Menu Toggle
     if (DOM.menuToggle) {
@@ -1300,6 +1339,7 @@ function bindEvents() {
     if (DOM.closeTranscript) DOM.closeTranscript.addEventListener('click', () => { DOM.transcriptPanel.style.display = 'none'; DOM.transcriptPanel.setAttribute('aria-hidden', 'true'); DOM.body.style.overflow = ''; DOM.body.classList.remove('modal-open'); if (AppState.lastFocused) { AppState.lastFocused.focus(); AppState.lastFocused = null; } });
     const shareEpBtn = document.getElementById('shareEpisode');
     if (shareEpBtn) shareEpBtn.addEventListener('click', openShare);
+    if (DOM.modalSaveBtn) DOM.modalSaveBtn.addEventListener('click', () => AppState.current && toggleWatchLater(AppState.current));
     const transBtn = document.getElementById('toggleTranscript');
     if (transBtn) transBtn.addEventListener('click', openTranscript);
     const copyLinkBtn = document.getElementById('copyLinkBtn');
