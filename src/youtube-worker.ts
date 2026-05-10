@@ -78,7 +78,7 @@ export default {
     };
 
     try {
-      const apiKey = env.YOUTUBE_API_KEY || 'AIzaSyAjd6rE_KTxT9mdkT4XPrEL2vD0fEEc9DA';
+      const apiKey = env.YOUTUBE_API_KEY || '';
       const hasSecretBinding = !!env.YOUTUBE_API_KEY;
 
       if (path === '/' || path === '/health') {
