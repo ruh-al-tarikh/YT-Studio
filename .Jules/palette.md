@@ -31,3 +31,6 @@
 ## 2024-05-21 - Enhanced Accessibility for Dynamic Content and State Toggles
 **Learning:** For dynamic applications with real-time filtering and mode switching, using `aria-live` and `aria-pressed` significantly improves the experience for assistive technology users by announcing state changes that are otherwise purely visual.
 **Action:** Always pair visual state changes (like "active" classes) with corresponding ARIA attributes (`aria-pressed`, `aria-expanded`) and use `aria-live` regions for status updates like search result counts.
+## 2025-05-08 - Accessible Tooltips and Touch Target Reliability
+**Learning:** Pairing `aria-label` with `title` on icon-only buttons provides a dual-layer of UX: screen reader accessibility and visual tooltips for mouse users. Additionally, ensuring click listeners target the parent button rather than nested decorative elements (like badges) prevents "dead zones" in the UI.
+**Action:** Always wrap icons and badges in semantic buttons and apply attributes to the outermost interactive element. Use 'title' for native tooltips on all icon-only actions.
