@@ -31,3 +31,7 @@
 ## 2024-05-21 - Enhanced Accessibility for Dynamic Content and State Toggles
 **Learning:** For dynamic applications with real-time filtering and mode switching, using `aria-live` and `aria-pressed` significantly improves the experience for assistive technology users by announcing state changes that are otherwise purely visual.
 **Action:** Always pair visual state changes (like "active" classes) with corresponding ARIA attributes (`aria-pressed`, `aria-expanded`) and use `aria-live` regions for status updates like search result counts.
+
+## 2025-05-22 - Predictable Keyboard Navigation for Overlays
+**Learning:** For interactive search inputs and side panels, the 'Escape' key must handle focus and visibility states predictably. Ensuring that 'Escape' blurs and closes an active search section even when focus is inside the input improves navigation flow for power users and assistive technology.
+**Action:** Implement 'Escape' key handlers that explicitly manage both DOM state (closing sections) and ARIA states (`aria-expanded="false"`) across all navigation toggles.
