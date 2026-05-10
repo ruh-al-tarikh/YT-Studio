@@ -40,7 +40,7 @@ let PLANNER_HTML=`
 		</aside>
 	</div>
 </div>
-`;function initPlanner(){var a=document.getElementById("studio-view-planner");if(a){a.innerHTML=PLANNER_HTML;a=document.getElementById("calendarGrid");let e=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"].map(a=>`<div class="calendar-day-header">${a}</div>`).join("");for(let a=1;a<=28;a++){var i=12===a,d=15===a||22===a;e+=`
+`;function initPlanner(){var a=document.getElementById("studio-view-planner");if(a){a.innerHTML=PLANNER_HTML,a=document.getElementById("calendarGrid");let e=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"].map(a=>`<div class="calendar-day-header">${a}</div>`).join("");for(let a=1;a<=28;a++){var i=12===a,d=15===a||22===a;e+=`
 			<div class="calendar-day ${i?"today":""}">
 				<span class="day-number">${a}</span>
 				${d?`<div class="calendar-event ${15===a?"writing":"editing"}">Video Project</div>`:""}
