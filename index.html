@@ -76,19 +76,19 @@
         </div>
       </div>
 
-      <nav class="navbar-nav">
+      <nav class="navbar-nav" id="navbar-nav">
         <button class="nav-link" data-action="scroll-to-episodes">
           <i class="fas fa-film"></i>
           <span>Episodes</span>
         </button>
-        <button class="nav-link" id="searchToggleBtn">
+        <button class="nav-link" id="searchToggleBtn" aria-controls="searchSection" aria-expanded="false">
           <i class="fas fa-search"></i>
           <span>Search</span>
         </button>
       </nav>
 
       <div class="navbar-actions">
-        <button id="watchLaterBtn" class="action-btn badge-btn" aria-label="View Saved Episodes" title="View Saved Episodes">
+        <button id="watchLaterBtn" class="action-btn badge-btn" aria-label="View Saved Episodes" title="View Saved Episodes" aria-controls="watchLaterPage" aria-expanded="false">
           <i class="fas fa-bookmark" aria-hidden="true"></i>
           <span class="badge" id="watchLaterBadge">0</span>
         </button>
@@ -112,10 +112,10 @@
           </div>
         </div>
         <div id="modeSwitcher" class="mode-switcher glass-card p-1 flex gap-1 mx-4">
-          <button class="mode-btn active px-3 py-1 text-[10px] rounded-md transition-all font-bold uppercase tracking-wider" data-mode="archive">Archive</button>
-          <button class="mode-btn px-3 py-1 text-[10px] rounded-md transition-all font-bold uppercase tracking-wider" data-mode="creator">Studio</button>
+          <button class="mode-btn active px-3 py-1 text-[10px] rounded-md transition-all font-bold uppercase tracking-wider" data-mode="archive" aria-pressed="true">Archive</button>
+          <button class="mode-btn px-3 py-1 text-[10px] rounded-md transition-all font-bold uppercase tracking-wider" data-mode="creator" aria-pressed="false">Studio</button>
         </div>
-        <button id="menuToggleBtn" class="menu-toggle" aria-label="Menu">
+        <button id="menuToggleBtn" class="menu-toggle" aria-label="Menu" aria-controls="navbar-nav" aria-expanded="false">
           <span></span>
           <span></span>
           <span></span>
@@ -255,7 +255,7 @@
       <div class="container">
         <div class="section-header">
           <h2 class="section-title">Episode Archive</h2>
-          <p class="section-subtitle" id="results-meta">Loading episodes...</p>
+          <p class="section-subtitle" id="results-meta" aria-live="polite">Loading episodes...</p>
         </div>
         
         <div id="grid" class="episodes-grid">

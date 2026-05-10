@@ -1,14 +1,1 @@
-export const FLAGS = {
-  AI_ASSISTANT: true,
-  THEME_ENGINE: true,
-  WEB_VITALS: true,
-  BETA_ANALYTICS: true
-};
-
-export const isFeatureEnabled = (flag) => {
-  const urlParams = new URLSearchParams(window.location.search);
-  if (urlParams.has(`flag_${flag}`)) {
-    return urlParams.get(`flag_${flag}`) === 'true';
-  }
-  return FLAGS[flag] || false;
-};
+let FLAGS={AI_ASSISTANT:!0,THEME_ENGINE:!0,WEB_VITALS:!0,BETA_ANALYTICS:!0},isFeatureEnabled=e=>{var a=new URLSearchParams(window.location.search);return a.has("flag_"+e)?"true"===a.get("flag_"+e):FLAGS[e]||!1};export{FLAGS,isFeatureEnabled};

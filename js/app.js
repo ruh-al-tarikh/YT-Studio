@@ -1,3 +1,4 @@
+import{DeepSearch}from"./search.js";import{isFeatureEnabled}from"./config.js";import{initMonitoring}from"./monitoring.js";import{initScriptStudio}from"./script.js";import{initIslamic}from"./islamic.js";let CONFIG={API:{YOUTUBE_WORKER:window.__API_CONFIG__?.YOUTUBE_WORKER||"https://yt-studio-youtube-api.ruhdevopsytstudio.workers.dev",FALLBACK_DATA:"/data/demo.json"},STORAGE:{CHANNEL_KEY:"yt_studio_channel_id",CACHE_KEY:"yt_studio_videos_cache_v4",CACHE_EXPIRY:864e5,PROJECTS_KEY:"yt_studio_projects",RESEARCH_KEY:"yt_studio_research",WATCH_LATER_KEY:"watch_later_list",THEME_KEY:"ui_theme",SEARCH_HISTORY_KEY:"search_history",PROGRESS_KEY:"watch_progress"},UI:{ITEMS_PER_PAGE:15,LAZY_LOAD_THRESHOLD:400},API_CONFIG:{timeout:1e4,retries:3,backoff:1.5,delay:500}},CATEGORIES=[{key:"quran",label:"Quran",terms:["quran","surah","ayah","allah","tafsir","islam"]},{key:"prophecy",label:"Prophecy",terms:["prophecy","dajjal","gog","magog","end times"]},{key:"discussion",label:"Discussion",terms:["podcast","debate","interview","conversation"]},{key:"educational",label:"Educational",terms:["lesson","guide","explained","documentary"]},{key:"history",label:"History",terms:["history","empire","caliph","war","civilization"]}],DOM={body:document.body,grid:document.getElementById("grid"),modal:document.getElementById("modal"),player:document.getElementById("player"),closeModal:document.getElementById("close"),toast:document.getElementById("toast"),heroTitle:document.getElementById("hero-title"),heroDesc:document.getElementById("hero-desc"),heroBtn:document.getElementById("hero-btn"),heroSave:document.getElementById("hero-save"),heroCategory:document.getElementById("hero-category"),heroDate:document.getElementById("hero-date"),bg:document.getElementById("bg"),search:document.getElementById("searchInput"),searchToggle:document.getElementById("searchToggleBtn"),searchSection:document.getElementById("searchSection"),clearSearch:document.getElementById("clearSearch"),resultsMeta:document.getElementById("results-meta"),loadMore:document.getElementById("loadMoreBtn"),loadMoreContainer:document.getElementById("loadMoreContainer"),loading:document.getElementById("loading"),error:document.getElementById("error"),errorMsg:document.getElementById("error-msg"),retryBtn:document.getElementById("retryBtn"),themeToggle:document.getElementById("themeToggleBtn"),menuToggle:document.getElementById("menuToggleBtn"),scrollToTop:document.getElementById("scrollToTop"),watchLaterBadge:document.getElementById("watchLaterBadge"),watchLaterCount:document.getElementById("watchLaterCount"),watchLaterPage:document.getElementById("watchLaterPage"),watchLaterContainer:document.getElementById("watchLaterContainer"),closeWatchLater:document.getElementById("closeWatchLater"),dashboardBtn:document.getElementById("dashboardBtn"),dashboardModal:document.getElementById("dashboardModal"),closeDashboard:document.getElementById("closeDashboard"),dashTotal:document.getElementById("dashboard-total"),dashSaved:document.getElementById("dashboard-saved"),dashProgress:document.getElementById("dashboard-progress"),dashHours:document.getElementById("dashboard-hours"),dashCategories:document.getElementById("dashboardCategories"),dashResumeList:document.getElementById("dashboardResumeList"),modeSwitcher:document.getElementById("modeSwitcher"),modeBtns:document.querySelectorAll(".mode-btn"),studioRoot:document.getElementById("studio-root"),appRoot:document.getElementById("app-root"),heroSection:document.getElementById("hero"),continueBlock:document.getElementById("continue-block"),continueRow:document.getElementById("continue-row"),emptyHistory:document.getElementById("empty-history"),recommendedRow:document.getElementById("recommended-row"),recommendedBlockSec:document.getElementById("recommended-block"),continueBlockSec:document.getElementById("continue-block"),studioNavBtns:document.querySelectorAll(".studio-nav-btn"),studioViews:document.querySelectorAll(".studio-view"),studioBreadcrumbs:document.getElementById("studioBreadcrumbs"),studioViewProjects:document.getElementById("studio-view-projects"),activeProjectView:document.getElementById("active-project-view"),newProjectBtn:document.getElementById("newProjectBtn"),backToProjectsBtn:document.getElementById("backToProjectsBtn"),projectTabBtns:document.querySelectorAll(".project-tab-btn"),ptabContents:document.querySelectorAll(".ptab-content"),channelInput:document.getElementById("channelIdInput"),connectBtn:document.getElementById("connectChannelBtn"),clearFilters:document.getElementById("clearFilters")},AppState={videos:[],filtered:[],hero:null,current:null,categories:["all"],search:"",page:0,watchLater:[],theme:"dark",debounceTimer:null,searchHistory:[],progress:{},ytPlayer:null,isPlaying:!1,isMuted:!1,currentView:"list",lastFocused:null},Utils={sanitize(e){return String(e??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;")},truncate(e,t){return e?e.length>t?e.slice(0,t)+"...":e:""},formatDate(e){try{return new Intl.DateTimeFormat("en",{month:"short",day:"numeric",year:"numeric"}).format(new Date(e))}catch{return""}},highlight(e,t){return t?(t=new RegExp(`(${this.escapeRegex(t)})`,"gi"),e.replace(t,"<mark>$1</mark>")):e},escapeRegex(e){return e.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")},saveLS(e,t){try{localStorage.setItem(e,JSON.stringify(t))}catch(e){console.error("LS Save Error:",e)}},getLS(e,t=null){try{var a=localStorage.getItem(e);return a?JSON.parse(a):t}catch{return t}},async fetchWithRetry(a,o=CONFIG.API_CONFIG){let s=o.delay;for(let t=0;t<o.retries;t++)try{let e=new AbortController;var r=setTimeout(()=>e.abort(),o.timeout),n=await fetch(a,{signal:e.signal});if(clearTimeout(r),n.ok)return n;throw new Error("API Error: "+n.status)}catch(e){if(t===o.retries-1)throw e;await new Promise(e=>setTimeout(e,s)),s*=o.backoff}},showToast(e,t="info"){DOM.toast&&(DOM.toast.textContent=e,DOM.toast.className="toast show","info"!==t&&DOM.toast.classList.add(t),setTimeout(()=>DOM.toast.classList.remove("show"),3e3))},async copyToClipboard(e,t){try{if(await navigator.clipboard.writeText(e),this.showToast("Copied to clipboard!","success"),t){let e=document.createElement("span");e.className="copy-feedback",e.textContent="Copied!",t.style.position="relative",t.appendChild(e),setTimeout(()=>e.classList.add("show"),10),setTimeout(()=>{e.classList.remove("show"),setTimeout(()=>e.remove(),200)},2e3)}}catch(e){console.error("Failed to copy: ",e),this.showToast("Failed to copy","error")}},trapFocus(e){AppState.lastFocused=document.activeElement;var t=e.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');let a=t[0],o=t[t.length-1];e.addEventListener("keydown",e=>{"Tab"!==e.key&&9!==e.keyCode||(e.shiftKey?document.activeElement===a&&(o.focus(),e.preventDefault()):document.activeElement===o&&(a.focus(),e.preventDefault()))}),a&&a.focus()}};function getCategoryLabel(t){var e=CATEGORIES.find(e=>e.key===t);return e?e.label:"History"}function detectCategory(e){let t=(e||"").toLowerCase();e=CATEGORIES.find(e=>e.terms.some(e=>t.includes(e)));return e?e.key:"history"}function getProgress(e){return AppState.progress[e]||null}async function fetchYouTubeChannelData(){try{var e=await fetch(CONFIG.API.YOUTUBE_WORKER+"/api/channel");if(e.ok)return await e.json();throw new Error("Failed to fetch channel data")}catch(e){return console.error("YouTube Worker Error:",e),null}}async function loadVideos(){DOM.loading&&(DOM.loading.style.display="block");var e=Utils.getLS(CONFIG.STORAGE.CACHE_KEY);if(e&&e.data&&e.data.length&&Date.now()-e.time<CONFIG.STORAGE.CACHE_EXPIRY)return DOM.loading&&(DOM.loading.style.display="none"),e.data;try{var t=Utils.getLS(CONFIG.STORAGE.CHANNEL_KEY);let e=CONFIG.API.YOUTUBE_WORKER+"/api/videos";t&&(e+="?channelId="+t);var a=await(await Utils.fetchWithRetry(e)).json(),o=(console.log("API Fetch Success:",a),(a.videos||[]).map(e=>({id:e.id||e.videoId,title:e.title||"Untitled",thumbnail:e.thumbnail||`https://i.ytimg.com/vi/${e.id}/hqdefault.jpg`,publishedAt:e.publishedAt||(new Date).toISOString(),category:detectCategory(e.title),description:e.description||"Deep dive into Islamic history and theology."})));return console.log("Processed Videos:",o.length),o.length&&Utils.saveLS(CONFIG.STORAGE.CACHE_KEY,{data:o,time:Date.now()}),DOM.loading&&(DOM.loading.style.display="none"),o}catch(e){DOM.loading&&(DOM.loading.style.display="none"),console.error("Worker fetch failed, using fallback:",e);try{var s,r,n=await fetch(CONFIG.API.FALLBACK_DATA);if(n.ok)return s=await n.json(),console.log("Fallback Data Loaded:",s),document.body.classList.add("demo-mode"),r=(s.videos||[]).map(e=>({...e,category:e.category||"history",description:e.description||"Deep dive into Islamic history and theology."})),console.log("Processed Fallback Videos:",r.length),r;throw new Error("Fallback HTTP error: "+n.status)}catch(e){return console.error("Fallback fetch also failed:",e),[]}}}function renderCard(t,e=0){var a=AppState.watchLater.some(e=>e.id===t.id),o=t.thumbnail||`https://i.ytimg.com/vi/${t.id}/hqdefault.jpg`,s=getProgress(t.id);return`
 import { DeepSearch } from './search.js';
 import { isFeatureEnabled } from './config.js';
 import { initMonitoring } from './monitoring.js';
@@ -102,6 +103,7 @@ const DOM = {
     scrollToTop: document.getElementById('scrollToTop'),
 
     // Watch Later
+    watchLaterBtn: document.getElementById('watchLaterBtn'),
     watchLaterBadge: document.getElementById('watchLaterBadge'),
     watchLaterCount: document.getElementById('watchLaterCount'),
     watchLaterPage: document.getElementById('watchLaterPage'),
@@ -406,15 +408,20 @@ async function loadVideos() {
 // ============================================
 // RENDER FUNCTIONS
 // ============================================
-function renderCard(video) {
+function renderCard(video, index = 0) {
     const isSaved = AppState.watchLater.some(v => v.id === video.id);
     const thumbnail = video.thumbnail || `https://i.ytimg.com/vi/${video.id}/hqdefault.jpg`;
     const progress = getProgress(video.id);
 
     return `
-        <div class="card" data-id="${video.id}" role="button" tabindex="0" aria-label="Watch ${Utils.sanitize(video.title)}">
+        <div class="card animate-in"
+             style="--index: ${e}"
+             data-id="${t.id}"
+             role="button"
+             tabindex="0"
+             aria-label="Watch ${Utils.sanitize(t.title)}">
             <div class="card-thumb-wrapper">
-                <img data-src="${thumbnail}" 
+                <img data-src="${o}" 
                      src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=" 
                      alt=""
                      class="lazy-img" 
@@ -423,61 +430,22 @@ function renderCard(video) {
                     <i class="fa-solid fa-play play-icon" aria-hidden="true"></i>
                 </div>
                 <div class="duration-badge">HD</div>
-                ${progress ? `<div class="progress-bar-container"><div class="progress-bar-fill" style="width:${progress.percent}%"></div></div>` : ''}
-                <button class="watch-later-btn ${isSaved ? 'active' : ''}" 
-                        data-id="${video.id}" 
-                        aria-label="${isSaved ? 'Remove from Watch Later' : 'Save for later'}">
-                    <i class="fa-${isSaved ? 'solid' : 'regular'} fa-bookmark"></i>
+                ${s?`<div class="progress-bar-container"><div class="progress-bar-fill" style="width:${s.percent}%"></div></div>`:""}
+                <button class="watch-later-btn ${a?"active":""}" 
+                        data-id="${t.id}" 
+                        aria-label="${a?"Remove from Watch Later":"Save for later"}">
+                    <i class="fa-${a?"solid":"regular"} fa-bookmark"></i>
                 </button>
             </div>
             <div class="card-copy">
-                <div class="card-title">${Utils.highlight(Utils.sanitize(Utils.truncate(video.title, 60)), AppState.search)}</div>
+                <div class="card-title">${Utils.highlight(Utils.sanitize(Utils.truncate(t.title,60)),AppState.search)}</div>
                 <div class="card-meta">
-                    <span class="card-tag">${getCategoryLabel(video.category)}</span>
-                    <span>${Utils.formatDate(video.publishedAt)}</span>
+                    <span class="card-tag">${getCategoryLabel(t.category)}</span>
+                    <span>${Utils.formatDate(t.publishedAt)}</span>
                 </div>
             </div>
         </div>
-    `;
-}
-
-function renderHero(video) {
-    if (!video) return;
-
-    if (DOM.heroTitle) DOM.heroTitle.textContent = video.title;
-    if (DOM.heroDesc) DOM.heroDesc.textContent = video.description || '';
-    if (DOM.heroCategory) DOM.heroCategory.textContent = getCategoryLabel(video.category);
-    if (DOM.heroDate) DOM.heroDate.textContent = Utils.formatDate(video.publishedAt);
-    if (DOM.bg) DOM.bg.style.backgroundImage = `url(${video.thumbnail})`;
-
-    const isSaved = AppState.watchLater.some(v => v.id === video.id);
-    if (DOM.heroSave) {
-        DOM.heroSave.innerHTML = `<i class="fa-${isSaved ? 'solid' : 'regular'} fa-bookmark"></i> <span>${isSaved ? 'Saved' : 'Save'}</span>`;
-    }
-}
-
-function renderGrid() {
-    const searchTerm = AppState.search.toLowerCase();
-
-    AppState.filtered = AppState.videos.filter(video => {
-        const categoryMatch = AppState.categories.includes('all') || AppState.categories.includes(video.category);
-        const searchMatch = !searchTerm || video.title.toLowerCase().includes(searchTerm);
-        return categoryMatch && searchMatch;
-    });
-
-    if (DOM.clearFilters) {
-        DOM.clearFilters.style.display = AppState.categories.includes('all') ? 'none' : 'inline-flex';
-    }
-
-    if (DOM.resultsMeta) {
-        DOM.resultsMeta.textContent = `${AppState.filtered.length} episode${AppState.filtered.length !== 1 ? 's' : ''} found`;
-    }
-
-    const displayVideos = AppState.filtered.slice(0, CONFIG.UI.ITEMS_PER_PAGE * (AppState.page + 1));
-
-    if (DOM.grid) {
-        if (AppState.filtered.length === 0) {
-            DOM.grid.innerHTML = `
+    `}function renderHero(t){var e;t&&(DOM.heroTitle&&(DOM.heroTitle.textContent=t.title),DOM.heroDesc&&(DOM.heroDesc.textContent=t.description||""),DOM.heroCategory&&(DOM.heroCategory.textContent=getCategoryLabel(t.category)),DOM.heroDate&&(DOM.heroDate.textContent=Utils.formatDate(t.publishedAt)),DOM.bg&&(DOM.bg.style.backgroundImage=`url(${t.thumbnail})`),e=AppState.watchLater.some(e=>e.id===t.id),DOM.heroSave)&&(DOM.heroSave.innerHTML=`<i class="fa-${e?"solid":"regular"} fa-bookmark"></i> <span>${e?"Saved":"Save"}</span>`)}function renderGrid(){let a=AppState.search.toLowerCase();AppState.filtered=AppState.videos.filter(e=>{var t=AppState.categories.includes("all")||AppState.categories.includes(e.category),e=!a||e.title.toLowerCase().includes(a);return t&&e}),DOM.clearFilters&&(DOM.clearFilters.style.display=AppState.categories.includes("all")?"none":"inline-flex"),DOM.resultsMeta&&(DOM.resultsMeta.textContent=`${AppState.filtered.length} episode${1!==AppState.filtered.length?"s":""} found`);var e=AppState.filtered.slice(0,CONFIG.UI.ITEMS_PER_PAGE*(AppState.page+1));if(DOM.grid)if(0===AppState.filtered.length)DOM.grid.innerHTML=`
                 <div class="empty-state-card" style="grid-column: 1 / -1; margin-top: 40px;">
                     <i class="fa-solid fa-magnifying-glass"></i>
                     <h3>No results found</h3>
@@ -486,128 +454,28 @@ function renderGrid() {
                         Clear Search
                     </button>
                 </div>
-            `;
-        } else {
-            DOM.grid.innerHTML = displayVideos.map(renderCard).join('');
-
-            // Infinite scroll
-            if (displayVideos.length < AppState.filtered.length) {
-                const sentinel = document.createElement('div');
-                sentinel.id = 'grid-sentinel';
-                sentinel.style.height = '10px';
-                DOM.grid.appendChild(sentinel);
-
-                const observer = new IntersectionObserver((entries) => {
-                    if (entries[0].isIntersecting) {
-                        observer.disconnect();
-                        AppState.page++;
-                        renderGrid();
-                    }
-                }, { rootMargin: '400px' });
-                observer.observe(sentinel);
-            }
-        }
-    }
-
-    lazyLoadImages();
-
-    if (DOM.loadMoreContainer) {
-        DOM.loadMoreContainer.style.display = displayVideos.length < AppState.filtered.length ? 'block' : 'none';
-    }
-}
-
-function lazyLoadImages() {
-    const observer = new IntersectionObserver((entries, observer) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                const img = entry.target;
-                img.src = img.dataset.src;
-                img.onload = () => img.classList.add('loaded');
-                observer.unobserve(img);
-            }
-        });
-    }, { rootMargin: '100px' });
-
-    document.querySelectorAll('.lazy-img').forEach(img => observer.observe(img));
-}
-
-function renderContinueWatching() {
-    if (!DOM.continueBlock || !DOM.continueRow) return;
-
-    const continueVideos = AppState.videos
-        .filter(video => {
-            const progress = getProgress(video.id);
-            return progress && progress.percent >= 5 && progress.percent < 95;
-        })
-        .sort((a, b) => getProgress(b.id).updated - getProgress(a.id).updated)
-        .slice(0, 4);
-
-    if (continueVideos.length) {
-        DOM.continueBlock.style.display = 'block';
-        DOM.continueRow.innerHTML = continueVideos.map(renderCard).join('');
-        if (DOM.emptyHistory) DOM.emptyHistory.style.display = 'none';
-    } else {
-        DOM.continueBlock.style.display = 'none';
-        if (DOM.emptyHistory && AppState.videos.length) DOM.emptyHistory.style.display = 'block';
-    }
-}
-
-function renderWatchLater() {
-    if (!DOM.watchLaterContainer) return;
-
-    if (AppState.watchLater.length) {
-        DOM.watchLaterContainer.innerHTML = AppState.watchLater.map(video => {
-            const thumbnail = video.thumbnail || `https://i.ytimg.com/vi/${video.id}/hqdefault.jpg`;
-            return `
-                <div class="card" data-id="${video.id}" data-wl="1" role="button" tabindex="0" aria-label="Watch ${Utils.sanitize(video.title)}">
+            `;else if(DOM.grid.innerHTML=e.map((e,t)=>renderCard(e,t)).join(""),e.length<AppState.filtered.length){var o=document.createElement("div");o.id="grid-sentinel",o.style.height="10px",DOM.grid.appendChild(o);let t=new IntersectionObserver(e=>{e[0].isIntersecting&&(t.disconnect(),AppState.page++,renderGrid())},{rootMargin:"400px"});t.observe(o)}lazyLoadImages(),DOM.loadMoreContainer&&(DOM.loadMoreContainer.style.display=e.length<AppState.filtered.length?"block":"none")}function lazyLoadImages(){let t=new IntersectionObserver((e,a)=>{e.forEach(t=>{if(t.isIntersecting){let e=t.target;e.src=e.dataset.src,e.onload=()=>e.classList.add("loaded"),a.unobserve(e)}})},{rootMargin:"100px"});document.querySelectorAll(".lazy-img").forEach(e=>t.observe(e))}function renderContinueWatching(){var e;DOM.continueBlock&&DOM.continueRow&&((e=AppState.videos.filter(e=>{e=getProgress(e.id);return e&&5<=e.percent&&e.percent<95}).sort((e,t)=>getProgress(t.id).updated-getProgress(e.id).updated).slice(0,4)).length?(DOM.continueBlock.style.display="block",DOM.continueRow.innerHTML=e.map((e,t)=>renderCard(e,t)).join(""),DOM.emptyHistory&&(DOM.emptyHistory.style.display="none")):(DOM.continueBlock.style.display="none",DOM.emptyHistory&&AppState.videos.length&&(DOM.emptyHistory.style.display="block")))}function renderWatchLater(){DOM.watchLaterContainer&&(AppState.watchLater.length?(DOM.watchLaterContainer.innerHTML=AppState.watchLater.map(e=>{var t=e.thumbnail||`https://i.ytimg.com/vi/${e.id}/hqdefault.jpg`;return`
+                <div class="card" data-id="${e.id}" data-wl="1" role="button" tabindex="0" aria-label="Watch ${Utils.sanitize(e.title)}">
                     <div class="card-thumb-wrapper">
-                        <img data-src="${thumbnail}" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=" alt="" class="lazy-img" loading="lazy">
-                        <button class="watch-later-btn active" data-id="${video.id}" aria-label="Remove ${Utils.sanitize(video.title)} from Watch Later">
+                        <img data-src="${t}" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=" alt="" class="lazy-img" loading="lazy">
+                        <button class="watch-later-btn active" data-id="${e.id}" aria-label="Remove ${Utils.sanitize(e.title)} from Watch Later">
                             <i class="fa-solid fa-bookmark" aria-hidden="true"></i>
                         </button>
                     </div>
                     <div class="card-copy">
-                        <div class="card-title">${Utils.highlight(Utils.sanitize(Utils.truncate(video.title, 60)), AppState.search)}</div>
+                        <div class="card-title">${Utils.highlight(Utils.sanitize(Utils.truncate(e.title,60)),AppState.search)}</div>
                         <div class="card-meta">
-                            <span class="card-tag">${getCategoryLabel(video.category)}</span>
-                            <span>${Utils.formatDate(video.publishedAt)}</span>
+                            <span class="card-tag">${getCategoryLabel(e.category)}</span>
+                            <span>${Utils.formatDate(e.publishedAt)}</span>
                         </div>
                     </div>
                 </div>
-            `;
-        }).join('');
-        lazyLoadImages();
-    } else {
-        DOM.watchLaterContainer.innerHTML = '<div class="empty-state">No episodes saved yet. Click the bookmark icon on any episode to save it.</div>';
-    }
-}
-
-function renderDashboard() {
-    if (!DOM.dashboardModal) return;
-
-    if (DOM.dashTotal) DOM.dashTotal.textContent = AppState.videos.length;
-    if (DOM.dashSaved) DOM.dashSaved.textContent = AppState.watchLater.length;
-    if (DOM.dashProgress) DOM.dashProgress.textContent = Object.keys(AppState.progress).length;
-    if (DOM.dashHours) DOM.dashHours.textContent = (0.5 * AppState.videos.length).toFixed(1) + 'h';
-
-    if (DOM.dashCategories && AppState.videos.length) {
-        const categoryCount = {};
-        AppState.videos.forEach(video => {
-            categoryCount[video.category] = (categoryCount[video.category] || 0) + 1;
-        });
-        DOM.dashCategories.innerHTML = Object.entries(categoryCount)
-            .sort((a, b) => b[1] - a[1])
-            .map(([cat, count]) => `<div class="dashboard-list-row"><span>${getCategoryLabel(cat)}</span><strong>${count}</strong></div>`)
-            .join('');
-    }
-
-    if (DOM.dashResumeList) {
-        DOM.dashResumeList.innerHTML = AppState.watchLater.length
-            ? AppState.watchLater.slice(0, 5).map(video => `
+            `}).join(""),lazyLoadImages()):DOM.watchLaterContainer.innerHTML='<div class="empty-state">No episodes saved yet. Click the bookmark icon on any episode to save it.</div>')}function renderDashboard(){if(DOM.dashboardModal){if(DOM.dashTotal&&(DOM.dashTotal.textContent=AppState.videos.length),DOM.dashSaved&&(DOM.dashSaved.textContent=AppState.watchLater.length),DOM.dashProgress&&(DOM.dashProgress.textContent=Object.keys(AppState.progress).length),DOM.dashHours&&(DOM.dashHours.textContent=(.5*AppState.videos.length).toFixed(1)+"h"),DOM.dashCategories&&AppState.videos.length){let t={};AppState.videos.forEach(e=>{t[e.category]=(t[e.category]||0)+1}),DOM.dashCategories.innerHTML=Object.entries(t).sort((e,t)=>t[1]-e[1]).map(([e,t])=>`<div class="dashboard-list-row"><span>${getCategoryLabel(e)}</span><strong>${t}</strong></div>`).join("")}DOM.dashResumeList&&(DOM.dashResumeList.innerHTML=AppState.watchLater.length?AppState.watchLater.slice(0,5).map(e=>`
                 <div class="dashboard-list-row">
-                    <span>${Utils.sanitize(Utils.truncate(video.title, 40))}</span>
-                    <strong>${getCategoryLabel(video.category)}</strong>
+                    <span>${Utils.sanitize(Utils.truncate(e.title,40))}</span>
+                    <strong>${getCategoryLabel(e.category)}</strong>
                 </div>
+            `).join(""):'<p style="color:var(--text-soft)">No saved episodes.</p>')}}function updateStats(){DOM.statTotal&&(DOM.statTotal.textContent=AppState.videos.length),DOM.statSaved&&(DOM.statSaved.textContent=AppState.watchLater.length),DOM.statProgress&&(DOM.statProgress.textContent=Object.keys(AppState.progress).length),DOM.watchLaterCount&&(DOM.watchLaterCount.textContent=AppState.watchLater.length),DOM.watchLaterBadge&&DOM.watchLaterBadge.setAttribute("aria-label",`Open watch later list (${AppState.watchLater.length} episodes)`)}function openVideo(e){var t;DOM.modal&&DOM.player&&(t=getProgress((AppState.current=e).id)?.time||0,DOM.player.src=`https://www.youtube.com/embed/${e.id}?autoplay=1&rel=0&modestbranding=1&enablejsapi=1&start=`+Math.floor(t),DOM.modal.style.display="flex",DOM.modal.setAttribute("aria-hidden","false"),Utils.trapFocus(DOM.modal),DOM.body.style.overflow="hidden",DOM.body.classList.add("modal-open"),(t=document.getElementById("video-title"))&&(t.textContent=e.title),DOM.transcriptPanel&&DOM.transcriptPanel.setAttribute("aria-hidden","true"),DOM.sharePanel)&&DOM.sharePanel.setAttribute("aria-hidden","true")}function closeVideo(){DOM.modal&&DOM.player&&(DOM.player.src="",DOM.modal.style.display="none",DOM.modal.setAttribute("aria-hidden","true"),DOM.body.style.overflow="",DOM.body.classList.remove("modal-open"),AppState.current=null,clearInterval(AppState.progressTimer),renderContinueWatching(),AppState.lastFocused)&&(AppState.lastFocused.focus(),AppState.lastFocused=null)}function navigateVideo(t){if(AppState.current&&AppState.filtered.length){var a=AppState.filtered.findIndex(e=>e.id===AppState.current.id);if(-1!==a){let e=a+t;(e=e<0?AppState.filtered.length-1:e)>=AppState.filtered.length&&(e=0),openVideo(AppState.filtered[e])}}}function toggleWatchLater(t){var e=AppState.watchLater.findIndex(e=>e.id===t.id);-1===e?(AppState.watchLater.push(t),Utils.showToast("Added to Watch Later")):(AppState.watchLater.splice(e,1),Utils.showToast("Removed from Watch Later")),Utils.saveLS(CONFIG.STORAGE.WATCH_LATER_KEY,AppState.watchLater),updateStats(),AppState.hero&&AppState.hero.id===t.id&&renderHero(AppState.hero),renderGrid(),DOM.watchLaterContainer&&renderWatchLater()}function openWatchLater(){DOM.watchLaterPage&&(renderWatchLater(),DOM.watchLaterPage.style.display="block",DOM.watchLaterPage.setAttribute("aria-hidden","false"),Utils.trapFocus(DOM.watchLaterPage),DOM.body.style.overflow="hidden",DOM.body.classList.add("modal-open"))}function closeWatchLater(){DOM.watchLaterPage&&(DOM.watchLaterPage.style.display="none",DOM.watchLaterPage.setAttribute("aria-hidden","true"),DOM.body.style.overflow="",DOM.body.classList.remove("modal-open"),AppState.lastFocused)&&(AppState.lastFocused.focus(),AppState.lastFocused=null)}let initAnalyticsChart=async()=>{var e=document.getElementById("analyticsChart");e&&(window.Chart||await new Promise(e=>{var t=document.createElement("script");t.src="https://cdn.jsdelivr.net/npm/chart.js",t.onload=e,document.head.appendChild(t)}),e=e.getContext("2d"),window.myChart&&window.myChart.destroy(),window.myChart=new Chart(e,{type:"line",data:{labels:["Mon","Tue","Wed","Thu","Fri","Sat","Sun"],datasets:[{label:"Subscriber Growth",data:[12,19,3,5,2,3,9],borderColor:"#e50914",backgroundColor:"rgba(229, 9, 20, 0.1)",fill:!0,tension:.4}]},options:{responsive:!0,maintainAspectRatio:!1,plugins:{legend:{display:!1}},scales:{y:{display:!1},x:{grid:{display:!1},ticks:{color:"#808080",font:{size:10}}}}}}))},initAIAssistant=()=>{var e;if(isFeatureEnabled("AI_ASSISTANT")){let s=document.getElementById("ai-score-title"),a=document.getElementById("ai-generate-hook"),o=document.getElementById("ai-title-input");s&&s.addEventListener("click",()=>{o.value.trim()?(s.disabled=!0,s.innerHTML='<i class="fas fa-spinner fa-spin"></i>',setTimeout(()=>{var e=Math.floor(30*Math.random()+65),t=document.getElementById("ai-score-result"),a=document.getElementById("ai-score-value"),o=document.getElementById("ai-score-bar");t.classList.remove("hidden"),a.textContent=e+"/100",o.style.width=e+"%",s.disabled=!1,s.textContent="Score",Utils.showToast("Title analyzed!","success")},1e3)):Utils.showToast("Please enter a title","warning")}),a&&a.addEventListener("click",()=>{a.disabled=!0,a.innerHTML='<i class="fas fa-spinner fa-spin"></i> Analyzing...';let t=["What if everything you knew about the fall of Andalusia was wrong?","Behind the silence of history lies a truth far more cinematic than fiction.","The year was 1492. The world was changing. And at the center of it all?","How did one decision change the course of human history forever?"];setTimeout(()=>{var e=document.getElementById("ai-hook-result");e.classList.remove("hidden"),e.textContent=t[Math.floor(Math.random()*t.length)],a.disabled=!1,a.innerHTML='<i class="fas fa-bolt mr-2 text-primary"></i> Generate Viral Hook',Utils.showToast("Hook generated!","success")},1200)}),document.querySelectorAll("#ai-topics span").forEach(t=>{t.addEventListener("click",()=>{var e=t.textContent;o&&(o.value=e,Utils.showToast("Selected: "+e,"info"))}),t.addEventListener("keydown",e=>{"Enter"!==e.key&&" "!==e.key||(e.preventDefault(),t.click())})})}else(e=document.getElementById("ai-assistant-panel"))&&(e.style.display="none")};function openDashboard(){DOM.dashboardModal&&(renderDashboard(),initAnalyticsChart(),initAIAssistant(),DOM.dashboardModal.style.display="block",DOM.dashboardModal.setAttribute("aria-hidden","false"),Utils.trapFocus(DOM.dashboardModal),DOM.body.style.overflow="hidden",DOM.body.classList.add("modal-open"))}function closeDashboard(){DOM.dashboardModal&&(DOM.dashboardModal.style.display="none",DOM.dashboardModal.setAttribute("aria-hidden","true"),DOM.body.style.overflow="",DOM.body.classList.remove("modal-open"),AppState.lastFocused)&&(AppState.lastFocused.focus(),AppState.lastFocused=null)}function setTheme(t){AppState.theme=t,Utils.saveLS(CONFIG.STORAGE.THEME_KEY,t),DOM.body.classList.remove("light-mode","theme-neon"),"light"===t?DOM.body.classList.add("light-mode"):"neon"===t&&DOM.body.classList.add("theme-neon");var e=DOM.themeToggle?.querySelector("i");e&&(e.className="dark"===t?"fa-regular fa-moon":"neon"===t?"fa-solid fa-bolt":"fa-regular fa-sun"),document.querySelectorAll(".theme-opt").forEach(e=>{e.classList.toggle("active",e.dataset.theme===t)})}function toggleTheme(){setTheme("dark"===AppState.theme?"light":"dark")}function switchMode(e){"creator"===e?(DOM.studioRoot&&(DOM.studioRoot.style.display="block"),DOM.appRoot&&(DOM.appRoot.style.display="none"),DOM.heroSection&&(DOM.heroSection.style.display="none"),DOM.continueBlockSec&&(DOM.continueBlockSec.style.display="none"),updateBreadcrumbs("Studio > Projects")):(DOM.studioRoot&&(DOM.studioRoot.style.display="none"),DOM.appRoot&&(DOM.appRoot.style.display="block"),DOM.heroSection&&(DOM.heroSection.style.display="block"),DOM.continueBlockSec&&AppState.videos.some(e=>getProgress(e.id))&&(DOM.continueBlockSec.style.display="block"))}function updateBreadcrumbs(e){if(DOM.studioBreadcrumbs){let a=e.split(" > ");DOM.studioBreadcrumbs.innerHTML=a.map((e,t)=>t===a.length-1?`<span class="current">${e}</span>`:`<span>${e}</span>`).join(' <i class="fa-solid fa-chevron-right" style="font-size:0.7rem; margin:0 8px; opacity:0.5;"></i> ')}}function renderProjects(){var e=document.getElementById("studioProjectsList");if(e){let o=Utils.getLS(CONFIG.STORAGE.PROJECTS_KEY,[{id:"p1",title:"The Fall of the Abbasids",status:"Writing",progress:65,date:"2024-05-10"},{id:"p2",title:"Prophecy & Modernity",status:"Researching",progress:30,date:"2024-05-12"},{id:"p3",title:"The Silent Silk Road",status:"Editing",progress:90,date:"2024-05-08"},{id:"p4",title:"The Golden Age",status:"Published",progress:100,date:"2024-05-01"}]);"list"===AppState.currentView?(e.className="studio-projects-grid",e.innerHTML=o.map(e=>`
             `).join('')
             : '<p style="color:var(--text-soft)">No saved episodes.</p>';
     }
@@ -724,6 +592,7 @@ function openWatchLater() {
     renderWatchLater();
     DOM.watchLaterPage.style.display = 'block';
     DOM.watchLaterPage.setAttribute('aria-hidden', 'false');
+    if (DOM.watchLaterBtn) DOM.watchLaterBtn.setAttribute('aria-expanded', 'true');
     Utils.trapFocus(DOM.watchLaterPage);
     DOM.body.style.overflow = 'hidden';
     DOM.body.classList.add('modal-open');
@@ -733,6 +602,7 @@ function closeWatchLater() {
     if (!DOM.watchLaterPage) return;
     DOM.watchLaterPage.style.display = "none";
     DOM.watchLaterPage.setAttribute("aria-hidden", "true");
+    if (DOM.watchLaterBtn) DOM.watchLaterBtn.setAttribute('aria-expanded', 'false');
     DOM.body.style.overflow = "";
     DOM.body.classList.remove("modal-open");
     if (AppState.lastFocused) { AppState.lastFocused.focus(); AppState.lastFocused = null; }
@@ -954,165 +824,47 @@ function renderProjects() {
         projectsList.innerHTML = projects.map(project => `
             <div class="project-card">
                 <div class="project-card-header">
-                    <span class="status-badge ${project.status.toLowerCase()}">${project.status}</span>
-                    <span class="project-date">${project.date}</span>
+                    <span class="status-badge ${e.status.toLowerCase()}">${e.status}</span>
+                    <span class="project-date">${e.date}</span>
                 </div>
-                <h3 class="project-title">${project.title}</h3>
+                <h3 class="project-title">${e.title}</h3>
                 <div class="project-progress-container">
-                    <div class="project-progress-bar" style="width: ${project.progress}%"></div>
+                    <div class="project-progress-bar" style="width: ${e.progress}%"></div>
                 </div>
                 <div class="project-card-footer">
-                    <span>${project.progress}% Complete</span>
-                    <button class="secondary-button small resume-project-btn" data-id="${project.id}">Resume</button>
+                    <span>${e.progress}% Complete</span>
+                    <button class="secondary-button small resume-project-btn" data-id="${e.id}">Resume</button>
                 </div>
             </div>
-        `).join('');
-    } else {
-        projectsList.className = 'kanban-grid';
-        const columns = ['Research', 'Writing', 'Editing', 'Published'];
-        projectsList.innerHTML = columns.map(status => {
-            const filtered = projects.filter(p => p.status === status || (status === 'Research' && p.status === 'Researching'));
-            return `
+        `).join("")):(e.className="kanban-grid",e.innerHTML=["Research","Writing","Editing","Published"].map(t=>{var e=o.filter(e=>e.status===t||"Research"===t&&"Researching"===e.status);return`
                 <div class="kanban-column">
-                    <h3>${status} <span class="kanban-count">${filtered.length}</span></h3>
+                    <h3>${t} <span class="kanban-count">${e.length}</span></h3>
                     <div class="kanban-cards">
-                        ${filtered.map(project => `
-                            <div class="kanban-card resume-project-btn" data-id="${project.id}">
-                                <h4 class="text-sm font-bold mb-2">${project.title}</h4>
+                        ${e.map(e=>`
+                            <div class="kanban-card resume-project-btn" data-id="${e.id}">
+                                <h4 class="text-sm font-bold mb-2">${e.title}</h4>
                                 <div class="project-progress-container" style="height:4px;">
-                                    <div class="project-progress-bar" style="width: ${project.progress}%"></div>
+                                    <div class="project-progress-bar" style="width: ${e.progress}%"></div>
                                 </div>
                                 <div class="flex justify-between items-center mt-2 text-xs text-soft">
-                                    <span>${project.progress}%</span>
-                                    <span>${project.date}</span>
+                                    <span>${e.progress}%</span>
+                                    <span>${e.date}</span>
                                 </div>
                             </div>
-                        `).join('')}
+                        `).join("")}
                     </div>
                 </div>
-            `;
-        }).join('');
-    }
-
-    // Add event listeners to resume buttons
-    projectsList.querySelectorAll('.resume-project-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            const projectId = e.currentTarget.dataset.id;
-            const project = projects.find(p => p.id === projectId);
-            if (project) {
-                // Show project detail view
-                if (DOM.studioViews) DOM.studioViews.forEach(v => v.style.display = 'none');
-                if (DOM.activeProjectView) DOM.activeProjectView.style.display = 'block';
-                const titleEl = document.getElementById('current-project-title');
-                if (titleEl) titleEl.textContent = project.title;
-                updateBreadcrumbs(`Studio > Projects > ${project.title}`);
-                if (DOM.projectTabBtns && DOM.projectTabBtns[0]) DOM.projectTabBtns[0].click();
-            }
-        });
-    });
-}
-
-// ============================================
-// SEARCH & FILTERS
-// ============================================
-function initSearch() {
-    if (!DOM.search) return;
-
-    DOM.search.addEventListener('input', (e) => {
-        AppState.search = e.target.value;
-        AppState.page = 0;
-        if (DOM.clearSearch) DOM.clearSearch.style.display = AppState.search ? 'block' : 'none';
-
-        clearTimeout(AppState.debounceTimer);
-        AppState.debounceTimer = setTimeout(() => {
-            renderGrid();
-        }, 250);
-    });
-
-    if (DOM.clearSearch) {
-        DOM.clearSearch.addEventListener('click', () => {
-            if (DOM.search) DOM.search.value = '';
-            AppState.search = '';
-            AppState.page = 0;
-            if (DOM.clearSearch) DOM.clearSearch.style.display = 'none';
-            renderGrid();
-        });
-    }
-
-    // Category filters
-    const filterContainer = document.querySelector('.filter-chips');
-    if (filterContainer) {
-        filterContainer.addEventListener('click', (e) => {
-            const chip = e.target.closest('.chip');
-            if (!chip) return;
-
-            const category = chip.dataset.cat;
-
-            if (category === 'all') {
-                AppState.categories = ['all'];
-            } else {
-                AppState.categories = AppState.categories.filter(c => c !== 'all');
-                if (AppState.categories.includes(category)) {
-                    AppState.categories = AppState.categories.filter(c => c !== category);
-                    if (AppState.categories.length === 0) AppState.categories = ['all'];
-                } else {
-                    AppState.categories.push(category);
-                }
-            }
-
-            document.querySelectorAll('.chip').forEach(ch => {
-                const isActive = AppState.categories.includes(ch.dataset.cat);
-                ch.classList.toggle('active', isActive);
-                ch.setAttribute('aria-pressed', isActive ? 'true' : 'false');
-            });
-
-            AppState.page = 0;
-            renderGrid();
-        });
-    }
-
-    if (DOM.clearFilters) {
-        DOM.clearFilters.addEventListener('click', () => {
-            AppState.categories = ['all'];
-            document.querySelectorAll('.chip').forEach(chip => {
-                if (chip.dataset.cat === 'all') {
-                    chip.classList.add('active');
-                } else {
-                    chip.classList.remove('active');
-                }
-            });
-            AppState.page = 0;
-            renderGrid();
-        });
-    }
-}
-
-// ============================================
-// INITIALIZATION
-// ============================================
-async function init() {
-    try {
-        initMonitoring();
-        // Load saved theme
-        const savedTheme = Utils.getLS(CONFIG.STORAGE.THEME_KEY);
-        if (savedTheme) setTheme(savedTheme);
-
-        // Load watch later
-        AppState.watchLater = Utils.getLS(CONFIG.STORAGE.WATCH_LATER_KEY, []);
-        AppState.progress = Utils.getLS(CONFIG.STORAGE.PROGRESS_KEY, {});
-
-        // Load channel ID
-        const savedChannel = Utils.getLS(CONFIG.STORAGE.CHANNEL_KEY);
-        if (DOM.channelInput) DOM.channelInput.value = savedChannel || '';
-
-        // Show skeleton loading
-        if (DOM.grid) {
-            DOM.grid.innerHTML = Array(CONFIG.UI.ITEMS_PER_PAGE).fill(0).map(() => `
+            `}).join("")),e.querySelectorAll(".resume-project-btn").forEach(e=>{e.addEventListener("click",e=>{let t=e.currentTarget.dataset.id;var a,e=o.find(e=>e.id===t);e&&(DOM.studioViews&&DOM.studioViews.forEach(e=>e.style.display="none"),DOM.activeProjectView&&(DOM.activeProjectView.style.display="block"),(a=document.getElementById("current-project-title"))&&(a.textContent=e.title),updateBreadcrumbs("Studio > Projects > "+e.title),DOM.projectTabBtns)&&DOM.projectTabBtns[0]&&DOM.projectTabBtns[0].click()})})}}function initSearch(){var e;DOM.search&&(DOM.search.addEventListener("input",e=>{AppState.search=e.target.value,AppState.page=0,DOM.clearSearch&&(DOM.clearSearch.style.display=AppState.search?"block":"none"),clearTimeout(AppState.debounceTimer),AppState.debounceTimer=setTimeout(()=>{renderGrid()},250)}),DOM.clearSearch&&DOM.clearSearch.addEventListener("click",()=>{DOM.search&&(DOM.search.value=""),AppState.search="",AppState.page=0,DOM.clearSearch&&(DOM.clearSearch.style.display="none"),renderGrid()}),(e=document.querySelector(".filter-chips"))&&e.addEventListener("click",e=>{e=e.target.closest(".chip");if(e){let t=e.dataset.cat;"all"===t?AppState.categories=["all"]:(AppState.categories=AppState.categories.filter(e=>"all"!==e),AppState.categories.includes(t)?(AppState.categories=AppState.categories.filter(e=>e!==t),0===AppState.categories.length&&(AppState.categories=["all"])):AppState.categories.push(t)),document.querySelectorAll(".chip").forEach(e=>{var t=AppState.categories.includes(e.dataset.cat);e.classList.toggle("active",t),e.setAttribute("aria-pressed",t?"true":"false")}),AppState.page=0,renderGrid()}}),DOM.clearFilters)&&DOM.clearFilters.addEventListener("click",()=>{AppState.categories=["all"],document.querySelectorAll(".chip").forEach(e=>{"all"===e.dataset.cat?e.classList.add("active"):e.classList.remove("active")}),AppState.page=0,renderGrid()})}async function init(){try{initMonitoring();var e=Utils.getLS(CONFIG.STORAGE.THEME_KEY),t=(e&&setTheme(e),AppState.watchLater=Utils.getLS(CONFIG.STORAGE.WATCH_LATER_KEY,[]),AppState.progress=Utils.getLS(CONFIG.STORAGE.PROGRESS_KEY,{}),Utils.getLS(CONFIG.STORAGE.CHANNEL_KEY));if(DOM.channelInput&&(DOM.channelInput.value=t||""),DOM.grid&&(DOM.grid.innerHTML=Array(CONFIG.UI.ITEMS_PER_PAGE).fill(0).map(()=>`
                 <div class="skeleton-card">
                     <div class="skeleton skeleton-thumb"></div>
                     <div class="skeleton skeleton-title"></div>
                     <div class="skeleton skeleton-meta"></div>
                 </div>
+            `).join("")),AppState.videos=await loadVideos(),AppState.videos.sort((e,t)=>new Date(t.publishedAt)-new Date(e.publishedAt)),0===AppState.videos.length)throw new Error("No videos available in the archive.");AppState.hero=AppState.videos[0],renderHero(AppState.hero),renderGrid(),renderContinueWatching(),updateStats();var a,o,s=await fetchYouTubeChannelData();s&&(console.log("Channel Stats:",s),a=document.getElementById("channel-stats"))&&(a.innerHTML=`
+                    <span>📺 ${s.subscribers?.toLocaleString()} subscribers</span>
+                    <span>👁️ ${s.views?.toLocaleString()} views</span>
+                    <span>🎬 ${s.videos} videos</span>
+                `),Utils.getLS("yt_studio_demo_loaded_v2")||(o=[{id:"demo-1",title:"The Lost Library of Timbuktu",status:"Writing",progress:45,date:(new Date).toLocaleDateString()},{id:"demo-2",title:"Secrets of the Ottoman Archives",status:"Researching",progress:20,date:(new Date).toLocaleDateString()}],Utils.saveLS(CONFIG.STORAGE.PROJECTS_KEY,o),localStorage.setItem("yt_studio_demo_loaded_v2","true"),Utils.showToast("Demo data preloaded!")),renderProjects(),setupRecommendedSection()}catch(e){console.error("Init Error:",e),DOM.error&&(DOM.error.style.display="block"),DOM.errorMsg&&(DOM.errorMsg.textContent=e.message||"Connection failed. Please try again.")}finally{DOM.loading&&(DOM.loading.style.display="none")}}function setupRecommendedSection(){if(DOM.recommendedRow){let o=Object.keys(AppState.progress).map(t=>AppState.videos.find(e=>e.id===t)).filter(Boolean),t=[];if(0===o.length)t=AppState.videos.slice(4,8);else{let a={},e=(o.forEach(e=>{a[e.category]=(a[e.category]||0)+1}),Object.keys(a).sort((e,t)=>a[t]-a[e])[0]);var s;(t=AppState.videos.filter(t=>t.category===e&&!o.some(e=>e.id===t.id)).slice(0,4)).length<4&&(s=AppState.videos.filter(t=>t.category!==e&&!o.some(e=>e.id===t.id)).slice(0,4-t.length),t.push(...s))}t.length&&(DOM.recommendedBlockSec&&(DOM.recommendedBlockSec.style.display="block"),DOM.recommendedRow.innerHTML=t.map((e,t)=>renderCard(e,t)).join(""),lazyLoadImages())}}function bindEvents(){DOM.themeToggle&&DOM.themeToggle.addEventListener("click",toggleTheme),DOM.menuToggle&&DOM.menuToggle.addEventListener("click",()=>{document.body.classList.toggle("mobile-nav-active")}),DOM.searchToggle&&DOM.searchSection&&DOM.searchToggle.addEventListener("click",()=>{DOM.searchSection.classList.toggle("active"),DOM.searchSection.classList.contains("active")&&DOM.search.focus()}),document.querySelectorAll(".theme-opt").forEach(t=>{t.addEventListener("click",()=>{setTheme(t.dataset.theme);var e=document.getElementById("themeMenu");e&&e.classList.add("hidden")})}),DOM.heroBtn&&DOM.heroBtn.addEventListener("click",()=>AppState.hero&&openVideo(AppState.hero)),DOM.heroSave&&DOM.heroSave.addEventListener("click",()=>AppState.hero&&toggleWatchLater(AppState.hero)),DOM.closeModal&&DOM.closeModal.addEventListener("click",closeVideo),DOM.modal&&DOM.modal.addEventListener("click",e=>{e.target===DOM.modal&&closeVideo()}),DOM.grid&&(DOM.grid.addEventListener("click",e=>{let t=e.target.closest(".watch-later-btn");var a;if(t)e.stopPropagation(),(a=AppState.videos.find(e=>e.id===t.dataset.id))&&toggleWatchLater(a);else{let t=e.target.closest(".card");t&&(a=AppState.videos.find(e=>e.id===t.dataset.id))&&openVideo(a)}}),DOM.grid.addEventListener("keydown",e=>{if("Enter"===e.key||" "===e.key){let t=e.target.closest(".card");t&&(e.preventDefault(),e=AppState.videos.find(e=>e.id===t.dataset.id))&&openVideo(e)}})),DOM.loadMore&&DOM.loadMore.addEventListener("click",()=>{AppState.page++,renderGrid()}),DOM.watchLaterBadge&&DOM.watchLaterBadge.addEventListener("click",openWatchLater),DOM.closeWatchLater&&DOM.closeWatchLater.addEventListener("click",closeWatchLater),DOM.watchLaterPage&&DOM.watchLaterPage.addEventListener("click",e=>{e.target===DOM.watchLaterPage&&closeWatchLater();let t=e.target.closest(".watch-later-btn");var a;if(t)e.stopPropagation(),(a=AppState.watchLater.find(e=>e.id===t.dataset.id))&&toggleWatchLater(a);else{let t=e.target.closest(".card");t&&(a=AppState.watchLater.find(e=>e.id===t.dataset.id))&&(closeWatchLater(),openVideo(a))}}),DOM.dashboardBtn&&DOM.dashboardBtn.addEventListener("click",openDashboard),DOM.closeDashboard&&DOM.closeDashboard.addEventListener("click",closeDashboard),DOM.closeShare&&DOM.closeShare.addEventListener("click",()=>{DOM.sharePanel.style.display="none",DOM.sharePanel.setAttribute("aria-hidden","true"),DOM.body.style.overflow="",DOM.body.classList.remove("modal-open"),AppState.lastFocused&&(AppState.lastFocused.focus(),AppState.lastFocused=null)}),DOM.closeTranscript&&DOM.closeTranscript.addEventListener("click",()=>{DOM.transcriptPanel.style.display="none",DOM.transcriptPanel.setAttribute("aria-hidden","true"),DOM.body.style.overflow="",DOM.body.classList.remove("modal-open"),AppState.lastFocused&&(AppState.lastFocused.focus(),AppState.lastFocused=null)});var e=document.getElementById("shareEpisode"),e=(e&&e.addEventListener("click",openShare),document.getElementById("toggleTranscript")),e=(e&&e.addEventListener("click",openTranscript),document.getElementById("copyLinkBtn"));e&&e.addEventListener("click",e=>{var t=document.getElementById("shareLink");t&&Utils.copyToClipboard(t.value,e.currentTarget)}),DOM.dashboardModal&&DOM.dashboardModal.addEventListener("click",e=>{e.target===DOM.dashboardModal&&closeDashboard()}),DOM.retryBtn&&DOM.retryBtn.addEventListener("click",()=>location.reload()),DOM.connectBtn&&DOM.connectBtn.addEventListener("click",()=>{var e=DOM.channelInput?.value.trim();e?(localStorage.setItem(CONFIG.STORAGE.CHANNEL_KEY,e),localStorage.removeItem(CONFIG.STORAGE.CACHE_KEY),Utils.showToast("Channel ID saved! Reloading archives..."),setTimeout(()=>location.reload(),1500)):Utils.showToast("Please enter a valid Channel ID")}),DOM.scrollToTop&&(window.addEventListener("scroll",()=>{DOM.scrollToTop.classList.toggle("show",500<window.scrollY)}),DOM.scrollToTop.addEventListener("click",()=>{window.scrollTo({top:0,behavior:"smooth"})}));let t=document.querySelector(".header");t&&window.addEventListener("scroll",()=>{t.classList.toggle("scrolled",20<window.scrollY)}),document.addEventListener("keydown",e=>{var t;"INPUT"===e.target.tagName||"TEXTAREA"===e.target.tagName?"Escape"===e.key&&e.target.blur():("/"===(t=e.key.toLowerCase())&&DOM.search&&(e.preventDefault(),DOM.search.focus()),"escape"===t&&(closeVideo(),closeWatchLater(),closeDashboard(),DOM.sharePanel&&(DOM.sharePanel.style.display="none",DOM.sharePanel.setAttribute("aria-hidden","true")),DOM.transcriptPanel&&(DOM.transcriptPanel.style.display="none",DOM.transcriptPanel.setAttribute("aria-hidden","true")),DOM.body.style.overflow="",DOM.body.classList.remove("modal-open"),AppState.lastFocused)&&(AppState.lastFocused.focus(),AppState.lastFocused=null),AppState.current&&("j"===t?(e.preventDefault(),navigateVideo(-1)):"k"===t&&(e.preventDefault(),navigateVideo(1))),"t"===t&&toggleTheme())}),document.addEventListener("mousemove",o=>{document.querySelectorAll(".card").forEach(e=>{var t=e.getBoundingClientRect(),a=(o.clientX-t.left)/t.width*100,t=(o.clientY-t.top)/t.height*100;e.style.setProperty("--mouse-x",a+"%"),e.style.setProperty("--mouse-y",t+"%")})}),DOM.modeBtns&&DOM.modeBtns.forEach(t=>{t.addEventListener("click",()=>{var e=t.dataset.mode;DOM.modeBtns.forEach(e=>{e.classList.remove("active"),e.setAttribute("aria-pressed","false")}),t.classList.add("active"),t.setAttribute("aria-pressed","true"),switchMode(e)})}),DOM.studioNavBtns&&DOM.studioNavBtns.forEach(a=>{a.addEventListener("click",()=>{DOM.studioNavBtns.forEach(e=>e.classList.remove("active")),a.classList.add("active"),a.setAttribute("aria-pressed","true");var e,t=a.dataset.tab;DOM.studioViews&&(DOM.studioViews.forEach(e=>e.style.display="none"),DOM.activeProjectView&&(DOM.activeProjectView.style.display="none"),(e=document.getElementById("studio-view-"+t))&&(e.style.display="block"),"islamic"===t&&initIslamic(),updateBreadcrumbs("Studio > "+(t.charAt(0).toUpperCase()+t.slice(1))))})}),DOM.newProjectBtn&&DOM.newProjectBtn.addEventListener("click",()=>{DOM.studioViews&&DOM.studioViews.forEach(e=>e.style.display="none"),DOM.activeProjectView&&(DOM.activeProjectView.style.display="block");var e=document.getElementById("current-project-title");e&&(e.textContent="New Untitled Video"),updateBreadcrumbs("Studio > Projects > New Untitled Video"),DOM.projectTabBtns&&DOM.projectTabBtns[0]&&DOM.projectTabBtns[0].click()}),DOM.backToProjectsBtn&&DOM.backToProjectsBtn.addEventListener("click",()=>{DOM.activeProjectView&&(DOM.activeProjectView.style.display="none"),DOM.studioViewProjects&&(DOM.studioViewProjects.style.display="block"),updateBreadcrumbs("Studio > Projects"),DOM.studioNavBtns&&DOM.studioNavBtns.forEach(e=>{e.classList.remove("active"),"projects"===e.dataset.tab&&e.classList.add("active"),e.setAttribute("aria-pressed","true")})}),DOM.projectTabBtns&&DOM.projectTabBtns.forEach(t=>{t.addEventListener("click",()=>{DOM.projectTabBtns.forEach(e=>e.classList.remove("active")),t.classList.add("active"),t.setAttribute("aria-pressed","true");var e=t.dataset.ptab;DOM.ptabContents&&(DOM.ptabContents.forEach(e=>e.classList.remove("active")),e=document.getElementById("ptab-"+e))&&e.classList.add("active")})})}let deferredPrompt,setupPWA=()=>{"serviceWorker"in navigator&&window.addEventListener("load",()=>{navigator.serviceWorker.register("/sw.js").then(e=>console.log("[PWA] Service Worker registered")).catch(e=>console.log("[PWA] Registration failed:",e))}),window.addEventListener("beforeinstallprompt",e=>{e.preventDefault(),deferredPrompt=e;let t=document.getElementById("installBtn");t&&(t.classList.remove("hidden"),t.addEventListener("click",async()=>{var e;deferredPrompt&&(deferredPrompt.prompt(),e=(await deferredPrompt.userChoice).outcome,console.log("[PWA] Install outcome: "+e),deferredPrompt=null,t.classList.add("hidden"))}))}),window.addEventListener("online",()=>{window.utils&&utils.showToast&&utils.showToast("Back online! Syncing data...","success"),document.body.classList.remove("offline-mode")}),window.addEventListener("offline",()=>{window.utils&&utils.showToast&&utils.showToast("You are offline. Some features may be limited.","warning"),document.body.classList.add("offline-mode")})};function openShare(){var e;DOM.sharePanel&&((e=document.getElementById("shareLink"))&&AppState.current&&(e.value="https://www.youtube.com/watch?v="+AppState.current.id),DOM.sharePanel.style.display="block",DOM.sharePanel.setAttribute("aria-hidden","false"),DOM.body.style.overflow="hidden",DOM.body.classList.add("modal-open"),Utils.trapFocus(DOM.sharePanel))}function openTranscript(){DOM.transcriptPanel&&(DOM.transcriptPanel.style.display="block",DOM.transcriptPanel.setAttribute("aria-hidden","false"),DOM.body.style.overflow="hidden",DOM.body.classList.add("modal-open"),Utils.trapFocus(DOM.transcriptPanel))}function initBottomSheetGestures(){document.querySelectorAll(".side-panel").forEach(a=>{let o=0,s=0;var e=a.querySelector(".panel-header");e&&(e.addEventListener("touchstart",e=>{o=e.touches[0].clientY},{passive:!0}),e.addEventListener("touchmove",e=>{e=(s=e.touches[0].clientY)-o;0<e&&(a.style.transform="translateY("+e+"px)")},{passive:!0}),e.addEventListener("touchend",e=>{var t;150<s-o&&("watchLaterPage"===(t=a.id)?closeWatchLater():"dashboardModal"===t?closeDashboard():"sharePanel"===t?DOM.closeShare.click():"transcriptPanel"===t&&DOM.closeTranscript.click()),a.style.transform="",o=0,s=0},{passive:!0}))})}function initPullToRefresh(){if(DOM.grid){let t=0,a=!1,o=document.createElement("div");o.className="pull-indicator",o.innerHTML='<i class="fas fa-sync fa-spin"></i>',document.body.prepend(o),window.addEventListener("touchstart",e=>{0===window.scrollY&&(t=e.touches[0].clientY,a=!0)},{passive:!0}),window.addEventListener("touchmove",e=>{a&&0<(e=e.touches[0].clientY-t)&&(o.style.opacity=Math.min(e/150,1),o.style.transform="translateY("+Math.min(e,150)+"px) rotate("+2*e+"deg)")},{passive:!0}),window.addEventListener("touchend",async e=>{a&&(150<e.changedTouches[0].clientY-t&&("vibrate"in navigator&&navigator.vibrate(50),Utils.showToast("Refreshing archives...","info"),o.classList.add("refreshing"),localStorage.removeItem(CONFIG.STORAGE.CACHE_KEY),AppState.videos=await loadVideos(),renderGrid(),"vibrate"in navigator&&navigator.vibrate([30,30,30]),Utils.showToast("Archives updated!","success")),o.style.opacity="0",o.style.transform="translateY(-100%)",o.classList.remove("refreshing"),a=!1)},{passive:!0})}}if("loading"===document.readyState?document.addEventListener("DOMContentLoaded",()=>{init(),bindEvents(),setupPWA(),initPullToRefresh(),initBottomSheetGestures(),document.body.addEventListener("touchstart",()=>{},{passive:!0})}):(init(),bindEvents(),setupPWA(),initPullToRefresh(),initBottomSheetGestures(),document.body.addEventListener("touchstart",()=>{},{passive:!0})),Utils.copyToClipboard){let a=Utils.copyToClipboard;Utils.copyToClipboard=async function(e,t){return"vibrate"in navigator&&navigator.vibrate(10),a.call(this,e,t)}}
             `).join('');
         }
 
@@ -1208,7 +960,7 @@ function setupRecommendedSection() {
 
     if (recommended.length) {
         if (DOM.recommendedBlockSec) DOM.recommendedBlockSec.style.display = 'block';
-        DOM.recommendedRow.innerHTML = recommended.map(renderCard).join('');
+        DOM.recommendedRow.innerHTML = recommended.map((v, i) => renderCard(v, i)).join('');
         lazyLoadImages();
     }
 }
@@ -1238,15 +990,17 @@ function bindEvents() {
     // Mobile Menu Toggle
     if (DOM.menuToggle) {
         DOM.menuToggle.addEventListener('click', () => {
-            document.body.classList.toggle('mobile-nav-active');
+            const isActive = document.body.classList.toggle('mobile-nav-active');
+            DOM.menuToggle.setAttribute('aria-expanded', isActive ? 'true' : 'false');
         });
     }
 
     // Search Section Toggle
     if (DOM.searchToggle && DOM.searchSection) {
         DOM.searchToggle.addEventListener('click', () => {
-            DOM.searchSection.classList.toggle('active');
-            if (DOM.searchSection.classList.contains('active')) {
+            const isActive = DOM.searchSection.classList.toggle('active');
+            DOM.searchToggle.setAttribute('aria-expanded', isActive ? 'true' : 'false');
+            if (isActive) {
                 DOM.search.focus();
             }
         });
@@ -1307,7 +1061,7 @@ function bindEvents() {
     }
 
     // Watch Later
-    if (DOM.watchLaterBadge) DOM.watchLaterBadge.addEventListener('click', openWatchLater);
+    if (DOM.watchLaterBtn) DOM.watchLaterBtn.addEventListener('click', openWatchLater);
     if (DOM.closeWatchLater) DOM.closeWatchLater.addEventListener('click', closeWatchLater);
     if (DOM.watchLaterPage) {
         DOM.watchLaterPage.addEventListener('click', (e) => {
@@ -1388,13 +1142,19 @@ function bindEvents() {
 
     // Keyboard shortcuts
     document.addEventListener('keydown', (e) => {
-        // Don't interfere with input fields
+        const key = e.key.toLowerCase();
+
+        // Handle Escape for input fields
         if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
-            if (e.key === 'Escape') e.target.blur();
+            if (key === 'escape') {
+                e.target.blur();
+                if (e.target === DOM.search && DOM.searchSection && DOM.searchSection.classList.contains('active')) {
+                    DOM.searchSection.classList.remove('active');
+                    if (DOM.searchToggle) DOM.searchToggle.setAttribute('aria-expanded', 'false');
+                }
+            }
             return;
         }
-
-        const key = e.key.toLowerCase();
 
         // Search focus
         if (key === '/' && DOM.search) {
@@ -1407,6 +1167,14 @@ function bindEvents() {
             closeVideo();
             closeWatchLater();
             closeDashboard();
+            if (DOM.searchToggle && DOM.searchSection && DOM.searchSection.classList.contains('active')) {
+                DOM.searchSection.classList.remove('active');
+                DOM.searchToggle.setAttribute('aria-expanded', 'false');
+            }
+            if (document.body.classList.contains('mobile-nav-active')) {
+                document.body.classList.remove('mobile-nav-active');
+                if (DOM.menuToggle) DOM.menuToggle.setAttribute('aria-expanded', 'false');
+            }
             if (DOM.sharePanel) { DOM.sharePanel.style.display = "none"; DOM.sharePanel.setAttribute("aria-hidden", "true"); }
             if (DOM.transcriptPanel) { DOM.transcriptPanel.style.display = "none"; DOM.transcriptPanel.setAttribute("aria-hidden", "true"); }
             DOM.body.style.overflow = "";
@@ -1447,8 +1215,9 @@ function bindEvents() {
         DOM.modeBtns.forEach(btn => {
             btn.addEventListener('click', () => {
                 const mode = btn.dataset.mode;
-                DOM.modeBtns.forEach(b => b.classList.remove('active'));
+                DOM.modeBtns.forEach(b => { b.classList.remove('active'); b.setAttribute('aria-pressed', 'false'); });
                 btn.classList.add('active');
+                btn.setAttribute('aria-pressed', 'true');
                 switchMode(mode);
             });
         });
@@ -1460,6 +1229,7 @@ function bindEvents() {
             btn.addEventListener('click', () => {
                 DOM.studioNavBtns.forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
+                btn.setAttribute('aria-pressed', 'true');
                 const tab = btn.dataset.tab;
                 if (DOM.studioViews) {
                     DOM.studioViews.forEach(v => v.style.display = 'none');
@@ -1495,6 +1265,7 @@ function bindEvents() {
                 DOM.studioNavBtns.forEach(btn => {
                     btn.classList.remove('active');
                     if (btn.dataset.tab === 'projects') btn.classList.add('active');
+                btn.setAttribute('aria-pressed', 'true');
                 });
             }
         });
@@ -1506,6 +1277,7 @@ function bindEvents() {
             btn.addEventListener('click', () => {
                 DOM.projectTabBtns.forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
+                btn.setAttribute('aria-pressed', 'true');
                 const tabId = btn.dataset.ptab;
                 if (DOM.ptabContents) {
                     DOM.ptabContents.forEach(content => content.classList.remove('active'));

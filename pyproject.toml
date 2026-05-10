@@ -1,0 +1,36 @@
+[project]
+name = "yt-studio"
+version = "0.1.0"
+description = "YT-Studio Python tooling"
+requires-python = ">=3.12"
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "C", "N", "UP", "B", "A", "COM", "PT", "Q", "RET", "SIM", "TID", "ARG", "PTH", "RUF", "PD"]
+ignore = ["E501", "COM812"]   # line too long, handled by formatter
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = false
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+addopts = "-ra -q --strict-markers --cov=. --cov-report=term-missing"
+testpaths = ["tests"]
+
+[tool.pydocstyle]
+convention = "google"
+add-ignore = "D100,D104"
