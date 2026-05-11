@@ -76,19 +76,19 @@
         </div>
       </div>
 
-      <nav class="navbar-nav">
+      <nav class="navbar-nav" id="navbar-nav">
         <button class="nav-link" data-action="scroll-to-episodes">
           <i class="fas fa-film"></i>
           <span>Episodes</span>
         </button>
-        <button class="nav-link" id="searchToggleBtn">
+        <button class="nav-link" id="searchToggleBtn" aria-controls="searchSection" aria-expanded="false">
           <i class="fas fa-search"></i>
           <span>Search</span>
         </button>
       </nav>
 
       <div class="navbar-actions">
-        <button id="watchLaterBtn" class="action-btn badge-btn" aria-label="View Saved Episodes" title="View Saved Episodes">
+        <button id="watchLaterBtn" class="action-btn badge-btn" aria-label="View Saved Episodes" title="View Saved Episodes" aria-controls="watchLaterPage" aria-expanded="false">
           <i class="fas fa-bookmark" aria-hidden="true"></i>
           <span class="badge" id="watchLaterBadge">0</span>
         </button>
@@ -102,7 +102,7 @@
           <i class="fas fa-download"></i>
         </button>
         <div class="theme-switcher relative">
-          <button id="themeToggleBtn" class="action-btn" aria-label="Toggle Theme" title="Toggle Theme">
+          <button id="themeToggleBtn" class="action-btn" aria-label="Toggle Theme" title="Toggle Theme" aria-haspopup="menu" aria-expanded="false">
             <i class="fas fa-moon"></i>
           </button>
           <div id="themeMenu" class="hidden absolute top-full right-0 mt-2 bg-bg-secondary border border-white/10 rounded-lg shadow-xl z-50 py-2 min-width-[150px]">
@@ -115,7 +115,7 @@
           <button class="mode-btn active px-3 py-1 text-[10px] rounded-md transition-all font-bold uppercase tracking-wider" data-mode="archive" aria-pressed="true">Archive</button>
           <button class="mode-btn px-3 py-1 text-[10px] rounded-md transition-all font-bold uppercase tracking-wider" data-mode="creator" aria-pressed="false">Studio</button>
         </div>
-        <button id="menuToggleBtn" class="menu-toggle" aria-label="Menu">
+        <button id="menuToggleBtn" class="menu-toggle" aria-label="Menu" aria-controls="navbar-nav" aria-expanded="false">
           <span></span>
           <span></span>
           <span></span>

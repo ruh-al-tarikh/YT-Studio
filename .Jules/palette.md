@@ -34,3 +34,7 @@
 ## 2025-05-08 - Accessible Tooltips and Touch Target Reliability
 **Learning:** Pairing `aria-label` with `title` on icon-only buttons provides a dual-layer of UX: screen reader accessibility and visual tooltips for mouse users. Additionally, ensuring click listeners target the parent button rather than nested decorative elements (like badges) prevents "dead zones" in the UI.
 **Action:** Always wrap icons and badges in semantic buttons and apply attributes to the outermost interactive element. Use 'title' for native tooltips on all icon-only actions.
+
+## 2025-05-22 - Predictable Keyboard Navigation for Overlays
+**Learning:** For interactive search inputs and side panels, the 'Escape' key must handle focus and visibility states predictably. Ensuring that 'Escape' blurs and closes an active search section even when focus is inside the input improves navigation flow for power users and assistive technology.
+**Action:** Implement 'Escape' key handlers that explicitly manage both DOM state (closing sections) and ARIA states (`aria-expanded="false"`) across all navigation toggles.
