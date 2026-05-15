@@ -205,7 +205,7 @@ const Utils = {
 
     highlight(text, search) {
         if (!search) return text;
-        const regex = new RegExp(`(${this.escapeRegex(search)})`, 'gi');
+        const regex = new RegExp('(' + this.escapeRegex(search) + ')', 'gi');
         return text.replace(regex, '<mark>$1</mark>');
     },
 
@@ -447,10 +447,10 @@ function renderCard(video, index = 0) {
         </div>
     `}function renderHero(t){var e;t&&(DOM.heroTitle&&(DOM.heroTitle.textContent=t.title),DOM.heroDesc&&(DOM.heroDesc.textContent=t.description||""),DOM.heroCategory&&(DOM.heroCategory.textContent=getCategoryLabel(t.category)),DOM.heroDate&&(DOM.heroDate.textContent=Utils.formatDate(t.publishedAt)),DOM.bg&&(DOM.bg.style.backgroundImage=`url(${t.thumbnail})`),e=AppState.watchLater.some(e=>e.id===t.id),DOM.heroSave)&&(DOM.heroSave.innerHTML=`<i class="fa-${e?"solid":"regular"} fa-bookmark"></i> <span>${e?"Saved":"Save"}</span>`)}function renderGrid(){let a=AppState.search.toLowerCase();AppState.filtered=AppState.videos.filter(e=>{var t=AppState.categories.includes("all")||AppState.categories.includes(e.category),e=!a||e.title.toLowerCase().includes(a);return t&&e}),DOM.clearFilters&&(DOM.clearFilters.style.display=AppState.categories.includes("all")?"none":"inline-flex"),DOM.resultsMeta&&(DOM.resultsMeta.textContent=`${AppState.filtered.length} episode${1!==AppState.filtered.length?"s":""} found`);var e=AppState.filtered.slice(0,CONFIG.UI.ITEMS_PER_PAGE*(AppState.page+1));if(DOM.grid)if(0===AppState.filtered.length)DOM.grid.innerHTML=`
                 <div class="empty-state-card" style="grid-column: 1 / -1; margin-top: 40px;">
-                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
                     <h3>No results found</h3>
                     <p>Try different keywords or browse by category to find what you're looking for.</p>
-                    <button type="button" class="secondary-button" style="margin-top: 20px;" onclick="document.getElementById('searchInput').value=''; document.getElementById('searchInput').dispatchEvent(new Event('input'));">
+                    <button type="button" id="clearSearchEmpty" class="btn btn-secondary" style="margin-top: 20px;">
                         Clear Search
                     </button>
                 </div>
@@ -1025,6 +1025,19 @@ function bindEvents() {
     // Grid click delegation
     if (DOM.grid) {
         DOM.grid.addEventListener('click', (e) => {
+            const clearBtn = e.target.closest('#clearSearchEmpty');
+            if (clearBtn) {
+                if (DOM.search) {
+                    DOM.search.value = '';
+                    AppState.search = '';
+                    AppState.page = 0;
+                    if (DOM.clearSearch) DOM.clearSearch.style.display = 'none';
+                    renderGrid();
+                    DOM.search.focus();
+                }
+                return;
+            }
+
             const wlBtn = e.target.closest('.watch-later-btn');
             if (wlBtn) {
                 e.stopPropagation();
