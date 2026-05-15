@@ -1037,18 +1037,6 @@ function bindEvents() {
                 }
                 return;
             }
-            const clearBtn = e.target.closest('#clearSearchEmpty');
-            if (clearBtn) {
-                if (DOM.search) {
-                    DOM.search.value = '';
-                    AppState.search = '';
-                    AppState.page = 0;
-                    if (DOM.clearSearch) DOM.clearSearch.style.display = 'none';
-                    renderGrid();
-                    DOM.search.focus();
-                }
-                return;
-            }
 
             const wlBtn = e.target.closest('.watch-later-btn');
             if (wlBtn) {
