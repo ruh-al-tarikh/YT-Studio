@@ -450,7 +450,7 @@ function renderCard(video, index = 0) {
                     <i class="fa-solid fa-magnifying-glass"></i>
                     <h3>No results found</h3>
                     <p>Try different keywords or browse by category to find what you're looking for.</p>
-                    <button type="button" id="clearSearchEmpty" class="btn btn-secondary" style="margin-top: 20px;">
+                    <button type="button" class="secondary-button clear-search-empty" style="margin-top: 20px;">
                         Clear Search
                     </button>
                 </div>
@@ -1025,7 +1025,7 @@ function bindEvents() {
     // Grid click delegation
     if (DOM.grid) {
         DOM.grid.addEventListener('click', (e) => {
-            const clearBtn = e.target.closest('#clearSearchEmpty');
+            const clearBtn = e.target.closest('.clear-search-empty');
             if (clearBtn) {
                 if (DOM.search) {
                     DOM.search.value = '';
