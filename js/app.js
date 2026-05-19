@@ -205,7 +205,7 @@ const Utils = {
 
     highlight(text, search) {
         if (!search) return text;
-        const regex = new RegExp(`(${this.escapeRegex(search)})`, 'gi');
+        const regex = new RegExp('(' + this.escapeRegex(search) + ')', 'gi');
         return text.replace(regex, '<mark>$1</mark>');
     },
 
@@ -450,7 +450,7 @@ function renderCard(video, index = 0) {
                     <i class="fa-solid fa-magnifying-glass"></i>
                     <h3>No results found</h3>
                     <p>Try different keywords or browse by category to find what you're looking for.</p>
-                    <button type="button" class="secondary-button" style="margin-top: 20px;" onclick="document.getElementById('searchInput').value=''; document.getElementById('searchInput').dispatchEvent(new Event('input'));">
+                    <button type="button" class="secondary-button clear-search-empty" style="margin-top: 20px;">
                         Clear Search
                     </button>
                 </div>
@@ -1025,6 +1025,15 @@ function bindEvents() {
     // Grid click delegation
     if (DOM.grid) {
         DOM.grid.addEventListener('click', (e) => {
+            const clearBtn = e.target.closest('.clear-search-empty');
+            if (clearBtn) {
+                if (DOM.search) {
+                    DOM.search.value = '';
+                    DOM.search.dispatchEvent(new Event('input'));
+                }
+                return;
+            }
+
             const wlBtn = e.target.closest('.watch-later-btn');
             if (wlBtn) {
                 e.stopPropagation();
