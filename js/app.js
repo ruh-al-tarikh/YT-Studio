@@ -450,7 +450,7 @@ function renderCard(video, index = 0) {
                     <i class="fa-solid fa-magnifying-glass"></i>
                     <h3>No results found</h3>
                     <p>Try different keywords or browse by category to find what you're looking for.</p>
-                    <button type="button" class="secondary-button" style="margin-top: 20px;" onclick="document.getElementById('searchInput').value=''; document.getElementById('searchInput').dispatchEvent(new Event('input'));">
+                    <button type="button" id="clearSearchEmpty" class="btn btn-secondary" style="margin-top: 20px;">
                         Clear Search
                     </button>
                 </div>
@@ -1025,6 +1025,15 @@ function bindEvents() {
     // Grid click delegation
     if (DOM.grid) {
         DOM.grid.addEventListener('click', (e) => {
+            const clearEmpty = e.target.closest('#clearSearchEmpty');
+            if (clearEmpty) {
+                if (DOM.search) DOM.search.value = '';
+                AppState.search = '';
+                if (DOM.clearSearch) DOM.clearSearch.style.display = 'none';
+                renderGrid();
+                return;
+            }
+
             const wlBtn = e.target.closest('.watch-later-btn');
             if (wlBtn) {
                 e.stopPropagation();
@@ -1159,6 +1168,9 @@ function bindEvents() {
         // Search focus
         if (key === '/' && DOM.search) {
             e.preventDefault();
+            if (DOM.searchSection && !DOM.searchSection.classList.contains('active')) {
+                if (DOM.searchToggle) DOM.searchToggle.click();
+            }
             DOM.search.focus();
         }
 
@@ -1167,9 +1179,9 @@ function bindEvents() {
             closeVideo();
             closeWatchLater();
             closeDashboard();
-            if (DOM.searchToggle && DOM.searchSection && DOM.searchSection.classList.contains('active')) {
+            if (DOM.searchSection && DOM.searchSection.classList.contains('active')) {
                 DOM.searchSection.classList.remove('active');
-                DOM.searchToggle.setAttribute('aria-expanded', 'false');
+                if (DOM.searchToggle) DOM.searchToggle.setAttribute('aria-expanded', 'false');
             }
             if (document.body.classList.contains('mobile-nav-active')) {
                 document.body.classList.remove('mobile-nav-active');
