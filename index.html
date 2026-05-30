@@ -407,7 +407,7 @@
   <!-- Video Modal -->
   <div id="modal" class="modal" aria-hidden="true">
     <div class="modal-content">
-      <button class="modal-close" id="close" aria-label="Close">
+      <button class="modal-close" id="close" aria-label="Close" title="Close (Esc)">
         <i class="fas fa-times"></i>
       </button>
       
@@ -451,7 +451,7 @@
   <div id="watchLaterPage" class="side-panel" aria-hidden="true">
     <div class="panel-header">
       <h2>Watch Later</h2>
-      <button class="panel-close" id="closeWatchLater" aria-label="Close">
+      <button class="panel-close" id="closeWatchLater" aria-label="Close" title="Close (Esc)">
         <i class="fas fa-times"></i>
       </button>
     </div>
@@ -464,7 +464,7 @@
   <div id="dashboardModal" class="side-panel" aria-hidden="true">
     <div class="panel-header">
       <h2>Dashboard</h2>
-      <button class="panel-close" id="closeDashboard" aria-label="Close">
+      <button class="panel-close" id="closeDashboard" aria-label="Close" title="Close (Esc)">
         <i class="fas fa-times"></i>
       </button>
     </div>
@@ -555,7 +555,7 @@
   <div id="sharePanel" class="side-panel" aria-hidden="true">
     <div class="panel-header">
       <h2>Share Episode</h2>
-      <button class="panel-close" id="closeShare" aria-label="Close">
+      <button class="panel-close" id="closeShare" aria-label="Close" title="Close (Esc)">
         <i class="fas fa-times"></i>
       </button>
     </div>
@@ -563,7 +563,10 @@
       <div class="share-group">
         <label for="shareLink">Link:</label>
         <input type="text" id="shareLink" class="share-input" readonly>
-        <button id="copyLinkBtn" class="btn btn-secondary">Copy Link</button>
+        <button id="copyLinkBtn" class="btn btn-secondary">
+          <i class="fas fa-copy" aria-hidden="true"></i>
+          Copy Link
+        </button>
       </div>
       <div class="share-buttons">
         <button id="shareTwitter" class="social-share-btn twitter" title="Share on Twitter" aria-label="Share on Twitter">
@@ -583,7 +586,7 @@
   <div id="transcriptPanel" class="side-panel" aria-hidden="true">
     <div class="panel-header">
       <h2>Episode Notes</h2>
-      <button class="panel-close" id="closeTranscript" aria-label="Close">
+      <button class="panel-close" id="closeTranscript" aria-label="Close" title="Close (Esc)">
         <i class="fas fa-times"></i>
       </button>
     </div>

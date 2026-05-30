@@ -205,7 +205,7 @@ const Utils = {
 
     highlight(text, search) {
         if (!search) return text;
-        const regex = new RegExp(`(${this.escapeRegex(search)})`, 'gi');
+        const regex = new RegExp('(' + this.escapeRegex(search) + ')', 'gi');
         return text.replace(regex, '<mark>$1</mark>');
     },
 
