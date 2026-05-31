@@ -114,6 +114,9 @@ const DOM = {
     dashboardBtn: document.getElementById('dashboardBtn'),
     dashboardModal: document.getElementById('dashboardModal'),
     closeDashboard: document.getElementById('closeDashboard'),
+    shareTwitter: document.getElementById('shareTwitter'),
+    shareFacebook: document.getElementById('shareFacebook'),
+    shareWhatsApp: document.getElementById('shareWhatsApp'),
     dashTotal: document.getElementById('dashboard-total'),
     dashSaved: document.getElementById('dashboard-saved'),
     dashProgress: document.getElementById('dashboard-progress'),
@@ -1107,6 +1110,26 @@ function bindEvents() {
     if (transBtn) transBtn.addEventListener('click', openTranscript);
     const copyLinkBtn = document.getElementById('copyLinkBtn');
     if (copyLinkBtn) copyLinkBtn.addEventListener('click', (e) => { const link = document.getElementById('shareLink'); if (link) Utils.copyToClipboard(link.value, e.currentTarget); });
+
+    // Social Sharing
+    if (DOM.shareTwitter) {
+        DOM.shareTwitter.addEventListener('click', () => {
+            const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(AppState.current?.title)}&url=${encodeURIComponent('https://www.youtube.com/watch?v=' + AppState.current?.id)}`;
+            window.open(url, '_blank');
+        });
+    }
+    if (DOM.shareFacebook) {
+        DOM.shareFacebook.addEventListener('click', () => {
+            const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent('https://www.youtube.com/watch?v=' + AppState.current?.id)}`;
+            window.open(url, '_blank');
+        });
+    }
+    if (DOM.shareWhatsApp) {
+        DOM.shareWhatsApp.addEventListener('click', () => {
+            const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(AppState.current?.title + ' - https://www.youtube.com/watch?v=' + AppState.current?.id)}`;
+            window.open(url, '_blank');
+        });
+    }
     if (DOM.dashboardModal) {
         DOM.dashboardModal.addEventListener('click', (e) => {
             if (e.target === DOM.dashboardModal) closeDashboard();
