@@ -1107,6 +1107,21 @@ function bindEvents() {
     if (transBtn) transBtn.addEventListener('click', openTranscript);
     const copyLinkBtn = document.getElementById('copyLinkBtn');
     if (copyLinkBtn) copyLinkBtn.addEventListener('click', (e) => { const link = document.getElementById('shareLink'); if (link) Utils.copyToClipboard(link.value, e.currentTarget); });
+    const shareTwitter = document.getElementById('shareTwitter');
+    const shareFacebook = document.getElementById('shareFacebook');
+    const shareWhatsApp = document.getElementById('shareWhatsApp');
+
+    const openSocialPopup = (url) => {
+        const link = document.getElementById('shareLink');
+        if (!link || !link.value) return;
+        const shareUrl = url + encodeURIComponent(link.value);
+        window.open(shareUrl, '_blank', 'width=550,height=450,toolbar=0,location=0,menubar=0,status=0,scrollbars=1,resizable=1');
+    };
+
+    if (shareTwitter) shareTwitter.addEventListener('click', () => openSocialPopup('https://twitter.com/intent/tweet?url='));
+    if (shareFacebook) shareFacebook.addEventListener('click', () => openSocialPopup('https://www.facebook.com/sharer/sharer.php?u='));
+    if (shareWhatsApp) shareWhatsApp.addEventListener('click', () => openSocialPopup('https://api.whatsapp.com/send?text='));
+
     if (DOM.dashboardModal) {
         DOM.dashboardModal.addEventListener('click', (e) => {
             if (e.target === DOM.dashboardModal) closeDashboard();

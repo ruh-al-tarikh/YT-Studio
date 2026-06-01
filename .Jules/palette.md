@@ -42,3 +42,7 @@
 ## 2025-05-29 - Discoverability Hints and Minimalist UI
 **Learning:** Adding discoverability hints (like keyboard shortcuts) to 'title' attributes of interactive elements improves usability for power users. However, avoid redundant 'title' attributes on elements that already have clear text labels (e.g., "Copy Link") to maintain a clean UI.
 **Action:** Add '(Esc)' hints to close buttons. Only use 'title' for supplementary info or shortcut hints, not for repeating the button's own text.
+
+## 2025-05-14 - Social Sharing Implementation
+**Learning:** Placeholders for social sharing buttons significantly degrade UX when users expect to share discovered content. Standardizing these intents with popup windows (550x450) provides a "premium" feel while keeping users on the platform.
+**Action:** Always verify if sharing icons in modals are functional; if not, implement standardized platform intents using centered popups.
