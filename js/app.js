@@ -1117,8 +1117,8 @@ function bindEvents() {
         shareTwitter.addEventListener('click', () => {
             if (!AppState.current) return;
             const link = document.getElementById('shareLink');
-            const videoUrl = link ? link.value : `https://www.youtube.com/watch?v=${AppState.current.id}`;
-            const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(AppState.current.title)}&url=${encodeURIComponent(videoUrl)}`;
+            const videoUrl = link ? link.value : 'https://www.youtube.com/watch?v=' + AppState.current.id;
+            const url = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(AppState.current.title) + '&url=' + encodeURIComponent(videoUrl);
             window.open(url, 'share-twitter', 'width=550,height=450');
         });
     }
@@ -1127,8 +1127,8 @@ function bindEvents() {
         shareFacebook.addEventListener('click', () => {
             if (!AppState.current) return;
             const link = document.getElementById('shareLink');
-            const videoUrl = link ? link.value : `https://www.youtube.com/watch?v=${AppState.current.id}`;
-            const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(videoUrl)}`;
+            const videoUrl = link ? link.value : 'https://www.youtube.com/watch?v=' + AppState.current.id;
+            const url = 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(videoUrl);
             window.open(url, 'share-facebook', 'width=550,height=450');
         });
     }
@@ -1137,8 +1137,8 @@ function bindEvents() {
         shareWhatsApp.addEventListener('click', () => {
             if (!AppState.current) return;
             const link = document.getElementById('shareLink');
-            const videoUrl = link ? link.value : `https://www.youtube.com/watch?v=${AppState.current.id}`;
-            const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(AppState.current.title + ' - ' + videoUrl)}`;
+            const videoUrl = link ? link.value : 'https://www.youtube.com/watch?v=' + AppState.current.id;
+            const url = 'https://api.whatsapp.com/send?text=' + encodeURIComponent(AppState.current.title + ' - ' + videoUrl);
             window.open(url, 'share-whatsapp', 'width=550,height=450');
         });
     }
