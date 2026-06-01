@@ -99,6 +99,8 @@ const DOM = {
     // Theme & UI
     themeToggle: document.getElementById('themeToggleBtn'),
     themeMenu: document.getElementById('themeMenu'),
+    episodesNavBtn: document.querySelector('[data-action="scroll-to-episodes"]'),
+    episodesSection: document.getElementById('episodesSection'),
     menuToggle: document.getElementById('menuToggleBtn'),
     scrollToTop: document.getElementById('scrollToTop'),
 
@@ -1013,6 +1015,17 @@ function bindEvents() {
             if (menu) menu.classList.add('hidden');
         });
     });
+
+    // Navbar Episodes Scroll
+    if (DOM.episodesNavBtn && DOM.episodesSection) {
+        DOM.episodesNavBtn.addEventListener('click', () => {
+            DOM.episodesSection.scrollIntoView({ behavior: 'smooth' });
+            if (document.body.classList.contains('mobile-nav-active')) {
+                document.body.classList.remove('mobile-nav-active');
+                if (DOM.menuToggle) DOM.menuToggle.setAttribute('aria-expanded', 'false');
+            }
+        });
+    }
 
     // Hero buttons
     if (DOM.heroBtn) DOM.heroBtn.addEventListener('click', () => AppState.hero && openVideo(AppState.hero));
