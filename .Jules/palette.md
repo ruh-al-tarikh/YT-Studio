@@ -39,6 +39,10 @@
 **Learning:** For interactive search inputs and side panels, the 'Escape' key must handle focus and visibility states predictably. Ensuring that 'Escape' blurs and closes an active search section even when focus is inside the input improves navigation flow for power users and assistive technology.
 **Action:** Implement 'Escape' key handlers that explicitly manage both DOM state (closing sections) and ARIA states (`aria-expanded="false"`) across all navigation toggles.
 
+## 2025-06-01 - Discoverability Hints and Smooth Navigation
+**Learning:** Adding keyboard shortcut hints (like `(/)`) to button titles improves feature discoverability. Pairing these with smooth-scroll interactions for section-based navigation (e.g., "Episodes") creates a more seamless experience.
+**Action:** Include primary shortcuts in 'title' attributes of relevant buttons and ensure navbar navigation uses smooth-scroll for a premium feel.
+
 ## 2025-05-29 - Discoverability Hints and Minimalist UI
 **Learning:** Adding discoverability hints (like keyboard shortcuts) to 'title' attributes of interactive elements improves usability for power users. However, avoid redundant 'title' attributes on elements that already have clear text labels (e.g., "Copy Link") to maintain a clean UI.
 **Action:** Add '(Esc)' hints to close buttons. Only use 'title' for supplementary info or shortcut hints, not for repeating the button's own text.
