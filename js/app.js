@@ -1107,6 +1107,41 @@ function bindEvents() {
     if (transBtn) transBtn.addEventListener('click', openTranscript);
     const copyLinkBtn = document.getElementById('copyLinkBtn');
     if (copyLinkBtn) copyLinkBtn.addEventListener('click', (e) => { const link = document.getElementById('shareLink'); if (link) Utils.copyToClipboard(link.value, e.currentTarget); });
+
+    // Social Sharing
+    const shareTwitter = document.getElementById('shareTwitter');
+    const shareFacebook = document.getElementById('shareFacebook');
+    const shareWhatsApp = document.getElementById('shareWhatsApp');
+
+    if (shareTwitter) {
+        shareTwitter.addEventListener('click', () => {
+            if (!AppState.current) return;
+            const link = document.getElementById('shareLink');
+            const videoUrl = link ? link.value : `https://www.youtube.com/watch?v=${AppState.current.id}`;
+            const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(AppState.current.title)}&url=${encodeURIComponent(videoUrl)}`;
+            window.open(url, 'share-twitter', 'width=550,height=450');
+        });
+    }
+
+    if (shareFacebook) {
+        shareFacebook.addEventListener('click', () => {
+            if (!AppState.current) return;
+            const link = document.getElementById('shareLink');
+            const videoUrl = link ? link.value : `https://www.youtube.com/watch?v=${AppState.current.id}`;
+            const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(videoUrl)}`;
+            window.open(url, 'share-facebook', 'width=550,height=450');
+        });
+    }
+
+    if (shareWhatsApp) {
+        shareWhatsApp.addEventListener('click', () => {
+            if (!AppState.current) return;
+            const link = document.getElementById('shareLink');
+            const videoUrl = link ? link.value : `https://www.youtube.com/watch?v=${AppState.current.id}`;
+            const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(AppState.current.title + ' - ' + videoUrl)}`;
+            window.open(url, 'share-whatsapp', 'width=550,height=450');
+        });
+    }
     if (DOM.dashboardModal) {
         DOM.dashboardModal.addEventListener('click', (e) => {
             if (e.target === DOM.dashboardModal) closeDashboard();
